@@ -1,0 +1,4 @@
+# mamba fan script runs every 5 minutes
+*/5 * * * * /sbin/fan_ctrl.sh
+0 * * * * /usr/sbin/logrotate  -f /etc/logrotate.conf
+*/2 * * * * /usr/sbin/arp-scan -qxdlN -I br-lan

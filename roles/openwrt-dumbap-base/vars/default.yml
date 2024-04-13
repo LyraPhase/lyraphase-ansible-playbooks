@@ -1,0 +1,6 @@
+# openwrt-dumbap-base: entry point for defaults
+# default.yml - default vars for unsupported / unknown OS
+# (Assumes this is OpenWRT LEDE Image)
+---
+openwrt_dumbap_opkg_packages:
+  - arp-scan
