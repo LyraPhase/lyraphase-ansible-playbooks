@@ -19,6 +19,24 @@
 - [x] Install package: `arp-scan`
 - [x] Install crontab
   - Fix no `-d` option in LEDE 17.01.4
+  - No `fping` available in LEDE 17.01.4
+  - The following commands will do reverse lookups for all ARP hosts
+
+        /bin/sh -c 'arp-scan -qxl -I br-lan | cut -f1 | xargs -n1 nslookup' # slightly faster
+        /bin/sh -c 'arp-scan -qxl -I br-lan | cut -f1 | xargs -n1 host'
+
+  - Trying to force ARP ping lookups:
+
+        # Print all hostnames found via reverse IP lookup
+        time sh -c 'arp-scan -qxl -I br-lan | cut -f1 | xargs -n1 host | grep ".in-addr.arpa domain name pointer
+" | sed -e "s/.*\.in-addr\.arpa domain name pointer \(.*\)$/\1/" '
+
+        # Ping all hostnames, forcing a forward DNS lookup
+        time sh -c 'arp-scan -qxl -I br-lan | cut -f1 | xargs -n1 host | grep ".in-addr.arpa domain name pointer
+" | sed -e "s/.*\.in-addr\.arpa domain name pointer \(.*\)$/\1/" | xargs -n1 ping -c 1 -W 1 -q'
+        # Unfortunately, this still seems not to work to populate the hostnames in LEDE 17.01.4
+        # We will probably have to upgrade to newer OpenWRT version
+
 - Disable option: `Filter private`
   - Help text: `Do not forward reverse lookups for local networks`
   - Result:
