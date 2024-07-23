@@ -1,0 +1,30 @@
+---
+# This playbook creates a BSD Boot Environment and updates an OPNSense firewall's OS
+
+- hosts: opnsense
+  user: root
+  gather_facts: no
+
+#  roles:
+#    - opnsense-base
+
+  tasks:
+    - name: Inspect cli
+      ansible.builtin.raw: >
+        bectl list -a
+      args:
+        executable: /bin/csh
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+
+#    - name: Install Extra packages
+#      opkg: >
+#        name={{ item }}
+#        state=installed
+#      with_items:
+#        - ethtool
+#      tags:
+#        - opkg_packages
+#        - packages
+#        - install_packages
