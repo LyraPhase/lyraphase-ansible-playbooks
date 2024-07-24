@@ -1,0 +1,3 @@
+---
+# defaults file for lyraphase.opnsense-users
+lyraphase_opnsense_users_sudoers_path: '/usr/local/etc/sudoers.d'
