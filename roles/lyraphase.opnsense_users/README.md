@@ -1,39 +1,84 @@
-Role Name
-=========
+# Role Name
 
 A simple role to manage OPNsense users + sudoers.
 For bootstrapping an OPNsense firewall for Ansible config managment.
 
-Requirements
-------------
+## Requirements
 
-TODO
+This role should first be run in "bootstrap" mode, using the
+`bootstrap` tag to first setup your non-root SSH user and `ansible` group.
+Afterwards, the `bootstrap` tag can be skipped. It's recommended to run the
+bootstrap tasks in either a separate playbook, or by setting using the default
+OPNSense user: `root`, & password: `opnsense`.
 
-Role Variables
---------------
+### Bootstrap Tag Example
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+    ansible-playbook -i "${REPO_BASE}"/inventory/hosts "${REPO_BASE}"/opnsense-base.yml -vv --tags=bootstrap,never --diff --user=root --ask-pass
 
-Dependencies
-------------
+# Role Variables
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+- `lyraphase_opnsense_users_sudoers_path`: The location of `sudoers.d` drop-in directory
+   Default: `'/usr/local/etc/sudoers.d'`
+- `lyraphase_opnsense_users_ansible_gid`: Group ID for Ansible group. [Pick a free(BSD) GID][1]
+   Default: `731`
 
-Example Playbook
-----------------
+# Dependencies
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+This role depends on the `collections.general.sudoers` module.
+This module is found in the following collectiion:
 
-    - hosts: servers
+- community.general
+
+To install this dependency:
+
+    ansible-galaxy collection install community.general
+
+# Example Playbook
+
+There are 2 main scenarios which you could run this role:
+
+1. Bootstrapping
+  - In this mode, the goal is to login as the first pre-existing user: `root`,
+    to bootstrap the `ansible` group, user, and sudoers permissions.
+  - This can be done either with a specialized playbook (example below), or by
+    passing CLI flags to `ansible-playbook`: `--tags=bootstrap,never --user=root --ask-pass`
+  - Passing the `never` tag enables resetting the `root` password to a random value.
+2. Normal Config Management
+  - On subsequent runs, the playbook should be run in "normal" mode as the
+    first config management user (or primary personal Ops/DevOps user)
+  - The reason for this modality is to enable security & auditing for subsequent
+    actions performed on the system post-bootstrap.
+  - In this mode the playbook will add other users and groups to the system,
+    as defined in the role's configuration variables.
+
+## Bootstrap Playbook Example
+
+    - hosts: opnsense
+      user: root
+      gather_facts: no
+       
       roles:
-         - { role: username.rolename, x: 42 }
+        - role: lyraphase.opnsense_users
+          tags:
+            - { role: opnsense_users, lyraphase_opnsense_users_ansible_gid: 777 }
 
-License
--------
+To run only the bootstrap tasks, pass the `--tags=bootstrap,never` CLI flag to Ansible
 
-BSD
+     ansible-playbook bootstrap-play.yml --tags "bootstrap,never"
 
-Author Information
-------------------
+> [!CAUTION]
+> **Note:** The `never` tag enables running the "Reset root password" task!
+> 
+> Ensure that you save the `root` user's new password that will be output from
+> this task, because it will only be shown once.
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+# License
+
+AGPLv3
+
+# Author Information
+
+James Cuzella @trinitronx
+
+[1]: https://cgit.freebsd.org/ports/tree/GIDs
+
