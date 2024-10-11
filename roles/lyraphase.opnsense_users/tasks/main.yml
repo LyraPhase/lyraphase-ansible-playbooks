@@ -1,2 +1,9 @@
 ---
 # tasks file for lyraphase.opnsense-users
+- name: Include bootstrap tasks
+  ansible.builtin.include_tasks: 'bootstrap.yml'
+  tags:
+    - bootstrap
+    - ansible_group
+    - users
+    - install_users
