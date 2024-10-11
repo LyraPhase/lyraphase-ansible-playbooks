@@ -13,5 +13,4 @@ if [ -n "${DOCKER_MACHINE_NAME}" ]; then
 fi
 
 # Assuming you set up SSH keys, SSH in as root via key auth
-ansible-playbook -i "${REPO_BASE}"/inventory/hosts "${REPO_BASE}"/upgrade-opnsense-os.yml -vv --diff --user=root --check
-
+ANSIBLE_STDOUT_CALLBACK=debug ansible-playbook -i "${REPO_BASE}"/inventory/hosts "${REPO_BASE}"/upgrade-opnsense-os.yml -vv --diff --ask-become-pass
