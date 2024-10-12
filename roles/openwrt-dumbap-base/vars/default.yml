@@ -7,3 +7,9 @@ openwrt_dumbap_opkg_packages:
 
 openwrt_dumbap_logrotate_files:
   - ddns
+
+openwrt_dumbap_base_wireless:
+  "5GHz":
+    ssid: OpenWRT_5Ghz
+  "2.4GHz":
+    ssid: OpenWRT

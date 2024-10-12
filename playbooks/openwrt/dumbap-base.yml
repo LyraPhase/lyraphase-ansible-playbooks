@@ -4,6 +4,8 @@
 - hosts: openwrt
   user: root
   gather_facts: no
+  vars_files:
+    - "vars/openwrt-dumbap-base.yml"
 
   roles:
     - openwrt-dumbap-base

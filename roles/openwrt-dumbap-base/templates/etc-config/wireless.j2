@@ -18,16 +18,17 @@ config wifi-device 'radio1'
 config wifi-iface
 	option device 'radio0'
 	option mode 'ap'
-	option ssid 'OpenWRT_5Ghz'
+	option ssid '{{ openwrt_dumbap_base_wireless["5Ghz"]["ssid"] }}'
 	option network 'lan'
 	option encryption 'psk2'
-	option key '{{ openwrt_wireless_wpa_key }}'
+	option key '{{ openwrt_dumbap_base_wireless["5Ghz"]["wpa_key"] }}'
 
 config wifi-iface
 	option device 'radio1'
 	option mode 'ap'
 	option ssid 'OpenWRT'
+	option ssid '{{ openwrt_dumbap_base_wireless["2.4Ghz"]["ssid"] }}'
 	option network 'lan'
 	option encryption 'psk2'
-	option key '{{ openwrt_wireless_wpa_key }}'
+	option key '{{ openwrt_dumbap_base_wireless["2.4Ghz"]["wpa_key"] }}'
 
