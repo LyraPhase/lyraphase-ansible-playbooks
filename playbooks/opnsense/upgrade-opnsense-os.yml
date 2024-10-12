@@ -53,6 +53,7 @@
       register: zpool_status_has_checkpoint
       ignore_errors: true
       failed_when: false
+      changed_when: false
       tags:
         - bsd_zpool
         - bsd_zpool_status
@@ -82,6 +83,7 @@
     - name: Delete OLD zpool checkpoint
       ansible.builtin.command:
         zpool checkpoint --discard --wait zroot
+      changed_when: zpool_checkpoint_discard_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
       register: zpool_checkpoint_discard_result
@@ -94,6 +96,7 @@
     - name: Create NEW zpool checkpoint
       ansible.builtin.command:
         echo zpool checkpoint zroot
+      changed_when: zpool_checkpoint_create_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
       register: zpool_checkpoint_create_result
@@ -105,6 +108,7 @@
       ansible.builtin.shell:
         set -o pipefail
         opnsense-version | awk '{ print $2 }'
+      changed_when: false
       register: opnsense_current_version
       tags:
         - opnsense_version
@@ -114,6 +118,7 @@
     - name: Create boot environment for OLD OPNSense Version
       ansible.builtin.command:
         echo bectl create {{ opnsense_current_version.stdout }}
+      changed_when: opnsense_be_create_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
       register: opnsense_be_create_result
@@ -126,6 +131,7 @@
     - name: Activate boot environment for OLD OPNSense Version
       ansible.builtin.command:
         echo bectl activate {{ opnsense_current_version.stdout }}
+      changed_when: opnsense_be_activate_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
       register: opnsense_be_activate_result
@@ -201,6 +207,7 @@
     - name: Perform the upgrade
       ansible.builtin.command:
         echo TODO
+      changed_when: opnsense_upgrade_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
       register: opnsense_upgrade_result
@@ -228,6 +235,7 @@
     - name: Delete NEW zpool checkpoint
       ansible.builtin.command:
         zpool checkpoint --discard --wait zroot
+      changed_when: zpool_checkpoint_discard_new_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
       register: zpool_checkpoint_discard_result
