@@ -4,3 +4,6 @@
 ---
 openwrt_dumbap_opkg_packages:
   - arp-scan
+
+openwrt_dumbap_logrotate_files:
+  - ddns

@@ -6,3 +6,8 @@
   tags: opkg-openwrt
 - import_tasks: dumbap-clients-resolver-openwrt.yml
   tags: dumbap-clients-resolver-openwrt
+- name: "Run tasks: logrotate"
+  ansible.builtin.import_tasks: logrotate.yml
+  tags:
+    - logrotate-openwrt
+    - openwrt-dumbap-base-logrotate

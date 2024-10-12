@@ -6,3 +6,4 @@
   tags: python-openwrt
 - import_tasks: opkg-openwrt.yml
   tags: opkg-openwrt
+
