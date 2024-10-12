@@ -1,5 +1,7 @@
 ---
+#roles:
 collections:
   # OPNSense requirements
   - name: ansibleguy.opnsense
   - name: community.general
+
