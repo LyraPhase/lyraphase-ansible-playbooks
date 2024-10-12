@@ -5,13 +5,13 @@ galaxy_info:
   description: A base role to setup OpenWRT as a dumb Wifi Access Point on OpenWRT / LEDE
   company: LyraPhase
   license: GPL-3.0+
-  min_ansible_version: 2.5
+  min_ansible_version: "2.5"
   platforms:
   # Platforms tested are uncommented, but it probably works on most CentOS/RHEL
   platforms:
-    - name: Openwrt
+    - name: OpenWrt
       versions:
-        - 17.01
+        - "17.01"
   #- name: EL
   #  versions:
   #     - all
@@ -95,7 +95,7 @@ galaxy_info:
     - networking
     - packaging
     - openwrt
-  dependencies:
+  # dependencies:
   # Specify role dependencies here
   # For foo
   #  - foo
