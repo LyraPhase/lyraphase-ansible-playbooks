@@ -13,3 +13,6 @@ openwrt_opkg_packages:
   - libopenssl
   - curl
   - uclient-fetch
+
+openwrt_base_crontab_files:
+  - root

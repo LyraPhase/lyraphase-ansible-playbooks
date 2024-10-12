@@ -16,4 +16,8 @@
   tags:
     - wireless-openwrt
     - openwrt-base-wireless
-
+- name: "Run tasks: crontabs"
+  ansible.builtin.import_tasks: crontabs.yml
+  tags:
+    - crontabs-openwrt
+    - openwrt-base-crontabs
