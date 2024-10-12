@@ -3,13 +3,13 @@
 # This should fix any weird opkg cache bugs
 # Use this if you're seeing 0 packages for a repo,
 - name: Destroy opkg cache
-  ansible.builtin.file: >
+  ansible.builtin.file:
     path: /var/lib/opkg
     force: true
     state: absent
 
 - name: Create opkg cache dir
-  ansible.builtin.file: >
+  ansible.builtin.file:
     path: /var/lib/opkg
     force: true
     state: directory
