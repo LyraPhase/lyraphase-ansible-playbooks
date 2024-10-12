@@ -1,7 +1,8 @@
 ---
 # This playbook bootstraps an OpenWRT LEDE router with dumbap-base settings
 
-- hosts: openwrt
+- name: OpenWRT Dumb AP Base
+  hosts: openwrt
   user: root
   gather_facts: false
   vars_files:
