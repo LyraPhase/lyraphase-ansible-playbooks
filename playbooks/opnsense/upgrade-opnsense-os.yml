@@ -58,7 +58,7 @@
         - bsd_zpool
         - bsd_zpool_status
 
-    - name: Show boot environments
+    - name: Show zpool checkpoint status
       ansible.builtin.debug:
         var: zpool_status_has_checkpoint
       changed_when: false
@@ -177,7 +177,7 @@
         - bsd_bectl
         - bsd_be_create
 
-    - name: Show boot environments
+    - name: Show pre-upgrade boot environments
       ansible.builtin.debug:
         var: bectl_pre_upgrade_list_result
       changed_when: false
