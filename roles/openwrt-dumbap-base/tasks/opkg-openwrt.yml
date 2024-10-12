@@ -15,4 +15,3 @@
     name="{{ item }}"
     state=installed
   with_items: "{{ openwrt_dumbap_opkg_packages }}"
-

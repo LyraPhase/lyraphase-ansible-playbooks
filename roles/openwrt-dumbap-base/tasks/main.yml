@@ -6,4 +6,3 @@
   tags: opkg-openwrt
 - import_tasks: dumbap-clients-resolver-openwrt.yml
   tags: dumbap-clients-resolver-openwrt
-
