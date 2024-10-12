@@ -238,7 +238,7 @@
       changed_when: zpool_checkpoint_discard_new_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
-      register: zpool_checkpoint_discard_result
+      register: zpool_checkpoint_discard_new_result
       when: opnsense_upgrade_result.rc == 0
       tags:
         - bsd_zpool
