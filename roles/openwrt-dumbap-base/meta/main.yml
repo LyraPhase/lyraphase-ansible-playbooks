@@ -93,22 +93,8 @@ galaxy_info:
   galaxy_tags:
     - system
     - networking
-    - openwrt
-  categories:
-  #   - web
-    - system
     - packaging
-  #   - networking
-  #   - monitoring
-  #   - development
-  #   - database:sql
-  #   - database:nosql
-  #   - database
-  #   - clustering
-  #   - cloud:rax
-  #   - cloud:gce
-  #   - cloud:ec2
-  #   - cloud
+    - openwrt
   dependencies:
   # Specify role dependencies here
   # For foo
