@@ -8,8 +8,8 @@ A base role to setup OpenWRT as a dumb Wifi Access Point
 This role will:
 
 - Install `arp-scan` package dependency on OpenWRT via `opkg`
-- Install a `crontabs/root` file to run `arp-scan` periodically to resolve hostnames for
-  Associated Stations (WiFi clients)
+- Install a `crontabs/root` file to run `arp-scan` periodically to resolve
+  hostnames for Associated Stations (WiFi clients)
 - Disable DHCP on `br-lan`
 - Set static IP and network settings according to variables `openwrt_dumbap_static_lan`
 
