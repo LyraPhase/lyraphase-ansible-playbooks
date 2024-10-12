@@ -31,7 +31,7 @@
 
     - name: List zpool checkpoints
       ansible.builtin.command:
-        zpool list -o name,checkpoint
+        zpool list -H -o name,checkpoint
       changed_when: false
       register: zpool_checkpoints_result
       tags:
@@ -40,8 +40,8 @@
 
     - name: Show 'stdout_lines' from the 2nd line to the end
       debug:
-        msg: "{{ item | ansible.builtin.regex_replace('\\s+', ' ') | ansible.builtin.split(' ') }}"
-      loop: "{{ zpool_checkpoints_result.stdout_lines[1:] }}"
+        msg: "{{ item | ansible.builtin.split('\t') }}"
+      loop: "{{ zpool_checkpoints_result.stdout_lines }}"
       tags:
         - bsd_zpool
         - bsd_zpool_list
@@ -180,7 +180,7 @@
 
     - name: List zpool checkpoints
       ansible.builtin.command:
-        zpool list -o name,checkpoint
+        zpool list -H -o name,checkpoint
       changed_when: false
       register: zpool_checkpoints_pre_upgrade_result
       tags:
@@ -189,8 +189,8 @@
 
     - name: Show zpool checkpoints
       debug:
-        msg: "{{ item | ansible.builtin.regex_replace('\\s+', ' ') | ansible.builtin.split(' ') }}"
-      loop: "{{ zpool_checkpoints_pre_upgrade_result.stdout_lines[1:] }}"
+        msg: "{{ item | ansible.builtin.split('\t') }}"
+      loop: "{{ zpool_checkpoints_pre_upgrade_result.stdout_lines }}"
       tags:
         - bsd_zpool
         - bsd_zpool_list
