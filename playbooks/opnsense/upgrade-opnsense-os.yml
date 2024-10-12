@@ -74,7 +74,7 @@
           Remember: A ZFS pool can only have a single checkpoint.
           This playbook needs to create a checkpoint before upgrading OPNSense.
           Press return to continue. Press Ctrl+c and then "a" to abort
-      when: "{{ zpool_status_has_checkpoint.rc == 0 }}"
+      when: zpool_status_has_checkpoint.rc == 0
       tags:
         - pause
         - prompt
@@ -87,7 +87,7 @@
       become: true
       become_method: ansible.builtin.sudo
       register: zpool_checkpoint_discard_result
-      when: "{{ zpool_status_has_checkpoint.rc == 0 }}"
+      when: zpool_status_has_checkpoint.rc == 0
       tags:
         - bsd_zpool
         - bsd_zpool_checkpoint_discard
@@ -226,7 +226,7 @@
           Remember: A ZFS pool can only have a single checkpoint.
           This playbook wants to discard the checkpoint once the new OPNSense release is verified working.
           Press return to continue. Press Ctrl+c and then "a" to abort
-      when: "{{ opnsense_upgrade_result.rc == 0 }}"
+      when: opnsense_upgrade_result.rc == 0
       tags:
         - pause
         - prompt
@@ -239,7 +239,7 @@
       become: true
       become_method: ansible.builtin.sudo
       register: zpool_checkpoint_discard_result
-      when: "{{ opnsense_upgrade_result.rc == 0 }}"
+      when: opnsense_upgrade_result.rc == 0
       tags:
         - bsd_zpool
         - bsd_zpool_checkpoint_discard
