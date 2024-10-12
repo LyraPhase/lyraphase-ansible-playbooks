@@ -3,7 +3,6 @@
 
 - name: Upgrade OPNSense OS
   hosts: opnsense
-  user: root
   gather_facts: false
 
   # TODO: Maybe wrap tasks in role
