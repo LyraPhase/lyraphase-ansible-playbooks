@@ -4,15 +4,16 @@
 # Use this if you're seeing 0 packages for a repo,
 - name: Destroy opkg cache
   ansible.builtin.file:
-    path: /var/lib/opkg
+    path: /var/opkg-lists
     force: true
     state: absent
 
 - name: Create opkg cache dir
   ansible.builtin.file:
-    path: /var/lib/opkg
+    path: /var/opkg-lists
     force: true
     state: directory
+    mode: "0755"
 
 - name: Run opkg update
   ansible.builtin.command: opkg update
@@ -26,13 +27,13 @@
 # RAW command handlers for bootstrap steps
 - name: RAW destroy opkg cache
   ansible.builtin.raw:
-    rm -rf /var/lib/opkg
+    rm -rf /var/opkg-lists
   register: opkg_destroy_cache_result
   changed_when: opkg_destroy_cache_result.rc == 0
 
 - name: RAW create opkg cache dir
   ansible.builtin.raw:
-    mkdir -p /var/lib/opkg
+    mkdir -p /var/opkg-lists
   register: opkg_mkdir_cache_result
   changed_when: opkg_mkdir_cache_result.rc == 0
 
