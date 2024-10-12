@@ -95,7 +95,7 @@
 
     - name: Create NEW zpool checkpoint
       ansible.builtin.command:
-        echo zpool checkpoint zroot
+        zpool checkpoint zroot
       changed_when: zpool_checkpoint_create_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
@@ -141,21 +141,21 @@
         - bsd_be_create
         - upgrade
 
-    # - name: Reboot OPNSense to test the restore boot environment and wait for it to restart
-    #   ansible.builtin.reboot:
-    #     msg: "Reboot initiated by Ansible"
-    #     connect_timeout: 5
-    #     reboot_timeout: 600
-    #     pre_reboot_delay: 0
-    #     post_reboot_delay: 30
-    #     test_command: whoami
-    #   become: true
-    #   become_method: sudo
-    #   register: opnsense_be_reboot_result
-    #   tags:
-    #     - reboot
-    #     - opnsense_upgrade
-    #     - upgrade
+    - name: Reboot OPNSense to test the restore boot environment and wait for it to restart
+      ansible.builtin.reboot:
+        msg: "Reboot initiated by Ansible"
+        connect_timeout: 5
+        reboot_timeout: 600
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: whoami
+      become: true
+      become_method: ansible.builtin.sudo
+      register: opnsense_be_reboot_result
+      tags:
+        - reboot
+        - opnsense_upgrade
+        - upgrade
 
     - name: Wait for OPNSense host to reboot
       ansible.builtin.command:
