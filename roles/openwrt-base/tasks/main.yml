@@ -11,4 +11,9 @@
 - name: "Run tasks: logrotate"
   ansible.builtin.import_tasks: logrotate.yml
   tags: logrotate-openwrt
+- name: "Run tasks: wireless"
+  ansible.builtin.import_tasks: wireless.yml
+  tags:
+    - wireless-openwrt
+    - openwrt-base-wireless
 
