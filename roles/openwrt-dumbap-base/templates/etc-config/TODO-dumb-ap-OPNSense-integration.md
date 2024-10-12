@@ -1,8 +1,17 @@
+<!-- markdownlint-configure-file
+{
+  "line-length": {
+    "line_length": 120
+  }
+}
+-->
+
 # TODO items to integrate with DEC850 OPNSense Firewall + DNS server
 
-
-- Enable reverse DNS lookup forwarding to `unbound` DNS server running on OPNSense
-  - Set `DNS forwardings` on [DHCP page](http://192.168.1.2/cgi-bin/luci/admin/network/dhcp)
+- Enable reverse DNS lookup forwarding to `unbound` DNS server running on
+  OPNSense
+  - Set `DNS forwardings` on
+    [DHCP page](http://192.168.1.2/cgi-bin/luci/admin/network/dhcp)
   - Add DNS forwarder lines: `/*.in-addr.arpa/192.168.1.1`, `192.168.1.1`
   - Results in `/tmp/etc/dnsmasq.conf.cfg02411c` with contents:
 
@@ -10,7 +19,7 @@
         server=/cluster.local/10.96.0.10
         server=/*.in-addr.arpa/192.168.1.1
         server=192.168.1.1
-    
+
   - And in `uci show`:
 
         uci show  | grep -i cluster.local
@@ -28,6 +37,7 @@
   - Trying to force ARP ping lookups:
 
         # Print all hostnames found via reverse IP lookup
+
         time sh -c 'arp-scan -qxl -I br-lan | cut -f1 | xargs -n1 host | grep ".in-addr.arpa domain name pointer
 " | sed -e "s/.*\.in-addr\.arpa domain name pointer \(.*\)$/\1/" '
 
@@ -45,4 +55,3 @@
     - Removes config line from `dnsmasq.conf.cfg*`:
 
         bogus-priv
-
