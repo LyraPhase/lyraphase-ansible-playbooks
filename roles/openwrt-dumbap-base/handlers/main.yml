@@ -4,15 +4,15 @@
 # Use this if you're seeing 0 packages for a repo,
 - name: Destroy opkg cache
   ansible.builtin.file: >
-    path=/var/lib/opkg
-    force=yes
-    state=absent
+    path: /var/lib/opkg
+    force: yes
+    state: absent
 
 - name: Create opkg cache dir
   ansible.builtin.file: >
-    path=/var/lib/opkg
-    force=yes
-    state=directory
+    path: /var/lib/opkg
+    force: yes
+    state: directory
 
 - name: Run opkg update
   ansible.builtin.shell: opkg update
