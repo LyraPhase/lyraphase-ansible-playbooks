@@ -39,7 +39,7 @@
         - bsd_zpool_list
 
     - name: Show 'stdout_lines' from the 2nd line to the end
-      debug:
+      ansible.builtin.debug:
         msg: "{{ item | ansible.builtin.split('\t') }}"
       loop: "{{ zpool_checkpoints_result.stdout_lines }}"
       tags:
@@ -66,7 +66,7 @@
         - debug
 
     - name: Prompt to delete old checkpoints
-      pause:
+      ansible.builtin.pause:
         prompt: >-
           ZFS checkpoint found! Please confirm you want to discard the old checkpoint!
           Remember: A ZFS pool can only have a single checkpoint.
@@ -82,7 +82,7 @@
       ansible.builtin.command:
         zpool checkpoint --discard --wait zroot
       become: true
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       register: zpool_checkpoint_discard_result
       when: "{{ zpool_status_has_checkpoint.rc == 0 }}"
       tags:
@@ -94,7 +94,7 @@
       ansible.builtin.command:
         echo zpool checkpoint zroot
       become: true
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       register: zpool_checkpoint_create_result
       tags:
         - bsd_zpool
@@ -113,7 +113,7 @@
       ansible.builtin.command:
         echo bectl create {{ opnsense_current_version.stdout }}
       become: true
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       register: opnsense_be_create_result
       tags:
         - opnsense_upgrade
@@ -125,7 +125,7 @@
       ansible.builtin.command:
         echo bectl activate {{ opnsense_current_version.stdout }}
       become: true
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       register: opnsense_be_activate_result
       tags:
         - opnsense_upgrade
@@ -153,7 +153,7 @@
       ansible.builtin.command:
         echo TODO
       become: true
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       register: opnsense_be_create_result
       tags:
         - reboot
@@ -188,7 +188,7 @@
         - bsd_zpool_list
 
     - name: Show zpool checkpoints
-      debug:
+      ansible.builtin.debug:
         msg: "{{ item | ansible.builtin.split('\t') }}"
       loop: "{{ zpool_checkpoints_pre_upgrade_result.stdout_lines }}"
       tags:
@@ -200,7 +200,7 @@
       ansible.builtin.command:
         echo TODO
       become: true
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       register: opnsense_upgrade_result
       tags:
         - opnsense_upgrade
@@ -210,7 +210,7 @@
 ## OR: Wait here for SSH reconnect
 
     - name: Prompt to delete NEW checkpoint
-      pause:
+      ansible.builtin.pause:
         prompt: >-
           OPNSense has been upgraded! Check whether everything is working properly.
           Please confirm you want to discard the old checkpoint and activate the new boot environment.
@@ -227,7 +227,7 @@
       ansible.builtin.command:
         zpool checkpoint --discard --wait zroot
       become: true
-      become_method: sudo
+      become_method: ansible.builtin.sudo
       register: zpool_checkpoint_discard_result
       when: "{{ opnsense_upgrade_result.rc == 0 }}"
       tags:
