@@ -3,7 +3,7 @@
 
 - hosts: openwrt
   user: root
-  gather_facts: no
+  gather_facts: false
   vars_files:
     - "vars/openwrt-dumbap-base.yml"
 
