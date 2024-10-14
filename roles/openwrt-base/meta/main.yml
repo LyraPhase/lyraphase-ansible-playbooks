@@ -5,17 +5,15 @@ galaxy_info:
   description: Installs python and Ansible dependencies via opkg on OpenWRT / LEDE
   company: LyraPhase
   license: MIT
-  min_ansible_version: 2.5
+  min_ansible_version: "2.5"
   platforms:
-    - name: Openwrt
+    - name: OpenWrt
       versions:
-        - 17.01
+        - "17.01"
   galaxy_tags:
     - system
     - networking
     - openwrt
-  categories:
-    - system
     - packaging
   # dependencies:
 # version: 0.0.1 ## Ansible 2.0 broke this. Uncomment if / when they ever fix ansible/ansible#13496
