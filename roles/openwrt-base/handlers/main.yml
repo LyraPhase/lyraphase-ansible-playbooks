@@ -2,19 +2,19 @@
 # openwrt-base: entry point for handlers
 # This should fix any weird opkg cache bugs
 # Use this if you're seeing 0 packages for a repo,
-- name: destroy opkg cache
+- name: Destroy opkg cache
   ansible.builtin.file: >
     path: /var/lib/opkg
     force: yes
     state: absent
 
-- name: create opkg cache dir
+- name: Create opkg cache dir
   ansible.builtin.file:
     path: /var/lib/opkg
     force: yes
     state: directory
 
-- name: opkg update
+- name: Run opkg update
   ansible.builtin.shell: opkg update
   check_mode: no
   register: opkg_makecache_result
