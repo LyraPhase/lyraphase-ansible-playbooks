@@ -11,9 +11,9 @@
 #    - openwrt-logrotate
   tasks:
     - name: Install Extra packages
-      community.general.opkg: >
-        name={{ item }}
-        state=installed
+      community.general.opkg:
+        name: {{ item }}
+        state: installed
       with_items:
         - ethtool
 #        - ip-full

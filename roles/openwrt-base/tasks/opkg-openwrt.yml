@@ -12,12 +12,12 @@
   when: openwrt_opkg_repo_files is not defined
 
 - name: Install opkg repo definition files
-  ansible.builtin.template: >
-    src={{ item }}.j2
-    dest=/etc/opkg/{{ item }}
-    owner=root
-    group=root
-    mode=0644
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "/etc/opkg/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
   with_items: "{{ openwrt_opkg_repo_files }}"
   notify:
     - destroy opkg cache
