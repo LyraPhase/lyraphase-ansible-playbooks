@@ -2,9 +2,11 @@
 # openwrt-dumbap-base: entry point for tasks
 #               Generally only include other file(s) and add tags here.
 
-- ansible.builtin.import_tasks: opkg-openwrt.yml
+- name: "Run tasks: opkg-openwrt"
+  ansible.builtin.import_tasks: opkg-openwrt.yml
   tags: opkg-openwrt
-- ansible.builtin.import_tasks: dumbap-clients-resolver-openwrt.yml
+- name: "Run tasks: dumbap-clients-resolver-openwrt"
+  ansible.builtin.import_tasks: dumbap-clients-resolver-openwrt.yml
   tags: dumbap-clients-resolver-openwrt
 - name: "Run tasks: logrotate"
   ansible.builtin.import_tasks: logrotate.yml
