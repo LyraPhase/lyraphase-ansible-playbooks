@@ -1,0 +1,12 @@
+---
+# This playbook bootstraps an OPNSense firewall/router with base settings
+
+- name: OPNSense Base
+  hosts: opnsense
+  user: root
+  gather_facts: false
+
+  roles:
+    - role: lyraphase.opnsense_users
+      tags:
+        - opnsense_users
