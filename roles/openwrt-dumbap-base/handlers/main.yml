@@ -22,7 +22,7 @@
   until: opkg_update_result is defined and opkg_update_result.rc == 0
   retries: 3
   delay: 1
-  changed_when: opkg_makecache_result.rc == 0
+  changed_when: opkg_update_result.rc == 0
 
 # RAW command handlers for bootstrap steps
 - name: RAW destroy opkg cache
