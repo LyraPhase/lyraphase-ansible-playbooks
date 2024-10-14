@@ -50,6 +50,7 @@
     or not python_openssl_installed.stdout is search("Status: install (ok|user) installed")
     or not python_codecs_installed.stdout is search("Status: install (ok|user) installed")
     or not openssh_server_installed.stdout is search("Status: install (ok|user) installed")
+  changed_when: false
   notify:
     - RAW destroy opkg cache
     - RAW create opkg cache dir
@@ -65,23 +66,33 @@
   ansible.builtin.raw: opkg install python-light
   when: >
     not python_light_installed.stdout is search("Status: install (ok|user) installed")
+  register: opkg_install_python_light
+  changed_when: opkg_install_python_light.rc == 0
 
 - name: Install python-logging
   ansible.builtin.raw: opkg install python-logging
   when: >
     not python_logging_installed.stdout is search("Status: install (ok|user) installed")
+  register: opkg_install_python_logging
+  changed_when: opkg_install_python_logging.rc == 0
 
 - name: Install python-openssl
   ansible.builtin.raw: opkg install python-openssl
   when: >
     not python_openssl_installed.stdout is search("Status: install (ok|user) installed")
+  register: opkg_install_python_openssl
+  changed_when: opkg_install_python_openssl.rc == 0
 
 - name: Install python-codecs
   ansible.builtin.raw: opkg install python-codecs
   when: >
     not python_codecs_installed.stdout is search("Status: install (ok|user) installed")
+  register: opkg_install_python_codecs
+  changed_when: opkg_install_python_codecs.rc == 0
 
 - name: Install openssh-sftp-server
   ansible.builtin.raw: opkg install openssh-sftp-server
   when: >
     not openssh_server_installed.stdout is search("Status: install (ok|user) installed")
+  register: opkg_install_openssh_sftp_server
+  changed_when: opkg_install_openssh_sftp_server.rc == 0
