@@ -6,7 +6,6 @@ galaxy_info:
   company: LyraPhase
   license: MIT
   min_ansible_version: 2.5
-  # Platforms tested are uncommented, but it probably works on most CentOS/RHEL
   platforms:
     - name: Openwrt
       versions:
@@ -16,22 +15,7 @@ galaxy_info:
     - networking
     - openwrt
   categories:
-  #   - web
     - system
     - packaging
-  #   - networking
-  #   - monitoring
-  #   - development
-  #   - database:sql
-  #   - database:nosql
-  #   - database
-  #   - clustering
-  #   - cloud:rax
-  #   - cloud:gce
-  #   - cloud:ec2
-  #   - cloud
-  dependencies:
-  # Specify role dependencies here
-  # For foo
-  #  - foo
+  # dependencies:
 # version: 0.0.1 ## Ansible 2.0 broke this. Uncomment if / when they ever fix ansible/ansible#13496
