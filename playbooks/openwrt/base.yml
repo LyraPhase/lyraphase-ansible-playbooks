@@ -10,7 +10,7 @@
 #    - openwrt-logrotate
   tasks:
     - name: Install Extra packages
-      opkg: >
+      community.general.opkg: >
         name={{ item }}
         state=installed
       with_items:

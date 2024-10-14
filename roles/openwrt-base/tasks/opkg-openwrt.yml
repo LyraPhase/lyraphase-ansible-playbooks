@@ -2,7 +2,7 @@
 # opkg-edison: Tasks entry point. Called by main.yml
 
 # Load a variable file based on the OS type, or a default if not found.
-- include_vars: "{{ item }}"
+- ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
     - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version | int}}.yml"
     - "../vars/{{ ansible_distribution }}.yml"
@@ -11,7 +11,7 @@
   when: openwrt_opkg_repo_files is not defined
 
 - name: Install opkg repo definition files
-  template: >
+  ansible.builtin.template: >
     src={{ item }}.j2
     dest=/etc/opkg/{{ item }}
     owner=root
@@ -25,4 +25,4 @@
 
 # Run yum makecache handlers immediately
 # (Should fix Ansible runs on hosts with pre-existing opkg repo problems)
-- meta: flush_handlers
+- ansible.builtin.meta: flush_handlers
