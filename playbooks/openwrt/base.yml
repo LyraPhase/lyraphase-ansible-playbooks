@@ -4,7 +4,7 @@
 - name: OpenWRT Base
   hosts: openwrt
   user: root
-  gather_facts: no
+  gather_facts: true
 
   roles:
     - openwrt-base
@@ -12,7 +12,7 @@
   tasks:
     - name: Install Extra packages
       community.general.opkg:
-        name: {{ item }}
+        name: "{{ item }}"
         state: installed
       with_items:
         - ethtool
