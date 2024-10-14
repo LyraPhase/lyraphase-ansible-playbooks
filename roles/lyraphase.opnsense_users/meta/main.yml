@@ -1,6 +1,5 @@
 ---
 galaxy_info:
-  name: opnsense_users
   namespace: lyraphase
   author: trinitronx
   description: OPNSense Users - Provision users & sudoers file on OPNSense
