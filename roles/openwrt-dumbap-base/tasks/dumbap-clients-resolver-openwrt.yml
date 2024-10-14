@@ -10,10 +10,10 @@
 #    - "../vars/default.yml"
 #  when: openwrt_opkg_repo_files is not defined
 
-- name: setup root crontab
-  ansible.builtin.copy: >
-    src=files/crontabs/root
-    dest=/etc/crontabs/root
-    owner=root
-    group=root
-    mode=0644
+- name: Setup root crontab
+  ansible.builtin.copy:
+    src: files/crontabs/root
+    dest: /etc/crontabs/root
+    owner: root
+    group: root
+    mode: "0644"

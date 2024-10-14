@@ -12,7 +12,7 @@
   when: openwrt_dumbap_opkg_packages is not defined
 
 - name: Install Dumb AP packages
-  community.general.opkg: >
-    name="{{ item }}"
-    state=installed
+  community.general.opkg:
+    name: "{{ item }}"
+    state: installed
   with_items: "{{ openwrt_dumbap_opkg_packages }}"
