@@ -82,7 +82,7 @@ Example Playbook
 
 - hosts: openwrt
   user: root
-  gather_facts: no
+  gather_facts: false
 
   roles:
     - openwrt-base

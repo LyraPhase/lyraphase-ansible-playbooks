@@ -5,19 +5,19 @@
 - name: Destroy opkg cache
   ansible.builtin.file: >
     path: /var/lib/opkg
-    force: yes
+    force: true
     state: absent
 
 - name: Create opkg cache dir
   ansible.builtin.file:
     path: /var/lib/opkg
-    force: yes
+    force: true
     state: directory
     mode: "0755"
 
 - name: Run opkg update
   ansible.builtin.command: opkg update
-  check_mode: no
+  check_mode: false
   register: opkg_makecache_result
   until: opkg_makecache_result is defined and opkg_makecache_result.rc == 0
   retries: 3
@@ -34,7 +34,7 @@
 
 - name: RAW opkg update
   ansible.builtin.raw: opkg update
-  check_mode: no
+  check_mode: false
   register: opkg_makecache_result
   until: opkg_makecache_result is defined and opkg_makecache_result.rc == 0
   retries: 3

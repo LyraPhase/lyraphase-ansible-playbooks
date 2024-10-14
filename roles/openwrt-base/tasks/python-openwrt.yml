@@ -11,32 +11,32 @@
   when: openwrt_opkg_repo_files is not defined
 
 - name: Check for python interpreter
-  check_mode: no
-  changed_when: False
+  check_mode: false
+  changed_when: false
   ansible.builtin.raw: opkg status python-light
   register: python_light_installed
 
 - name: Check for python-logging
-  check_mode: no
-  changed_when: False
+  check_mode: false
+  changed_when: false
   ansible.builtin.raw: opkg status python-logging
   register: python_logging_installed
 
 - name: Check for python-openssl
-  check_mode: no
-  changed_when: False
+  check_mode: false
+  changed_when: false
   ansible.builtin.raw: opkg status python-openssl
   register: python_openssl_installed
 
 - name: Check for python-codecs
-  check_mode: no
-  changed_when: False
+  check_mode: false
+  changed_when: false
   ansible.builtin.raw: opkg status python-codecs
   register: python_codecs_installed
 
 - name: Check for openssh-sftp-server
-  check_mode: no
-  changed_when: False
+  check_mode: false
+  changed_when: false
   ansible.builtin.raw: opkg status openssh-sftp-server
   register: openssh_server_installed
 
@@ -57,7 +57,7 @@
 # Run yum makecache handlers immediately
 # (Should fix Ansible runs on hosts with pre-existing opkg repo problems)
 - ansible.builtin.meta: flush_handlers
-  check_mode: no
+  check_mode: false
 
 - name: Install python interpreter
   ansible.builtin.raw: opkg install python-light
