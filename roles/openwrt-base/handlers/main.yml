@@ -15,7 +15,7 @@
     state: directory
 
 - name: Run opkg update
-  ansible.builtin.shell: opkg update
+  ansible.builtin.command: opkg update
   check_mode: no
   register: opkg_makecache_result
   until: opkg_makecache_result is defined and opkg_makecache_result.rc == 0
