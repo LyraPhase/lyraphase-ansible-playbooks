@@ -4,10 +4,14 @@
 
 - name: "Run tasks: opkg-openwrt"
   ansible.builtin.import_tasks: opkg-openwrt.yml
-  tags: opkg-openwrt
+  tags:
+    - opkg-openwrt
+    - openwrt-dumbap-base-opkg-openwrt
 - name: "Run tasks: dumbap-clients-resolver-openwrt"
   ansible.builtin.import_tasks: dumbap-clients-resolver-openwrt.yml
-  tags: dumbap-clients-resolver-openwrt
+  tags:
+    - dumbap-clients-resolver-openwrt
+    - openwrt-dumbap-base-dumbap-clients-resolver-openwrt
 - name: "Run tasks: logrotate"
   ansible.builtin.import_tasks: logrotate.yml
   tags:
