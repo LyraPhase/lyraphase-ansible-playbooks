@@ -4,17 +4,52 @@
 - name: Upgrade OPNSense OS
   hosts: opnsense
   gather_facts: false
+  vars:
+    opnsense_upgrade_require_boot_environments: true
 
   # TODO: Maybe wrap tasks in role
   # roles:
   #   - opnsense-upgrade
 
   tasks:
+    - name: Check boot environment support
+      ansible.builtin.command:
+        bectl check
+      changed_when: false
+      register: bectl_sanity_check
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+        - upgrade
+
+    - name: Are boot environments supported?
+      ansible.builtin.debug:
+        msg: Boot environments are {{ "NOT" if bectl_sanity_check.rc != 0 }} supported
+      changed_when: false
+      failed_when: false
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+        - debug
+
+    - name: Assert Boot Environments are supported
+      ansible.builtin.assert:
+        that:
+          - bectl_sanity_check.rc is defined
+          - bectl_sanity_check.rc == 0
+      changed_when: false
+      when: opnsense_upgrade_require_boot_environments
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+        - upgrade
+
     - name: List boot environments
       ansible.builtin.command: >-
         bectl list -a
       changed_when: false
       register: bectl_list_result
+      when: bectl_sanity_check.rc == 0
       tags:
         - bsd_bectl
         - bsd_be_create
@@ -23,6 +58,7 @@
       ansible.builtin.debug:
         var: bectl_list_result
       changed_when: false
+      when: bectl_sanity_check.rc == 0
       tags:
         - bsd_bectl
         - bsd_be_create
@@ -129,11 +165,12 @@
 
     - name: Create boot environment for OLD OPNSense Version
       ansible.builtin.command:
-        echo bectl create {{ opnsense_current_version.stdout }}
+        bectl create {{ opnsense_current_version.stdout }}
       changed_when: opnsense_be_create_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
       register: opnsense_be_create_result
+      when: bectl_sanity_check.rc == 0
       tags:
         - opnsense_upgrade
         - bsd_bectl
@@ -142,11 +179,12 @@
 
     - name: Activate boot environment for OLD OPNSense Version
       ansible.builtin.command:
-        echo bectl activate {{ opnsense_current_version.stdout }}
+        bectl activate {{ opnsense_current_version.stdout }}
       changed_when: opnsense_be_activate_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
       register: opnsense_be_activate_result
+      when: bectl_sanity_check.rc == 0
       tags:
         - opnsense_upgrade
         - bsd_bectl
@@ -185,6 +223,7 @@
         bectl list -a
       changed_when: false
       register: bectl_pre_upgrade_list_result
+      when: bectl_sanity_check.rc == 0
       tags:
         - bsd_bectl
         - bsd_be_create
@@ -193,6 +232,7 @@
       ansible.builtin.debug:
         var: bectl_pre_upgrade_list_result
       changed_when: false
+      when: bectl_sanity_check.rc == 0
       tags:
         - bsd_bectl
         - bsd_be_create
