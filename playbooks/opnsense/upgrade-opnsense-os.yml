@@ -37,7 +37,7 @@
         - bsd_zpool
         - bsd_zpool_list
 
-    - name: Show 'stdout_lines' from the 2nd line to the end
+    - name: Show zpool checkpoint space used
       ansible.builtin.debug:
         msg: "{{ item | ansible.builtin.split('\t') }}"
       loop: "{{ zpool_checkpoints_result.stdout_lines }}"
