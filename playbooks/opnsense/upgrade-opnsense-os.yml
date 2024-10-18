@@ -66,6 +66,30 @@
         - bsd_zpool_status
         - debug
 
+    - name: Get OLD OPNSense Release Version
+      ansible.builtin.shell: |
+        set -o pipefail
+        opnsense-version | awk '{ print $2 }'
+      changed_when: false
+      register: opnsense_current_version
+      tags:
+        - opnsense_version
+        - opnsense_upgrade
+        - upgrade
+
+    - name: Assert OLD OPNSense Release Version is Defined
+      ansible.builtin.assert:
+        that:
+          - opnsense_current_version is defined
+          - opnsense_current_version.stdout is defined
+          - opnsense_current_version.stdout is string
+          - opnsense_current_version.stdout is match ('^[0-9.]+$')
+      changed_when: false
+      tags:
+        - opnsense_version
+        - opnsense_upgrade
+        - upgrade
+
     - name: Prompt to delete old checkpoints
       ansible.builtin.pause:
         prompt: >-
@@ -102,17 +126,6 @@
       tags:
         - bsd_zpool
         - bsd_zpool_checkpoint_create
-
-    - name: Get OLD OPNSense Release Version
-      ansible.builtin.shell:
-        set -o pipefail
-        opnsense-version | awk '{ print $2 }'
-      changed_when: false
-      register: opnsense_current_version
-      tags:
-        - opnsense_version
-        - opnsense_upgrade
-        - upgrade
 
     - name: Create boot environment for OLD OPNSense Version
       ansible.builtin.command:
