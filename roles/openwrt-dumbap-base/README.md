@@ -90,4 +90,4 @@ Author Information
 Copyright (C) © 🄯  2014-2024 LyraPhase.com / 37Om.com
 Copyright (C) © 🄯  2014-2024 James Cuzella <@trinitronx>
 
-[1]: http://choosealicense.com/licenses/gpl-3.0/
+[1]: http://choosealicense.com/licenses/agpl-3.0/
