@@ -61,12 +61,12 @@ Example Playbook
 License
 -------
 
-[MIT][1]
+[AGPLv3][1]
 
 Author Information
 ------------------
 
-(c) © 🄯  2014-2016 LyraPhase.com / 37Om.com
-(c) © 🄯  2014-2016 James Cuzella <@trinitronx>
+Copyright (C) © 🄯  2014-2024 LyraPhase.com / 37Om.com
+Copyright (C) © 🄯  2014-2024 James Cuzella <@trinitronx>
 
-[1]: http://choosealicense.com/licenses/mit/
+[1]: http://choosealicense.com/licenses/agpl-3.0/
