@@ -4,7 +4,7 @@ galaxy_info:
   author: James Cuzella
   description: Installs python and Ansible dependencies via opkg on OpenWRT / LEDE
   company: LyraPhase
-  license: GPL-3.0+
+  license: AGPL-3.0-or-later
   min_ansible_version: "2.5"
   platforms:
     - name: OpenWrt
