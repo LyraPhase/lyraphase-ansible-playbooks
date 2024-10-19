@@ -37,6 +37,10 @@ repos:
               .*/README\.md|
               .*/LICENSE
             )$
+-   repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.1
+    hooks:
+      - id: gitleaks
 - repo: https://github.com/igorshubovych/markdownlint-cli
   rev: v0.30.0
   hooks:
