@@ -85,4 +85,3 @@ AGPLv3
 James Cuzella @trinitronx
 
 [1]: https://cgit.freebsd.org/ports/tree/GIDs
-
