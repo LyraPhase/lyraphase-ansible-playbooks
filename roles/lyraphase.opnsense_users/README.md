@@ -17,7 +17,7 @@ OPNSense user: `root`, & password: `opnsense`.
       "${REPO_BASE}"/opnsense-base.yml -vv --tags=bootstrap,never --diff \
       --user=root --ask-pass
 
-# Role Variables
+## Role Variables
 
 - `lyraphase_opnsense_users_sudoers_path`: The location of `sudoers.d` drop-in directory
    Default: `'/usr/local/etc/sudoers.d'`
@@ -25,7 +25,7 @@ OPNSense user: `root`, & password: `opnsense`.
    [Pick a free(BSD) GID][1]
    Default: `731`
 
-# Dependencies
+## Dependencies
 
 This role depends on the `collections.general.sudoers` module.
 This module is found in the following collectiion:
@@ -36,7 +36,7 @@ To install this dependency:
 
     ansible-galaxy collection install community.general
 
-# Example Playbook
+## Example Playbook
 
 There are 2 main scenarios which you could run this role:
 
@@ -55,7 +55,7 @@ There are 2 main scenarios which you could run this role:
   - In this mode the playbook will add other users and groups to the system,
     as defined in the role's configuration variables.
 
-## Bootstrap Playbook Example
+### Bootstrap Playbook Example
 
     - hosts: opnsense
       user: root
@@ -76,11 +76,11 @@ To run only the bootstrap tasks, pass the `--tags=bootstrap,never` CLI flag to A
 > Ensure that you save the `root` user's new password that will be output from
 > this task, because it will only be shown once.
 
-# License
+## License
 
 AGPLv3
 
-# Author Information
+## Author Information
 
 James Cuzella @trinitronx
 
