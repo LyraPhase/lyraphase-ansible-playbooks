@@ -3,6 +3,7 @@
 
 - name: Upgrade OPNSense OS
   hosts: opnsense
+  serial: 1
   gather_facts: false
   vars:
     opnsense_upgrade_require_boot_environments: true
