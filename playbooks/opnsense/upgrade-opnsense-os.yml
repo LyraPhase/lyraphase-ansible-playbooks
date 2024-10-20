@@ -45,6 +45,50 @@
         - bsd_be_create
         - upgrade
 
+    - name: Check if OPNSense update is available
+      ansible.builtin.command:
+        opnsense-update -v -c -up
+      become: true
+      become_method: ansible.builtin.sudo
+      ignore_errors: true
+      failed_when: false
+      changed_when: false
+      register: opnsense_update_available
+      tags:
+        - opnsense_update
+        - opnsense_update_check
+        - upgrade
+
+    - name: Assert OPNSense update is available
+      ansible.builtin.assert:
+        that:
+          - opnsense_update_available.rc is defined
+          - opnsense_update_available.rc == 0
+      changed_when: false
+      tags:
+        - opnsense_update
+        - opnsense_update_check
+        - upgrade
+
+    - name: Set OPNSense new version
+      ansible.builtin.set_fact:
+        opnsense_upgrade_version: "{{ opnsense_update_available.stdout }}"
+      when: opnsense_update_available.rc == 0
+      changed_when: false
+      tags:
+        - opnsense_update
+        - opnsense_update_check
+        - upgrade
+
+    - name: OPNSense Upgrade Version
+      ansible.builtin.debug:
+        msg: "OPNSense Upgrade Available to: {{ opnsense_upgrade_version }}"
+      tags:
+        - opnsense_update
+        - opnsense_update_check
+        - upgrade
+        - debug
+
     - name: List boot environments (creation time descending order)
       ansible.builtin.command: >-
         bectl list -H -C creation
