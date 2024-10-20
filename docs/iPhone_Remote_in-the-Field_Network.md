@@ -154,7 +154,7 @@ board is switched towards the micro USB ports**\*
 
 #### Step 3 – Configure Edison
 
-1. Open a web browser and go to "http://edison.local".
+1. Open a web browser and go to <http://edison.local>.
    \***note - if you have already changed the name and password of you Edison,
    then replace "`edison`" in the URL with the name you have chosen.**
 
@@ -179,7 +179,7 @@ board is switched towards the micro USB ports**\*
 4. Click "Submit"
 5. You will see this screen.
    Please connect to your WiFi network now, and after **one** minute visit
-   "http://myedison.local".
+   <http://myedison.local>.
    If you have chosen a different name for your Edison then replace
    "`myedison`" with your name.
    <br/><br/>
