@@ -132,6 +132,21 @@
         - bsd_be_create
         - debug
 
+    - name: Gather facts about ZFS pool zroot
+      community.general.zpool_facts:
+        pool: zroot
+      tags:
+        - bsd_zpool
+        - bsd_zpool_facts
+
+    - name: DEBUG ZFS pool facts
+      ansible.builtin.debug:
+        var: ansible_zfs_pools
+      tags:
+        - bsd_zpool
+        - bsd_zpool_facts
+        - debug
+
     - name: List zpool checkpoints
       ansible.builtin.command:
         zpool list -H -o name,checkpoint
@@ -148,6 +163,16 @@
       tags:
         - bsd_zpool
         - bsd_zpool_list
+        - debug
+
+    - name: Show zpool checkpoint space used via facts
+      ansible.builtin.debug:
+        msg: "{% for pool in ansible_zfs_pools %}\
+          {{ [pool.name, pool.checkpoint] }}\n
+          {% endfor %}"
+      tags:
+        - bsd_zpool
+        - bsd_zpool_facts
         - debug
 
     - name: Check for any old checkpoints
