@@ -41,19 +41,19 @@ To install this dependency:
 There are 2 main scenarios which you could run this role:
 
 1. Bootstrapping
-  - In this mode, the goal is to login as the first pre-existing user: `root`,
-    to bootstrap the `ansible` group, user, and sudoers permissions.
-  - This can be done either with a specialized playbook (example below), or by
-    passing CLI flags to
-    `ansible-playbook`: `--tags=bootstrap,never --user=root --ask-pass`
-  - Passing the `never` tag enables resetting the `root` password to a random value.
+   - In this mode, the goal is to login as the first pre-existing user: `root`,
+     to bootstrap the `ansible` group, user, and sudoers permissions.
+   - This can be done either with a specialized playbook (example below), or by
+     passing CLI flags to
+     `ansible-playbook`: `--tags=bootstrap,never --user=root --ask-pass`
+   - Passing the `never` tag enables resetting the `root` password to a random value.
 2. Normal Config Management
-  - On subsequent runs, the playbook should be run in "normal" mode as the
-    first config management user (or primary personal Ops/DevOps user)
-  - The reason for this modality is to enable security & auditing for subsequent
-    actions performed on the system post-bootstrap.
-  - In this mode the playbook will add other users and groups to the system,
-    as defined in the role's configuration variables.
+   - On subsequent runs, the playbook should be run in "normal" mode as the
+     first config management user (or primary personal Ops/DevOps user)
+   - The reason for this modality is to enable security & auditing for subsequent
+     actions performed on the system post-bootstrap.
+   - In this mode the playbook will add other users and groups to the system,
+     as defined in the role's configuration variables.
 
 ### Bootstrap Playbook Example
 
