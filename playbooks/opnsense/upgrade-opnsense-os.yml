@@ -45,9 +45,9 @@
         - bsd_be_create
         - upgrade
 
-    - name: List boot environments
+    - name: List boot environments (creation time descending order)
       ansible.builtin.command: >-
-        bectl list -a
+        bectl list -H -C creation
       changed_when: false
       register: bectl_list_result
       when: bectl_sanity_check.rc == 0
@@ -55,9 +55,32 @@
         - bsd_bectl
         - bsd_be_create
 
+    - name: Get boot environments
+      ansible.builtin.set_fact:
+        bectl_boot_environments: "{{ bectl_boot_environments | default([]) + [ keys | zip(item | ansible.builtin.split('\t')) | community.general.dict ] }}"
+      loop: "{{ bectl_list_result.stdout_lines }}"
+      vars:
+        keys:
+          - name
+          - active
+          - mountpoint
+          - space
+          - created
+
     - name: Show boot environments
       ansible.builtin.debug:
-        var: bectl_list_result
+        var: bectl_boot_environments
+      changed_when: false
+      when: bectl_sanity_check.rc == 0
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+        - debug
+
+    - name: Show non-default boot environments
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ bectl_boot_environments | rejectattr('name', 'eq', 'default') }}"
       changed_when: false
       when: bectl_sanity_check.rc == 0
       tags:
