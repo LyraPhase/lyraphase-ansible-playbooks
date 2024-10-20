@@ -13,7 +13,7 @@
   "hr-style": {
     "style": "consistent"
   },
-  "header-style": {
+  "heading-style": {
     "style": "setext_with_atx"
   },
   "no-inline-html": {
