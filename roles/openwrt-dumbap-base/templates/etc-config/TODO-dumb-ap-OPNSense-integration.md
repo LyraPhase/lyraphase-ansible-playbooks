@@ -38,12 +38,17 @@
 
         # Print all hostnames found via reverse IP lookup
 
-        time sh -c 'arp-scan -qxl -I br-lan | cut -f1 | xargs -n1 host | grep ".in-addr.arpa domain name pointer
-" | sed -e "s/.*\.in-addr\.arpa domain name pointer \(.*\)$/\1/" '
+        time sh -c 'arp-scan -qxl -I br-lan \
+          | cut -f1 | xargs -n1 host \
+          | grep ".in-addr.arpa domain name pointer" \
+          | sed -e "s/.*\.in-addr\.arpa domain name pointer \(.*\)$/\1/" '
 
         # Ping all hostnames, forcing a forward DNS lookup
-        time sh -c 'arp-scan -qxl -I br-lan | cut -f1 | xargs -n1 host | grep ".in-addr.arpa domain name pointer
-" | sed -e "s/.*\.in-addr\.arpa domain name pointer \(.*\)$/\1/" | xargs -n1 ping -c 1 -W 1 -q'
+        time sh -c 'arp-scan -qxl -I br-lan \
+          | cut -f1 | xargs -n1 host \
+          | grep ".in-addr.arpa domain name pointer" \
+          | sed -e "s/.*\.in-addr\.arpa domain name pointer \(.*\)$/\1/" \
+          | xargs -n1 ping -c 1 -W 1 -q'
         # Unfortunately, this still seems not to work to populate the hostnames in LEDE 17.01.4
         # We will probably have to upgrade to newer OpenWRT version
 
