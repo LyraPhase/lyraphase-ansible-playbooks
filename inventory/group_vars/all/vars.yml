@@ -1,0 +1,1 @@
+lyraphase_static_dhcp: "{{ vault_lyraphase_static_dhcp }}"
