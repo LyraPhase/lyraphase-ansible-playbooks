@@ -13,13 +13,16 @@ OPNSense user: `root`, & password: `opnsense`.
 
 ### Bootstrap Tag Example
 
-    ansible-playbook -i "${REPO_BASE}"/inventory/hosts "${REPO_BASE}"/opnsense-base.yml -vv --tags=bootstrap,never --diff --user=root --ask-pass
+    ansible-playbook -i "${REPO_BASE}"/inventory/hosts \
+      "${REPO_BASE}"/opnsense-base.yml -vv --tags=bootstrap,never --diff \
+      --user=root --ask-pass
 
 # Role Variables
 
 - `lyraphase_opnsense_users_sudoers_path`: The location of `sudoers.d` drop-in directory
    Default: `'/usr/local/etc/sudoers.d'`
-- `lyraphase_opnsense_users_ansible_gid`: Group ID for Ansible group. [Pick a free(BSD) GID][1]
+- `lyraphase_opnsense_users_ansible_gid`: Group ID for Ansible group.
+   [Pick a free(BSD) GID][1]
    Default: `731`
 
 # Dependencies
@@ -41,7 +44,8 @@ There are 2 main scenarios which you could run this role:
   - In this mode, the goal is to login as the first pre-existing user: `root`,
     to bootstrap the `ansible` group, user, and sudoers permissions.
   - This can be done either with a specialized playbook (example below), or by
-    passing CLI flags to `ansible-playbook`: `--tags=bootstrap,never --user=root --ask-pass`
+    passing CLI flags to
+    `ansible-playbook`: `--tags=bootstrap,never --user=root --ask-pass`
   - Passing the `never` tag enables resetting the `root` password to a random value.
 2. Normal Config Management
   - On subsequent runs, the playbook should be run in "normal" mode as the
