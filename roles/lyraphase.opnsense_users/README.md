@@ -72,7 +72,7 @@ To run only the bootstrap tasks, pass the `--tags=bootstrap,never` CLI flag to A
 
 > [!CAUTION]
 > **Note:** The `never` tag enables running the "Reset root password" task!
-> 
+>
 > Ensure that you save the `root` user's new password that will be output from
 > this task, because it will only be shown once.
 
