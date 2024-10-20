@@ -101,7 +101,7 @@
 
     - name: Get boot environments
       ansible.builtin.set_fact:
-        bectl_boot_environments: "{{ bectl_boot_environments | default([]) + [ keys | zip(item | ansible.builtin.split('\t')) | community.general.dict ] }}"
+        bectl_boot_environments: "{{ bectl_boot_environments | default([]) + [keys | zip(item | ansible.builtin.split('\t')) | community.general.dict] }}"
       loop: "{{ bectl_list_result.stdout_lines }}"
       vars:
         keys:
