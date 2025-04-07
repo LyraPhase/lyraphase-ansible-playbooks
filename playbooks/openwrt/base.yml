@@ -37,6 +37,7 @@
 #        - libmbedtls
 #        - kmod-tun
 #        - luci-app-openvpn
+         - luci-app-advanced-reboot
 #        - luci-proto-ppp
 #        - ppp-mod-pppoe
 #        - ppp
