@@ -1,7 +1,8 @@
 #!/bin/bash
 
 SCRIPT=$(basename "$0")
-REPO_BASE=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+PLAYBOOK_BASE=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )
+REPO_BASE=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../" && pwd )
 ROLE_NAME=$(basename "$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd)" )
 source "${REPO_BASE}/bin/setup-ansible-vault.sh"
 
@@ -17,4 +18,4 @@ if [ -n "${DOCKER_MACHINE_NAME}" ]; then
 fi
 
 # Assuming you set up SSH keys, SSH in as root via key auth
-ansible-playbook -i "${REPO_BASE}"/inventory/hosts "${REPO_BASE}"/base.yml -vv --diff --user=root
+ansible-playbook -i "${PLAYBOOK_BASE}"/inventory/hosts "${PLAYBOOK_BASE}"/base.yml -vv --diff --user=root
