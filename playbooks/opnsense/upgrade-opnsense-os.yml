@@ -18,6 +18,7 @@
         bectl check
       changed_when: false
       register: bectl_sanity_check
+      check_mode: false
       tags:
         - bsd_bectl
         - bsd_be_create
@@ -28,6 +29,7 @@
         msg: Boot environments are {{ "NOT" if bectl_sanity_check.rc != 0 }} supported
       changed_when: false
       failed_when: false
+      check_mode: false
       tags:
         - bsd_bectl
         - bsd_be_create
@@ -53,6 +55,7 @@
       ignore_errors: true
       failed_when: false
       changed_when: false
+      check_mode: false
       register: opnsense_update_available
       tags:
         - opnsense_update
@@ -65,6 +68,7 @@
           - opnsense_update_available.rc is defined
           - opnsense_update_available.rc == 0
       changed_when: false
+      check_mode: false
       tags:
         - opnsense_update
         - opnsense_update_check
@@ -75,6 +79,7 @@
         opnsense_upgrade_version: "{{ opnsense_update_available.stdout }}"
       when: opnsense_update_available.rc == 0
       changed_when: false
+      check_mode: false
       tags:
         - opnsense_update
         - opnsense_update_check
@@ -83,6 +88,7 @@
     - name: OPNSense Upgrade Version
       ansible.builtin.debug:
         msg: "OPNSense Upgrade Available to: {{ opnsense_upgrade_version }}"
+      check_mode: false
       tags:
         - opnsense_update
         - opnsense_update_check
@@ -93,6 +99,7 @@
       ansible.builtin.command: >-
         bectl list -H -C creation
       changed_when: false
+      check_mode: false
       register: bectl_list_result
       when: bectl_sanity_check.rc == 0
       tags:
@@ -110,6 +117,7 @@
           - mountpoint
           - space
           - created
+      check_mode: false
 
     - name: Show boot environments
       ansible.builtin.debug:
@@ -151,6 +159,7 @@
       ansible.builtin.command:
         zpool list -H -o name,checkpoint
       changed_when: false
+      check_mode: false
       register: zpool_checkpoints_result
       tags:
         - bsd_zpool
@@ -160,6 +169,7 @@
       ansible.builtin.debug:
         msg: "{{ item | ansible.builtin.split('\t') }}"
       loop: "{{ zpool_checkpoints_result.stdout_lines }}"
+      check_mode: false
       tags:
         - bsd_zpool
         - bsd_zpool_list
@@ -182,6 +192,7 @@
       ignore_errors: true
       failed_when: false
       changed_when: false
+      check_mode: false
       tags:
         - bsd_zpool
         - bsd_zpool_status
@@ -200,6 +211,7 @@
         set -o pipefail
         opnsense-version | awk '{ print $2 }'
       changed_when: false
+      check_mode: false
       register: opnsense_current_version
       tags:
         - opnsense_version
@@ -214,6 +226,7 @@
           - opnsense_current_version.stdout is string
           - opnsense_current_version.stdout is match ('^[0-9.]+$')
       changed_when: false
+      check_mode: false
       tags:
         - opnsense_version
         - opnsense_upgrade
@@ -315,6 +328,7 @@
       ansible.builtin.command: >-
         bectl list -a
       changed_when: false
+      check_mode: false
       register: bectl_pre_upgrade_list_result
       when: bectl_sanity_check.rc == 0
       tags:
@@ -335,6 +349,7 @@
       ansible.builtin.command:
         zpool list -H -o name,checkpoint
       changed_when: false
+      check_mode: false
       register: zpool_checkpoints_pre_upgrade_result
       tags:
         - bsd_zpool
