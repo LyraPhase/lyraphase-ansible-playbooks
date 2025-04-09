@@ -2,6 +2,10 @@
 
 SCRIPT=$(basename "$0")
 REPO_BASE=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
+ROLE_NAME=$(basename "$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd)" )
+source "${REPO_BASE}/bin/setup-ansible-vault.sh"
+
+echo "${ROLE_NAME}: ${SCRIPT}"
 
 # If using docker-machine + VirtualBox...
 # Hack for forcing mdns / Bonjour / Zeroconf DNS resolution to be done on the Host machine running the VM
