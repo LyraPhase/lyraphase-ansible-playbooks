@@ -234,7 +234,8 @@
 
     - name: Prompt to delete old checkpoints
       ansible.builtin.pause:
-        prompt: >-
+        prompt: |-
+          {{ 'CHECK MODE is ON! No changes will be made. It is safe to continue.' if ansible_check_mode else '' }}
           ZFS checkpoint found! Please confirm you want to discard the old checkpoint!
           Remember: A ZFS pool can only have a single checkpoint.
           This playbook needs to create a checkpoint before upgrading OPNSense.
@@ -382,7 +383,8 @@
 
     - name: Prompt to delete NEW checkpoint
       ansible.builtin.pause:
-        prompt: >-
+        prompt: |-
+          {{ 'CHECK MODE is ON! No changes will be made. It is safe to continue.' if ansible_check_mode else '' }}
           OPNSense has been upgraded! Check whether everything is working properly.
           Please confirm you want to discard the old checkpoint and activate the new boot environment.
           Remember: A ZFS pool can only have a single checkpoint.
