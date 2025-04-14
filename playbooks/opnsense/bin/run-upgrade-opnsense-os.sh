@@ -18,4 +18,4 @@ if [ -n "${DOCKER_MACHINE_NAME}" ]; then
 fi
 
 # Assuming you set up SSH keys, SSH in as root via key auth
-ANSIBLE_STDOUT_CALLBACK=debug ansible-playbook -i "${PLAYBOOK_BASE}"/inventory/hosts "${PLAYBOOK_BASE}"/upgrade-opnsense-os.yml -vv --diff --ask-become-pass
+ANSIBLE_STDOUT_CALLBACK=debug ansible-playbook -i "${PLAYBOOK_BASE}"/inventory/hosts "${PLAYBOOK_BASE}"/upgrade-opnsense-os.yml -vv --diff --ask-become-pass "$@"
