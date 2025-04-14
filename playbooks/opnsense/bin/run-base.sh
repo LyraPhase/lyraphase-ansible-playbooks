@@ -18,4 +18,4 @@ if [ -n "${DOCKER_MACHINE_NAME}" ]; then
 fi
 
 # Assuming you set up SSH keys, SSH in as root via key auth
-ansible-playbook -i "${PLAYBOOK_BASE}"/inventory/hosts "${PLAYBOOK_BASE}"/base.yml -vv --diff --user=root
+ansible-playbook -i "${PLAYBOOK_BASE}"/inventory/hosts "${PLAYBOOK_BASE}"/base.yml -vv --diff --user=root "$@"
