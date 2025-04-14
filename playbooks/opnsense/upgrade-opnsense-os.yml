@@ -308,6 +308,7 @@
         test_command: whoami
       become: true
       become_method: ansible.builtin.sudo
+      when: not ansible_check_mode
       register: opnsense_be_reboot_result
       tags:
         - reboot
