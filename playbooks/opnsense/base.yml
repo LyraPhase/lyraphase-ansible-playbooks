@@ -5,6 +5,8 @@
   hosts: opnsense
   user: root
   gather_facts: false
+  vars:
+    opnsense_static_dhcp: "{{ lyraphase_static_dhcp }}"
 
   roles:
     - role: lyraphase.opnsense_users
