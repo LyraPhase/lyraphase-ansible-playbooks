@@ -27,6 +27,9 @@ galaxy_info:
   #       Maximum 20 tags per role.
 
 dependencies: []
+collections:
+  - ansibleguy.opnsense
+
 # Note: Cannot depend on collections :'-(
 # See: https://github.com/ansible/ansible/issues/62847
 #  - community.general.sudoers
