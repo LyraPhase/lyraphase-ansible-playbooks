@@ -1,0 +1,6 @@
+---
+- name: Test lyraphase.opnsense.opnsense_pkgs
+  hosts: localhost
+  remote_user: root
+  roles:
+    - lyraphase.opnsense.opnsense_pkgs
