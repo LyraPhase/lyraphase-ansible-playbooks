@@ -2,6 +2,10 @@
 # tasks file for lyraphase.opnsense.opnsense_pkgs pkg install
 - name: Install OPNsense packages
   ansibleguy.opnsense.package:
+    firewall: "{{ inventory_hostname }}"
+    ssl_ca_file: "{{ opnsense_pkgs_auth.ssl_ca_file }}"
+    api_key: "{{ opnsense_pkgs_auth.api_key }}"
+    api_secret: "{{ opnsense_pkgs_auth.api_secret }}"
     name: "{{ item }}"
-    state: present
+    action: install
   with_items: "{{ opnsense_pkgs_list }}"
