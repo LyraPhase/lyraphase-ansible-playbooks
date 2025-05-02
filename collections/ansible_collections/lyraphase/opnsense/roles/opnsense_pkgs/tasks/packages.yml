@@ -3,6 +3,7 @@
 - name: Install OPNsense packages
   ansibleguy.opnsense.package:
     firewall: "{{ inventory_hostname }}"
+    ssl_verify: "{{ opnsense_pkgs_auth.ssl_verify | default(true) }}"
     ssl_ca_file: "{{ opnsense_pkgs_auth.ssl_ca_file }}"
     api_key: "{{ opnsense_pkgs_auth.api_key }}"
     api_secret: "{{ opnsense_pkgs_auth.api_secret }}"
