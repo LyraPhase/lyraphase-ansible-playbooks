@@ -1,0 +1,20 @@
+---
+version: 3
+
+images:
+ base_image:
+   name: quay.io/ansible/awx-ee:24.6.1
+
+dependencies:
+  ansible_core:
+    package_pip: ansible-core
+  ansible_runner:
+    package_pip: ansible-runner
+  python: ee/ee-requirements.txt
+  system: ee/ee-bindep.txt
+  galaxy: requirements.yml
+
+additional_build_steps:
+  append_final: |
+    RUN sed -i -e 's/^Defaults.*requiretty/Defaults    !requiretty/' \
+               -e 's/^%wheel.*ALL$/%wheel    ALL=(ALL)    NOPASSWD: ALL/' /etc/sudoers
