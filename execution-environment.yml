@@ -21,3 +21,4 @@ additional_build_steps:
     RUN dnf install -y lastpass-cli && \
         rpm -e --nodeps xclip && \
         dnf remove -y libX11 libX11-common
+    RUN gem install --no-document lastpass-ansible
