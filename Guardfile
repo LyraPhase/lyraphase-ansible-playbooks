@@ -15,9 +15,23 @@
 #
 # and, you'll have to watch "config/Guardfile" instead of "Guardfile"
 
-guard :yaml do
-  watch(%r{^playbooks/(.*)/(.*)\.yml$})
-  watch(%r{^roles/(.*)/(.*)\.yml$})
+# YAML syntax check
+guard :shell do
+  watch(%r{^playbooks/(.*)/(.*)\.yml$}) do |m|
+    if system("yaml-lint playbooks/#{m[1]}/#{m[2]}.yml")
+      n "YAML syntax check passed!", m[1], :success
+    else
+      n "YAML syntax check FAILED!", m[1], :failed
+    end
+  end
+
+  watch(%r{^roles/(.*)/(.*)\.yml$}) do |m|
+    if system("yaml-lint roles/#{m[1]}/#{m[2]}.yml")
+      n "YAML syntax check passed!", m[1], :success
+    else
+      n "YAML syntax check FAILED!", m[2], :failed
+    end
+  end
 end
 
 guard :shell do
