@@ -294,7 +294,7 @@ su - ${MY_USERNAME} -c \
 '$EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK $EXPORT_DOCKER_PIP_USE_SUDO \
 cd ${REPO_BASE} && \
 source bin/setup-ansible-env.sh && [ -e /opt/ansible/ansible/hacking/env-setup ] && source /opt/ansible/ansible/hacking/env-setup ; \
-${CMD}'
+exec script -q -c "exec ${CMD}" /dev/null'
 EOF
 
 fi # End init check
