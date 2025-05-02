@@ -14,7 +14,7 @@ group :development do
   end
 
   gem 'rb-fsevent'
-  gem 'guard', '~> 1.8'
+  gem 'guard', '~> 2.19'
   gem 'guard-yaml'
   gem 'guard-shell'
   gem 'yaml-lint'
