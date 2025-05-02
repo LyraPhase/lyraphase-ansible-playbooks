@@ -18,3 +18,9 @@ xz
 zip
 man-db
 which
+ruby
+ruby-devel
+ripgrep
+bind-utils
+vim
+vim-ansible
