@@ -11,7 +11,7 @@ command -v pyenv 1>/dev/null 2>&1 && export PYENV_VERSION='system'
 # Just unload RVM b/c automatic loading of .ruby-version, .ruby-gemset,
 # and .rvmrc is problematic when changing project directories
 command -v rvm 1>/dev/null 2>&1 && typeset -f __rvm_unload 1>/dev/null 2>&1 && __rvm_unload && ruby_version_prompt() { :; }
-if command -v rvm 1>/dev/null 2>&1 && ! typeset -f __rvm_unload 1>/dev/null 2>&1 || echo "$PATH" | grep -iq rvm; then
+if command -v rvm 1>/dev/null 2>&1 && echo "$PATH" | grep -iq rvm || env | grep -iq rvm ; then
   # Remove RVM from path
   PATH="$(echo "$PATH" | tr ":" "\n" | grep -v rvm  | tr "\n" ":" | sed -e 's/:$//')"
   export PATH

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[[ "${ANSIBLE_EE}" == 1 ]] && source /etc/profile.d/setup-ansible-ee-docker-env.sh
+
 ANSIBLE_VAULT_PASSWORD_FILE=$(which lastpass-ansible)
 export ANSIBLE_VAULT_PASSWORD_FILE
 
