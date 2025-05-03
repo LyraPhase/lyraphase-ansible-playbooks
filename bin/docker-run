@@ -207,6 +207,9 @@ else
     unset EXPORT_DOCKER_PIP_USE_SUDO
   fi
 
+  # Generate temporary lastpass-cli home dir name
+  TMP_LPASS_HOME=$(mktemp /tmp/lpass.XXXXX)
+
   # Create script to run inside docker container
 cat << EOF > ${RUN_SCRIPT}
 #!/usr/bin/env bash
@@ -290,10 +293,24 @@ if [[ "\$SSH_AUTH_SOCK" == \$SSH_AUTH_SOCK_MAGIC_PATH ]]; then
   chown \$SSH_AUTH_SOCK_UID:\$SSH_AUTH_SOCK_GID \$SSH_AUTH_SOCK_MAGIC_PATH
 fi
 
+mkdir -p "${TMP_LPASS_HOME}"
+chown "\${MY_UID}":"\${MY_GID}" "${TMP_LPASS_HOME}"
+chmod 700 "${TMP_LPASS_HOME}"
+
+cp ${REPO_BASE}/bin/setup-ansible-ee-docker-env.sh /etc/profile.d/
+
 su - ${MY_USERNAME} -c \
 '$EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK $EXPORT_DOCKER_PIP_USE_SUDO \
 cd ${REPO_BASE} && \
 source bin/setup-ansible-env.sh && [ -e /opt/ansible/ansible/hacking/env-setup ] && source /opt/ansible/ansible/hacking/env-setup ; \
+export LPASS_HOME="${TMP_LPASS_HOME}"; \
+export ENV="/etc/profile.d/setup-ansible-ee-docker-env.sh" ; \
+export BASH_ENV="\${ENV}" ; \
+export ANSIBLE_EE="1"; \
+printf "[[ \"\\\${ANSIBLE_EE}\" == 1 ]] && source \${ENV} ; \
+  __cleanup_bash_profile() { sed -i -e \"\\|# Added by ${RUN_SCRIPT} to unload rvm$|d\" ~/.bash_profile &>/dev/null ; } ; \
+  trap __cleanup_bash_profile EXIT HUP INT QUIT KILL TERM ; \
+  # Added by ${RUN_SCRIPT} to unload rvm" >> ~/.bash_profile ; \
 exec script -q -c "exec ${CMD}" /dev/null'
 EOF
 
