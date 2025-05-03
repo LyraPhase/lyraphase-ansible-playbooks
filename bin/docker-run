@@ -31,7 +31,10 @@ MY_HOSTNAME=$(hostname)   # Only used for warning message clarity
 RUN_SCRIPT=$(mktemp ${REPO_BASE}/dockerized_run.XXXXX)
 
 # Cleanup on exit
-trap "bash -c 'rm ${RUN_SCRIPT} ' &>/dev/null" EXIT HUP INT QUIT KILL TERM
+__cleanup_bash_profile() {
+  sed -i -e "\|# Added by ${RUN_SCRIPT} to unload rvm$|d" ~/.bash_profile &>/dev/null
+}
+trap "bash -c 'rm ${RUN_SCRIPT} ' &>/dev/null; __cleanup_bash_profile" EXIT HUP INT QUIT KILL TERM
 
 # HACK: this is to allow 'docker-run' to work when DNS is unavailable.
 # For environments without DNS, we use /etc/hosts.
