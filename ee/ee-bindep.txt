@@ -24,3 +24,4 @@ ripgrep
 bind-utils
 vim
 vim-ansible
+glibc-langpack-en
