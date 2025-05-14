@@ -4,7 +4,7 @@
 - name: OpenWRT Base
   hosts: openwrt
   user: root
-  gather_facts: true
+  gather_facts: "{{ not (ansible_bootstrap | default(false)) }}"
   vars_files:
     - "vars/openwrt-base.yml"
 
