@@ -18,4 +18,4 @@ if [ -n "${DOCKER_MACHINE_NAME}" ]; then
 fi
 
 # First run must SSH in as root with asked password (we assume you have set a password first)
-ansible-playbook -i "${PLAYBOOK_BASE}"/inventory/hosts "${PLAYBOOK_BASE}"/base.yml --extra-vars 'ansible_bootstrap=true' -vv --diff --user=root --ask-pass "$@"
+ansible-playbook -i "${PLAYBOOK_BASE}"/inventory/hosts "${PLAYBOOK_BASE}"/base.yml --extra-vars 'ansible_bootstrap=true' -vv --diff --user=root --ask-pass --tags=openwrt_bootstrap "$@"

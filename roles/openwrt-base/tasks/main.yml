@@ -4,7 +4,10 @@
 
 - name: "Run tasks: python-openwrt"
   ansible.builtin.import_tasks: python-openwrt.yml
-  tags: python-openwrt
+  tags:
+    - python-openwrt
+    - openwrt_bootstrap
+    - ansible_bootstrap
 - name: "Run tasks: opkg-openwrt"
   ansible.builtin.import_tasks: opkg-openwrt.yml
   tags: opkg-openwrt
