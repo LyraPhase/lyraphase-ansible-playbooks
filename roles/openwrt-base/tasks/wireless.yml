@@ -19,3 +19,6 @@
     owner: root
     group: root
     mode: "0644"
+  register: openwrt_wireless
+  notify:
+    - reload wifi

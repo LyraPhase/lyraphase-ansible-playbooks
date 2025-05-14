@@ -45,3 +45,9 @@
   retries: 3
   delay: 1
   changed_when: opkg_makecache_result.rc == 0
+
+- name: reload wifi
+  ansible.builtin.raw: wifi
+  register: openwrt_wifi_result
+  changed_when: openwrt_wifi_result.rc == 0
+  when: openwrt_wireless.changed
