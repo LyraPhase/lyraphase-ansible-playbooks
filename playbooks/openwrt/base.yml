@@ -5,6 +5,8 @@
   hosts: openwrt
   user: root
   gather_facts: true
+  vars_files:
+    - "vars/openwrt-base.yml"
 
   roles:
     - openwrt-base
