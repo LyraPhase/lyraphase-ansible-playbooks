@@ -11,40 +11,92 @@
     - "../vars/default.yml"
   when: openwrt_opkg_repo_files is not defined
 
+- name: Check for OpenWRT version
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: grep VERSION_ID /etc/os-release | cut -f2 -d= | tr -d '"'
+  register: openwrt_version
+  tags: openwrt_version_check
+
+- name: Check for opkg
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: which opkg
+  register: openwrt_opkg
+  failed_when: false
+  tags: openwrt_version_check
+
+- name: Check for apk
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: which apk
+  register: openwrt_apk
+  failed_when: false
+  tags: openwrt_version_check
+
+- name: Use opkg on appropriate OpenWRT version
+  check_mode: false
+  changed_when: false
+  ansible.builtin.set_fact:
+    pkg_manager: opkg
+  when: >
+    (openwrt_version.stdout_lines[0].split('.')[0] | int) < 24
+    or ((openwrt_version.stdout_lines[0].split('.')[0] | int) >= 24
+        and openwrt_apk.rc != 0)
+  tags: openwrt_version_check
+
+- name: Use apk on appropriate OpenWRT version
+  check_mode: false
+  changed_when: false
+  ansible.builtin.set_fact:
+    pkg_manager: apk
+  when: >
+    (openwrt_version.stdout_lines[0].split('.')[0] | int) >= 24
+    and (openwrt_version.stdout_lines[0].split('.')[1] | int) >= 10
+    and openwrt_apk.rc == 0
+    and openwrt_apk.stdout_lines[0] | regex_search('.*/apk$')
+  tags: openwrt_version_check
+
 - name: Check for python interpreter
   check_mode: false
   changed_when: false
-  ansible.builtin.raw: opkg status python-light
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} status python-light
   register: python_light_installed
 
 - name: Check for python-logging
   check_mode: false
   changed_when: false
-  ansible.builtin.raw: opkg status python-logging
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} status python-logging
   register: python_logging_installed
 
 - name: Check for python-openssl
   check_mode: false
   changed_when: false
-  ansible.builtin.raw: opkg status python-openssl
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} status python-openssl
   register: python_openssl_installed
 
 - name: Check for python-codecs
   check_mode: false
   changed_when: false
-  ansible.builtin.raw: opkg status python-codecs
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} status python-codecs
   register: python_codecs_installed
 
 - name: Check for openssh-sftp-server
   check_mode: false
   changed_when: false
-  ansible.builtin.raw: opkg status openssh-sftp-server
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} status openssh-sftp-server
   register: openssh_server_installed
 
 # Bootstrap python interpreter for Ansible
 - name: Raw update opkg cache
   ansible.builtin.raw: echo 'Triggering RAW opkg update'
   when: >
+    pkg_manager == 'opkg' and
     not python_light_installed.stdout is search("Status: install (ok|user) installed")
     or not python_logging_installed.stdout is search("Status: install (ok|user) installed")
     or not python_openssl_installed.stdout is search("Status: install (ok|user) installed")
