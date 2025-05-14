@@ -85,6 +85,13 @@
     {{ pkg_manager | default('opkg') }} status python-codecs
   register: python_codecs_installed
 
+- name: Check for python-multiprocessing
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} status python-multiprocessing
+  register: python_multiprocessing_installed
+
 - name: Check for openssh-sftp-server
   check_mode: false
   changed_when: false
@@ -101,6 +108,7 @@
     or not python_logging_installed.stdout is search("Status: install (ok|user) installed")
     or not python_openssl_installed.stdout is search("Status: install (ok|user) installed")
     or not python_codecs_installed.stdout is search("Status: install (ok|user) installed")
+    or not python_multiprocessing_installed.stdout is search("Status: install (ok|user) installed")
     or not openssh_server_installed.stdout is search("Status: install (ok|user) installed")
   changed_when: false
   notify:
@@ -141,6 +149,13 @@
     not python_codecs_installed.stdout is search("Status: install (ok|user) installed")
   register: opkg_install_python_codecs
   changed_when: opkg_install_python_codecs.rc == 0
+
+- name: Install python-multiprocessing
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} install python-multiprocessing"
+  when: >
+    not python_multiprocessing_installed.stdout is search("Status: install (ok|user) installed")
+  register: opkg_install_python_multiprocessing
+  changed_when: opkg_install_python_multiprocessing.rc == 0
 
 - name: Install openssh-sftp-server
   ansible.builtin.raw: opkg install openssh-sftp-server
