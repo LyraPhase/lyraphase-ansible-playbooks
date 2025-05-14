@@ -39,3 +39,6 @@ config wifi-iface
 	option encryption 'psk2'
 	option key '{{ openwrt_base_wireless.radio1.key }}'
 	option dtim_period '3'
+
+{# Add 2 newlines match OpenWRT file contents #}
+{# (workaround pre-commit end-of-file-fixer) #}
