@@ -123,28 +123,28 @@
   check_mode: false
 
 - name: Install python interpreter
-  ansible.builtin.raw: opkg install python-light
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} install python-light"
   when: >
     not python_light_installed.stdout is search("Status: install (ok|user) installed")
   register: opkg_install_python_light
   changed_when: opkg_install_python_light.rc == 0
 
 - name: Install python-logging
-  ansible.builtin.raw: opkg install python-logging
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} install python-logging"
   when: >
     not python_logging_installed.stdout is search("Status: install (ok|user) installed")
   register: opkg_install_python_logging
   changed_when: opkg_install_python_logging.rc == 0
 
 - name: Install python-openssl
-  ansible.builtin.raw: opkg install python-openssl
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} install python-openssl"
   when: >
     not python_openssl_installed.stdout is search("Status: install (ok|user) installed")
   register: opkg_install_python_openssl
   changed_when: opkg_install_python_openssl.rc == 0
 
 - name: Install python-codecs
-  ansible.builtin.raw: opkg install python-codecs
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} install python-codecs"
   when: >
     not python_codecs_installed.stdout is search("Status: install (ok|user) installed")
   register: opkg_install_python_codecs
@@ -158,7 +158,7 @@
   changed_when: opkg_install_python_multiprocessing.rc == 0
 
 - name: Install openssh-sftp-server
-  ansible.builtin.raw: opkg install openssh-sftp-server
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} install openssh-sftp-server"
   when: >
     not openssh_server_installed.stdout is search("Status: install (ok|user) installed")
   register: opkg_install_openssh_sftp_server
