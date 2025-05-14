@@ -12,7 +12,7 @@
 #     - "../vars/default.yml"
 #   when: openwrt_base_logrotate_files is not defined
 
-- name: Install logrotate drop-ins
+- name: Install wireless config
   ansible.builtin.template:
     src: templates/etc-config/wireless.j2
     dest: /etc/config/wireless
