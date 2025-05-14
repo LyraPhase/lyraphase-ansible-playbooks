@@ -28,6 +28,8 @@ config wifi-iface
 	option network 'lan'
 	option encryption 'psk2'
 	option key '{{ openwrt_base_wireless.radio0.key }}'
+	option disassoc_low_ack '0'
+	option max_inactivity '3600'
 
 config wifi-iface
 	option device 'radio1'
