@@ -17,3 +17,20 @@
         - opkg_packages
         - packages
         - install_packages
+  tasks:
+    - name: Get original banner contents
+      ansible.builtin.slurp:
+        src: "/etc/banner"
+      register: openwrt_banner
+      tags:
+        - openwrt_banner
+    - name: Install SSH banner file
+      ansible.builtin.template:
+        src: templates/lyra-vega-banner.j2
+        dest: "{{ openwrt_dropbear_bannerfile | default('/etc/config/lyra-vega-banner') }}"
+        owner: root
+        group: root
+        mode: "0644"
+      register: openwrt_custom_banner
+      tags:
+        - openwrt_banner
