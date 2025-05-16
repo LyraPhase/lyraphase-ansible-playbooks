@@ -11,6 +11,14 @@
   roles:
     - openwrt-base
 #    - openwrt-logrotate
+    - role: imp1sh.ansible_managemynetwork.ansible_users
+      tags:
+        - ansible_users
+        - users
+    - role: imp1sh.ansible_managemynetwork.ansible_openwrtdropbear
+      tags:
+        - ansible_openwrtdropbear
+        - sshkeys
     - role: imp1sh.ansible_managemynetwork.ansible_packages
       when: not (ansible_bootstrap | default(false))
       tags:
