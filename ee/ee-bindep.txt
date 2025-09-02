@@ -2,6 +2,9 @@ ca-certificates
 bzip2
 file
 findutils
+gcc [platform:rpm compile]
+gcc-c++ [platform:rpm compile]
+python3.11-devel [platform:rpm compile]
 gem
 git
 gzip
