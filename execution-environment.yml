@@ -19,7 +19,9 @@ dependencies:
   python: ee/ee-requirements.txt
   system: ee/ee-bindep.txt
   galaxy: requirements.yml
-
+additional_build_files:
+  - src: ee/profile.d/p10k-centos.zsh
+    dest: profile.d
 additional_build_steps:
   append_base:
     - RUN $PKGMGR install -y git-core git-lfs
@@ -31,3 +33,17 @@ additional_build_steps:
         rpm -e --nodeps xclip && \
         $PKGMGR remove -y libX11 libX11-common libXmu libXext libXt
     RUN gem install --no-document lastpass-ansible
+    RUN git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /usr/share/oh-my-zsh && \
+        cp /usr/share/oh-my-zsh/templates/zshrc.zsh-template /usr/share/oh-my-zsh/zshrc && \
+        curl -Ls -o - 'https://raw.githubusercontent.com/manjaro-sway/oh-my-zsh/refs/heads/master/0001-zshrc.patch' \
+          | patch -p1 /usr/share/oh-my-zsh/zshrc
+    RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /usr/share/zsh-theme-powerlevel10k \
+        && cd /usr/share/zsh-theme-powerlevel10k && \
+        for file in *.zsh-theme internal/*.zsh gitstatus/*.zsh gitstatus/install; do \
+          zsh -fc "emulate zsh -o no_aliases && zcompile -R -- $file.zwc $file" ; \
+        done
+    COPY _build/profile.d/p10k-centos.zsh /etc/profile.d/p10k-centos.zsh
+    RUN echo '[[ ! -f /etc/profile.d/p10k-centos.zsh ]] || source /etc/profile.d/p10k-centos.zsh' >> \
+        /usr/share/oh-my-zsh/zshrc
+    RUN echo '[[ ! -f /etc/profile ]] || source /etc/profile' >> \
+        /usr/share/oh-my-zsh/zshrc

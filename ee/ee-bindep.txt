@@ -13,6 +13,7 @@ gzip
 hg [platform:centos-9 platform:rhel-9]
 iproute
 nmap-ncat
+patch
 procps-ng
 svn
 sudo
@@ -32,6 +33,7 @@ bind-utils
 vim
 vim-ansible [epel platform:redhat]
 glibc-langpack-en
+zsh
 # CentOS/RHEL 9 Override all python 3.x deps w/3.11
 python3.11-devel [compile platform:centos-9 platform:rhel-9]  # from collection openstack.cloud
 python3.11-cryptography [platform:centos-9 platform:rhel-9]  # from collection openstack.cloud
