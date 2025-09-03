@@ -1,10 +1,11 @@
+epel-release [platform:rpm]
 ca-certificates
 bzip2
 file
 findutils
 gcc [platform:rpm compile]
 gcc-c++ [platform:rpm compile]
-python3.11-devel [platform:rpm compile]
+python3.12-devel [platform:rpm platform:centos-10 platform:rhel-10 compile]
 gem
 git
 gzip
@@ -28,3 +29,17 @@ bind-utils
 vim
 vim-ansible
 glibc-langpack-en
+# CentOS/RHEL 9 Override all python 3.x deps w/3.11
+python3.11-devel [compile platform:centos-9 platform:rhel-9]  # from collection openstack.cloud
+python3.11-cryptography [platform:centos-9 platform:rhel-9]  # from collection openstack.cloud
+python3.11-pyyaml [platform:centos-9 platform:rhel-9]  # from collection awx.awx
+python3.11-requests [platform:centos-9 platform:rhel-9]  # from collection awx.awx
+# replaced with pip equivalents b/c no RHEL py3.11 pkg
+# python3-pytz [platform:centos-9 platform:rhel-9]  # from collection awx.awx
+# CentOS Stream 10 - Override all python 3.x deps w/3.12
+python3-devel [compile platform:centos-10 platform:rhel-10]  # from collection openstack.cloud
+python3-cryptography [platform:centos-10 platform:rhel-10]  # from collection openstack.cloud
+python3-pyyaml [platform:centos-10 platform:rhel-10]  # from collection awx.awx
+python3-requests [platform:centos-10 platform:rhel-10]  # from collection awx.awx
+# All RHEL
+python3-rpm [(platform:redhat platform:base-py3)]  # from collection theforeman.foreman
