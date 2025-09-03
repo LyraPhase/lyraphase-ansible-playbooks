@@ -10,7 +10,7 @@ gem
 git-core [platform:rpm]
 git-lfs [platform:rpm]
 gzip
-hg
+hg [platform:centos-9 platform:rhel-9]
 iproute
 nmap-ncat
 procps-ng
@@ -25,10 +25,12 @@ man-db
 which
 ruby
 ruby-devel
-ripgrep
+bat [epel platform:redhat]
+fzf [epel platform:redhat]
+ripgrep [epel platform:redhat]
 bind-utils
 vim
-vim-ansible
+vim-ansible [epel platform:redhat]
 glibc-langpack-en
 # CentOS/RHEL 9 Override all python 3.x deps w/3.11
 python3.11-devel [compile platform:centos-9 platform:rhel-9]  # from collection openstack.cloud
