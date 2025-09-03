@@ -7,7 +7,8 @@ gcc [platform:rpm compile]
 gcc-c++ [platform:rpm compile]
 python3.12-devel [platform:rpm platform:centos-10 platform:rhel-10 compile]
 gem
-git
+git-core [platform:rpm]
+git-lfs [platform:rpm]
 gzip
 hg
 iproute
