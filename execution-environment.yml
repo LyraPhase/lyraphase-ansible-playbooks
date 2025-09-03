@@ -3,12 +3,15 @@ version: 3
 
 images:
  base_image:
-   name: quay.io/ansible/awx-ee:latest
+  name: quay.io/centos/centos:stream10-minimal
+options:
+  package_manager_path: /usr/bin/microdnf
+
 
 dependencies:
   python_interpreter:
-    package_system: python3.11
-    python_path: /usr/bin/python3.11
+    package_system: python3.12
+    python_path: /usr/bin/python3.12
   ansible_core:
     package_pip: ansible-core
   ansible_runner:
@@ -21,7 +24,7 @@ additional_build_steps:
   append_final: |
     RUN sed -i -e 's/^Defaults.*requiretty/Defaults    !requiretty/' \
                -e 's/^%wheel.*ALL$/%wheel    ALL=(ALL)    NOPASSWD: ALL/' /etc/sudoers
-    RUN dnf install -y lastpass-cli && \
+    RUN $PKGMGR install -y lastpass-cli && \
         rpm -e --nodeps xclip && \
-        dnf remove -y libX11 libX11-common
+        $PKGMGR remove -y libX11 libX11-common libXmu libXext libXt
     RUN gem install --no-document lastpass-ansible
