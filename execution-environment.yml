@@ -60,3 +60,4 @@ additional_build_steps:
         chmod 0775 /run/user/bat/cache && \
         chown -R root:users /run/user/bat/cache && \
         chmod 0664 /run/user/bat/cache/*
+    RUN rpm -i 'https://ziply.mm.fcix.net/fedora/linux/releases/42/Everything/x86_64/os/Packages/f/foot-terminfo-1.21.0-1.fc42.x86_64.rpm'
