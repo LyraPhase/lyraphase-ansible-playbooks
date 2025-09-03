@@ -10,12 +10,10 @@ gem
 git-core [platform:rpm]
 git-lfs [platform:rpm]
 gzip
-hg [platform:centos-9 platform:rhel-9]
 iproute
 nmap-ncat
 patch
 procps-ng
-svn
 sudo
 tar
 which
