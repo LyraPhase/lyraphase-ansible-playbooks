@@ -61,3 +61,10 @@ additional_build_steps:
         chown -R root:users /run/user/bat/cache && \
         chmod 0664 /run/user/bat/cache/*
     RUN rpm -i 'https://ziply.mm.fcix.net/fedora/linux/releases/42/Everything/x86_64/os/Packages/f/foot-terminfo-1.21.0-1.fc42.x86_64.rpm'
+    ARG TERRA_RELEASEVER=42
+    RUN curl -fsSL https://github.com/terrapkg/subatomic-repos/raw/main/terra.repo | \
+        sed -e "s|\$releasever|${TERRA_RELEASEVER}|g" | \
+        tee /etc/yum.repos.d/terra.repo && \
+        sudo rpm --import https://repos.fyralabs.com/terra${TERRA_RELEASEVER}/key.asc && \
+        $PKGMGR update -y && $PKGMGR clean all
+    RUN $PKGMGR install -y $PKGMGR_OPTS --enablerepo terra eza
