@@ -19,6 +19,21 @@ dependencies:
   python: ee/ee-requirements.txt
   system: ee/ee-bindep.txt
   galaxy: requirements.yml
+  exclude:
+    system:
+      - systemd
+      - libX11
+      - libX11-common
+      - libXmu
+      - python3-devel
+      - python3-libs
+      - python39-devel
+      - python38-pytz
+      - python38-requests
+      - python38-pyyaml
+      - python38-cryptography
+      - python38-devel
+      - python38-requests
 additional_build_files:
   - src: ee/profile.d/p10k-centos.zsh
     dest: profile.d
