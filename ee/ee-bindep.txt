@@ -16,7 +16,6 @@ nmap-ncat
 patch
 procps-ng
 svn
-busybox [epel platform:redhat]
 sudo
 tar
 which

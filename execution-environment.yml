@@ -72,10 +72,3 @@ additional_build_steps:
         chmod 0775 /run/user/bat/cache && \
         chown -R root:users /run/user/bat/cache && \
         chmod 0664 /run/user/bat/cache/*
-    RUN /bin/sh -c 'for cmd in ps top free pgrep pidof pkill pmap pwdx \
-            uptime w watch ; do \
-            update-alternatives --verbose --install /usr/bin/$cmd $cmd /usr/sbin/busybox 50 ; \
-          done'
-    RUN for cmd in sysctl ; do \
-            update-alternatives --verbose --install /usr/sbin/$cmd $cmd /usr/sbin/busybox 50 ; \
-          done
