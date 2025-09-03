@@ -9,6 +9,7 @@ python3.12-devel [platform:rpm platform:centos-10 platform:rhel-10 compile]
 gem
 git-core [platform:rpm]
 git-lfs [platform:rpm]
+gnupg2 [platform:rpm]
 gzip
 iproute
 nmap-ncat
