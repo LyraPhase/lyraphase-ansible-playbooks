@@ -287,7 +287,7 @@ if env | grep -q SSH_AUTH_SOCK ; then
 fi
 
 # Create user & group with names matching host, GID/UID matching volume permissions (ideally)
-if (! egrep -q "^${MY_GROUPNAME}:x:\${MY_GID}:" /etc/group); then
+if (! grep -E -q "^${MY_GROUPNAME}:x:\${MY_GID}:" /etc/group); then
     groupadd \${groupadd_args} -g \${MY_GID} "${MY_GROUPNAME}"
 fi
 useradd -u \${MY_UID} -g \${MY_GID} -G \${USERS_GID}\${WHEEL_GID:+,\${WHEEL_GID}} -d ${HOME} -M ${MY_USERNAME}
