@@ -336,7 +336,7 @@ if [ -n "$EXEC_CONTAINER" ]; then
   docker exec ${DOCKER_INTERACT_ARGS:-} --user=root "${EXEC_CONTAINER}" "${RUN_SCRIPT}"
   RET=$?
 else
-  docker run ${DOCKER_INTERACT_ARGS:-} --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" --name="${CONTAINER_NAME}" ${DOCKER_RUN_SSH_AGENT_ARGS:-} ${DOCKER_RUN_ARGS:-} "${CONTAINER_ID}" "${RUN_SCRIPT}"
+  docker run ${DOCKER_INTERACT_ARGS:-} --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --name="${CONTAINER_NAME}" ${DOCKER_RUN_SSH_AGENT_ARGS:-} ${DOCKER_RUN_ARGS:-} "${CONTAINER_ID}" "${RUN_SCRIPT}"
   RET=$?
   rm ${RUN_SCRIPT}
 fi
