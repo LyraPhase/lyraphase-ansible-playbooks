@@ -61,6 +61,7 @@ additional_build_steps:
         chown -R root:users /run/user/bat/cache && \
         chmod 0664 /run/user/bat/cache/*
     RUN rpm -i 'https://dl.fedoraproject.org/pub/fedora/linux/updates/42/Everything/x86_64/Packages/f/foot-terminfo-1.23.1-1.fc42.x86_64.rpm'
+    RUN rpm -i 'https://dl.fedoraproject.org/pub/fedora/linux/updates/42/Everything/x86_64/Packages/g/git-delta-0.18.2-9.fc42.x86_64.rpm'
     ARG TERRA_RELEASEVER=42
     RUN rpm -i 'https://repos.fyralabs.com/terra42/eza-0%3A0.23.1-1.fc42.x86_64.rpm' && \
         $PKGMGR clean all
