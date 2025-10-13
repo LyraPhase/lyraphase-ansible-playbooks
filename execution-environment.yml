@@ -43,10 +43,14 @@ additional_build_steps:
         cp /usr/share/oh-my-zsh/templates/zshrc.zsh-template /usr/share/oh-my-zsh/zshrc && \
         curl -Ls -o - 'https://raw.githubusercontent.com/manjaro-sway/oh-my-zsh/refs/heads/master/0001-zshrc.patch' \
           | patch -p1 /usr/share/oh-my-zsh/zshrc
-    RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /usr/share/zsh-theme-powerlevel10k \
-        && cd /usr/share/zsh-theme-powerlevel10k && \
+    RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /usr/share/zsh-theme-powerlevel10k && \
+        cd /usr/share/zsh-theme-powerlevel10k && \
+        sed -i'' -e '/_p9k_must_init() {/a \ \ set -x; echo "CENTOS_POWERLEVEL9K_CONFIG_FILE=$CENTOS_POWERLEVEL9K_CONFIG_FILE"; [ -r "$CENTOS_POWERLEVEL9K_CONFIG_FILE" ] && builtin source "$CENTOS_POWERLEVEL9K_CONFIG_FILE" ; set +x' \
+          /usr/share/zsh-theme-powerlevel10k/internal/p10k.zsh && \
+          sync /usr/share/zsh-theme-powerlevel10k/internal/p10k.zsh && \
         for file in *.zsh-theme internal/*.zsh gitstatus/*.zsh gitstatus/install; do \
           zsh -fc "emulate zsh -o no_aliases && zcompile -R -- $file.zwc $file" ; \
+          sync ${file}.zwc ; \
         done
     COPY _build/profile.d/p10k-centos.zsh /etc/profile.d/p10k-centos.zsh
     RUN echo '[[ ! -f /etc/profile.d/p10k-centos.zsh ]] || source /etc/profile.d/p10k-centos.zsh' >> \
