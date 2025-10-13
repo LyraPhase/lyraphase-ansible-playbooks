@@ -26,6 +26,10 @@ man-db
 which
 ruby
 ruby-devel
+capstone [platform:redhat]
+openssl-libs [platform:redhat]
+crypto-policies-scripts [platform:redhat]
+ncurses [platform:redhat]
 bat [epel platform:redhat]
 fzf [epel platform:redhat]
 ripgrep [epel platform:redhat]
