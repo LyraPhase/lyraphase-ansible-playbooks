@@ -38,6 +38,7 @@ additional_build_steps:
         $PKGMGR remove -y libX11 libX11-common libXmu libXext libXt && \
         $PKGMGR clean all
     RUN gem install --no-document lastpass-ansible
+    RUN update-crypto-policies --set LEGACY
     RUN git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /usr/share/oh-my-zsh && \
         cp /usr/share/oh-my-zsh/templates/zshrc.zsh-template /usr/share/oh-my-zsh/zshrc && \
         curl -Ls -o - 'https://raw.githubusercontent.com/manjaro-sway/oh-my-zsh/refs/heads/master/0001-zshrc.patch' \
