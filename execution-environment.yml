@@ -20,6 +20,8 @@ dependencies:
   system: ee/ee-bindep.txt
   galaxy: requirements.yml
 additional_build_files:
+  - src: ee/profile.d/00-xdg-docker-config.sh
+    dest: profile.d
   - src: ee/profile.d/p10k-centos.zsh
     dest: profile.d
   - src: ee/profile.d/bat-themes.sh
@@ -39,6 +41,12 @@ additional_build_steps:
         $PKGMGR clean all
     RUN gem install --no-document lastpass-ansible
     RUN update-crypto-policies --set LEGACY
+    COPY _build/profile.d/00-xdg-docker-config.sh /etc/profile.d/00-xdg-docker-config.sh
+    RUN export _docker_xdg_cache_home=/var/run/user/1000/cache && \
+        echo "$_docker_xdg_cache_home" && \
+        mkdir -p "$_docker_xdg_cache_home" && \
+        chown 1000:1000 "$_docker_xdg_cache_home" && \
+        chmod 0700 "$_docker_xdg_cache_home"
     RUN git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /usr/share/oh-my-zsh && \
         cp /usr/share/oh-my-zsh/templates/zshrc.zsh-template /usr/share/oh-my-zsh/zshrc && \
         curl -Ls -o - 'https://raw.githubusercontent.com/manjaro-sway/oh-my-zsh/refs/heads/master/0001-zshrc.patch' \
