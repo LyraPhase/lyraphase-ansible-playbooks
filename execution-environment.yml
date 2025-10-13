@@ -26,6 +26,8 @@ additional_build_files:
     dest: profile.d
   - src: ee/profile.d/bat-themes.sh
     dest: profile.d
+  - src: ee/profile.d/zsh-profile.sh
+    dest: profile.d
 additional_build_steps:
   append_base:
     - RUN $PKGMGR install -y --nodocs --setopt install_weak_deps=0
@@ -61,6 +63,7 @@ additional_build_steps:
           sync ${file}.zwc ; \
         done
     COPY _build/profile.d/p10k-centos.zsh /etc/profile.d/p10k-centos.zsh
+    COPY _build/profile.d/zsh-profile.sh /etc/profile.d/zsh-profile.sh
     RUN echo '[[ ! -f /etc/profile.d/p10k-centos.zsh ]] || source /etc/profile.d/p10k-centos.zsh' >> \
         /usr/share/oh-my-zsh/zshrc
     RUN echo '[[ ! -f /etc/profile ]] || source /etc/profile' >> \
