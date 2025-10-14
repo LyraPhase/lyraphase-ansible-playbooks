@@ -47,12 +47,14 @@ additional_build_steps:
     RUN export _docker_xdg_cache_home=/var/run/user/1000/cache && \
         echo "$_docker_xdg_cache_home" && \
         mkdir -p "$_docker_xdg_cache_home" && \
-        chown 1000:1000 "$_docker_xdg_cache_home" && \
+        mkdir -p "${_docker_xdg_cache_home}/zsh/zcompcache" && \
+        chown -R 1000:1000 "$_docker_xdg_cache_home" && \
         chmod 0700 "$_docker_xdg_cache_home"
     RUN git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /usr/share/oh-my-zsh && \
         cp /usr/share/oh-my-zsh/templates/zshrc.zsh-template /usr/share/oh-my-zsh/zshrc && \
         curl -Ls -o - 'https://raw.githubusercontent.com/manjaro-sway/oh-my-zsh/refs/heads/master/0001-zshrc.patch' \
-          | patch -p1 /usr/share/oh-my-zsh/zshrc
+          | patch -p1 /usr/share/oh-my-zsh/zshrc && \
+        git config --global --add safe.directory /usr/share/oh-my-zsh
     RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /usr/share/zsh-theme-powerlevel10k && \
         cd /usr/share/zsh-theme-powerlevel10k && \
         sed -i'' -e '/_p9k_must_init() {/a \ \ [ -r "$CENTOS_POWERLEVEL9K_CONFIG_FILE" ] && builtin source "$CENTOS_POWERLEVEL9K_CONFIG_FILE"' \
@@ -63,7 +65,15 @@ additional_build_steps:
         for file in *.zsh-theme internal/*.zsh gitstatus/*.zsh gitstatus/install; do \
           zsh -fc "emulate zsh -o no_aliases && zcompile -R -- $file.zwc $file" ; \
           sync ${file}.zwc ; \
-        done
+        done && \
+        zsh -l -i -c 'source /usr/share/oh-my-zsh/zshrc' && \
+        zsh -c 'export ZSH_COMPDUMP="/var/run/user/1000/cache/zsh/zcompcache/.zcompdump-${ZSH_VERSION}"; autoload -Uz compinit; compinit -C -d "${ZSH_COMPDUMP}"; sync "$ZSH_COMPDUMP"' && \
+        zsh -c 'export ZSH_COMPDUMP="/var/run/user/1000/cache/zsh/zcompcache/.zcompdump-${ZSH_VERSION}"; echo "#omz revision: $(git -C /usr/share/oh-my-zsh rev-parse HEAD)" | tee -a "${ZSH_COMPDUMP}"; sync "$ZSH_COMPDUMP"' && \
+        zsh -l -i -c 'export ZSH_COMPDUMP="/var/run/user/1000/cache/zsh/zcompcache/.zcompdump-${ZSH_VERSION}"; source /usr/share/oh-my-zsh/zshrc; echo "#omz fpath: ${fpath[@]}" | tee -a "${ZSH_COMPDUMP}"; sync "$ZSH_COMPDUMP"' && \
+        zsh -c 'export ZSH_COMPDUMP="/var/run/user/1000/cache/zsh/zcompcache/.zcompdump-${ZSH_VERSION}"; zcompile "${ZSH_COMPDUMP}".zwc "${ZSH_COMPDUMP}" ; sync "${ZSH_COMPDUMP}.zwc"' && \
+        zsh -c 'export ZSH_COMPDUMP="/var/run/user/1000/cache/zsh/zcompcache/.zcompdump-${ZSH_VERSION}"; autoload -Uz zrecompile; zrecompile -q -p "${ZSH_COMPDUMP}"' && \
+        zsh -c 'export ZSH_COMPDUMP="/var/run/user/1000/cache/zsh/zcompcache/.zcompdump-${ZSH_VERSION}"; chown -R 1000:1000 "$(dirname "${ZSH_COMPDUMP}")" && touch "${ZSH_COMPDUMP}".zwc' && \
+        git config --global --add safe.directory /usr/share/zsh-theme-powerlevel10k
     COPY _build/profile.d/p10k-centos.zsh /etc/profile.d/p10k-centos.zsh
     COPY _build/profile.d/zsh-profile.sh /etc/profile.d/zsh-profile.sh
     RUN echo '[[ ! -f /etc/profile.d/p10k-centos.zsh ]] || source /etc/profile.d/p10k-centos.zsh' >> \
