@@ -300,6 +300,14 @@ mkdir -p "${TMP_LPASS_HOME}"
 chown "\${MY_UID}":"\${MY_GID}" "${TMP_LPASS_HOME}"
 chmod 700 "${TMP_LPASS_HOME}"
 
+if mount | grep -E "\$(realpath /var/run/user/\${MY_UID})" | grep -qE 'tmpfs' ; then
+# Not as portable
+# if [[ "tmpfs" == "\$(stat --file-system --printf='%T' "/var/run/user/\${MY_UID}")" ]]; then
+  cp -ar "/var/run/user/docker-skel"/* "/var/run/user/\${MY_UID}/"
+else
+  ln -s "/var/run/user/docker-skel" "/var/run/user/\${MY_UID}"
+fi
+
 cp ${REPO_BASE}/bin/setup-ansible-ee-docker-env.sh /etc/profile.d/
 
 su - ${MY_USERNAME} -c \
@@ -336,7 +344,7 @@ if [ -n "$EXEC_CONTAINER" ]; then
   docker exec ${DOCKER_INTERACT_ARGS:-} --user=root "${EXEC_CONTAINER}" "${RUN_SCRIPT}"
   RET=$?
 else
-  docker run ${DOCKER_INTERACT_ARGS:-} --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --name="${CONTAINER_NAME}" ${DOCKER_RUN_SSH_AGENT_ARGS:-} ${DOCKER_RUN_ARGS:-} "${CONTAINER_ID}" "${RUN_SCRIPT}"
+  docker run ${DOCKER_INTERACT_ARGS:-} --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --tmpfs "/var/run/user/${MY_UID}:rw,nosuid,nodev,relatime,exec,size=64M" --name="${CONTAINER_NAME}" ${DOCKER_RUN_SSH_AGENT_ARGS:-} ${DOCKER_RUN_ARGS:-} "${CONTAINER_ID}" "${RUN_SCRIPT}"
   RET=$?
   rm ${RUN_SCRIPT}
 fi

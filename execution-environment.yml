@@ -48,7 +48,6 @@ additional_build_steps:
         echo "$_docker_xdg_cache_home" && \
         mkdir -p "$_docker_xdg_cache_home" && \
         mkdir -p "${_docker_xdg_cache_home}/zsh/zcompcache" && \
-        ln -s "$(dirname ${_docker_xdg_cache_home})" /var/run/user/1000 && \
         chown -R 1000:1000 "$_docker_xdg_cache_home" && \
         chmod 0700 "$_docker_xdg_cache_home"
     RUN git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /usr/share/oh-my-zsh && \
