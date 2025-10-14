@@ -55,7 +55,7 @@ additional_build_steps:
           | patch -p1 /usr/share/oh-my-zsh/zshrc
     RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /usr/share/zsh-theme-powerlevel10k && \
         cd /usr/share/zsh-theme-powerlevel10k && \
-        sed -i'' -e '/_p9k_must_init() {/a \ \ set -x; echo "CENTOS_POWERLEVEL9K_CONFIG_FILE=$CENTOS_POWERLEVEL9K_CONFIG_FILE"; [ -r "$CENTOS_POWERLEVEL9K_CONFIG_FILE" ] && builtin source "$CENTOS_POWERLEVEL9K_CONFIG_FILE" ; set +x' \
+        sed -i'' -e '/_p9k_must_init() {/a \ \ [ -r "$CENTOS_POWERLEVEL9K_CONFIG_FILE" ] && builtin source "$CENTOS_POWERLEVEL9K_CONFIG_FILE"' \
           /usr/share/zsh-theme-powerlevel10k/internal/p10k.zsh && \
           sync /usr/share/zsh-theme-powerlevel10k/internal/p10k.zsh && \
         for file in *.zsh-theme internal/*.zsh gitstatus/*.zsh gitstatus/install; do \
