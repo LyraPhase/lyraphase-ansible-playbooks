@@ -300,10 +300,10 @@ mkdir -p "${TMP_LPASS_HOME}"
 chown "\${MY_UID}":"\${MY_GID}" "${TMP_LPASS_HOME}"
 chmod 700 "${TMP_LPASS_HOME}"
 
-if mount | grep -E "\$(realpath /var/run/user/\${MY_UID})" | grep -qE 'tmpfs' ; then
-# Not as portable
-# if [[ "tmpfs" == "\$(stat --file-system --printf='%T' "/var/run/user/\${MY_UID}")" ]]; then
-  cp -ar "/var/run/user/docker-skel"/* "/var/run/user/\${MY_UID}/"
+if mount | grep -E "\$(realpath /var/run/user/\${MY_UID})" | grep -qE 'tmpfs|ext4' ; then
+  chown "\${MY_UID}:\${MY_GID}" "/var/run/user/\${MY_UID}/"
+  rsync -a -u --chown="\${MY_UID}:\${MY_GID}" "/var/run/user/docker-skel/" "/var/run/user/\${MY_UID}/"
+  chmod 0700 "/var/run/user/\${MY_UID}/"
 else
   ln -s "/var/run/user/docker-skel" "/var/run/user/\${MY_UID}"
 fi
@@ -344,7 +344,15 @@ if [ -n "$EXEC_CONTAINER" ]; then
   docker exec ${DOCKER_INTERACT_ARGS:-} --user=root "${EXEC_CONTAINER}" "${RUN_SCRIPT}"
   RET=$?
 else
-  docker run ${DOCKER_INTERACT_ARGS:-} --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --tmpfs "/var/run/user/${MY_UID}:rw,nosuid,nodev,relatime,exec,size=64M" --name="${CONTAINER_NAME}" ${DOCKER_RUN_SSH_AGENT_ARGS:-} ${DOCKER_RUN_ARGS:-} "${CONTAINER_ID}" "${RUN_SCRIPT}"
+  CACHE_VOLUME_NAME="xdg-cache-${MY_USERNAME}-$(docker inspect --format '{{range $index, $rt := .RepoDigests}}{{if eq $index 0}}{{$rt}}{{end}}{{end}}' "${CONTAINER_ID}" | tr '/@' '_' | tr ':' '.' | tr -d '[[:space:]]' )"
+  if ! docker volume ls -q | grep -q "$CACHE_VOLUME_NAME"; then
+    #docker volume create --name "$CACHE_VOLUME_NAME" --driver local --label "purpose=xdg-cache" --label "image_name=${CONTAINER_ID}" --label "user=${MY_USERNAME}" --label "group=${MY_GROUPNAME}" --label "uid=${MY_UID}" --label "gid=${MY_GID}" --opt type=tmpfs --opt device=tmpfs --opt "o=rw,nosuid,nodev,relatime,exec,uid=${MY_UID},gid=${MY_GID},size=64M"
+    docker volume create --name "$CACHE_VOLUME_NAME" --driver local \
+      --label "purpose=xdg-cache" --label "image_name=${CONTAINER_ID}" \
+      --label "user=${MY_USERNAME}" --label "group=${MY_GROUPNAME}" \
+      --label "uid=${MY_UID}" --label "gid=${MY_GID}"
+  fi
+  docker run ${DOCKER_INTERACT_ARGS:-} --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}" --name="${CONTAINER_NAME}" ${DOCKER_RUN_SSH_AGENT_ARGS:-} ${DOCKER_RUN_ARGS:-} "${CONTAINER_ID}" "${RUN_SCRIPT}"
   RET=$?
   rm ${RUN_SCRIPT}
 fi
