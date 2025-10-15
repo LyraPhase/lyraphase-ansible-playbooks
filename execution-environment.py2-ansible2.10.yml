@@ -1,0 +1,128 @@
+---
+version: 3
+
+images:
+ base_image:
+  name: quay.io/centos/centos:stream8
+options:
+  package_manager_path: /usr/bin/dnf
+
+
+dependencies:
+  python_interpreter:
+    package_system: python2
+    python_path: /usr/bin/python2.7
+  ansible_core:
+    package_pip: ansible-base~=2.10.0
+  ansible_runner:
+    package_pip: ansible-runner==1.4.7
+  python: ee/ee-requirements.txt
+  system: ee/ee-bindep.txt
+  galaxy: requirements.yml
+additional_build_files:
+  - src: ee/profile.d/00-xdg-docker-config.sh
+    dest: profile.d
+  - src: ee/profile.d/p10k-centos.zsh
+    dest: profile.d
+  - src: ee/profile.d/bat-themes.sh
+    dest: profile.d
+  - src: ee/profile.d/zsh-profile.sh
+    dest: profile.d
+  - src: ee/py2-introspect-shim.py
+    dest: output
+additional_build_steps:
+  prepend_base:
+    - RUN sed -i s/mirror.centos.org/vault.centos.org/g /etc/yum.repos.d/*.repo
+    - RUN sed -i s/^#.*baseurl=http/baseurl=http/g /etc/yum.repos.d/*.repo
+    - RUN sed -i s/^mirrorlist=http/#mirrorlist=http/g /etc/yum.repos.d/*.repo
+    - RUN $PKGMGR install -y --nodocs --setopt install_weak_deps=0 gcc python2-devel python39 python39-pip
+    - RUN python3.9 -m pip install --no-cache-dir -U pip &&
+          python3.9 -m pip cache purge
+  append_base:
+    - RUN $PKGMGR install -y --nodocs --setopt install_weak_deps=0
+          git-core git-lfs && $PKGMGR clean all
+#    - RUN $PYCMD -m pip install --no-cache-dir --python-version 2.7 -U pip==20.3.4 setuptools==44.1.1 wheel &&
+#          $PYCMD -m pip cache purge
+#    - RUN $PYCMD -m pip install --no-cache-dir -U pip &&
+#          $PYCMD -m pip cache purge
+  prepend_builder:
+    # - ENV PYCMD=python3.9
+    - RUN python3.9 -m pip install --no-cache-dir bindep pyyaml packaging &&
+          python3.9 -m pip cache purge
+    - RUN $PYCMD -m pip install --no-cache-dir virtualenv
+    - RUN virtualenv -p /usr/bin/python2.7 /tmp/venv
+          --system-site-packages
+          --no-pip &&
+          source /tmp/venv/bin/activate &&
+          $PYCMD -m  ensurepip --upgrade
+    - RUN sed -i''  -e '/\$PYCMD -m venv \/tmp\/venv/d' /output/scripts/assemble
+    # - RUN $PYCMD -m venv /tmp/venv --system-site-packages --without-pip &&
+          # source /tmp/venv/bin/activate &&
+          # /usr/bin/python3 -m  ensurepip --upgrade
+    - RUN mv /output/scripts/introspect.py /output/scripts/introspect.py3.py &&
+          sed -i'' -e "/^EXCLUDE_REQUIREMENTS = /a \ \ \ \ 'httpx', 'ansible-runner'," /output/scripts/introspect.py3.py
+    - COPY _build/output/py2-introspect-shim.py /output/scripts/introspect.py
+  append_final: |
+    RUN sed -i -e 's/^Defaults.*requiretty/Defaults    !requiretty/' \
+               -e 's/^%wheel.*ALL$/%wheel    ALL=(ALL)    NOPASSWD: ALL/' /etc/sudoers
+    RUN $PKGMGR install -y --nodocs --setopt install_weak_deps=0 lastpass-cli && \
+        rpm -e --nodeps xclip && \
+        $PKGMGR remove -y libX11 libX11-common libXmu libXext libXt && \
+        $PKGMGR clean all
+    RUN gem install --no-document lastpass-ansible
+    RUN update-crypto-policies --set LEGACY
+    COPY _build/profile.d/00-xdg-docker-config.sh /etc/profile.d/00-xdg-docker-config.sh
+    RUN export _docker_xdg_cache_home=/var/run/user/docker-skel/cache && \
+        echo "$_docker_xdg_cache_home" && \
+        mkdir -p "$_docker_xdg_cache_home" && \
+        mkdir -p "${_docker_xdg_cache_home}/zsh/zcompcache" && \
+        chown -R 1000:1000 "$_docker_xdg_cache_home" && \
+        chmod 0700 "$_docker_xdg_cache_home"
+    RUN git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /usr/share/oh-my-zsh && \
+        cp /usr/share/oh-my-zsh/templates/zshrc.zsh-template /usr/share/oh-my-zsh/zshrc && \
+        curl -Ls -o - 'https://raw.githubusercontent.com/manjaro-sway/oh-my-zsh/refs/heads/master/0001-zshrc.patch' \
+          | patch -p1 /usr/share/oh-my-zsh/zshrc && \
+        git config --global --add safe.directory /usr/share/oh-my-zsh
+    RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /usr/share/zsh-theme-powerlevel10k && \
+        cd /usr/share/zsh-theme-powerlevel10k && \
+        sed -i'' -e '/_p9k_must_init() {/a \ \ [ -r "$CENTOS_POWERLEVEL9K_CONFIG_FILE" ] && builtin source "$CENTOS_POWERLEVEL9K_CONFIG_FILE"' \
+          /usr/share/zsh-theme-powerlevel10k/internal/p10k.zsh && \
+          sync /usr/share/zsh-theme-powerlevel10k/internal/p10k.zsh && \
+          export GITSTATUS_CACHE_DIR=/var/run/user/docker-skel/cache/gitstatus && \
+          /usr/share/zsh-theme-powerlevel10k/gitstatus/install && \
+          chown -R 1000:1000 "${GITSTATUS_CACHE_DIR}" && \
+        for file in *.zsh-theme internal/*.zsh gitstatus/*.zsh gitstatus/install; do \
+          zsh -fc "emulate zsh -o no_aliases && zcompile -R -- $file.zwc $file" ; \
+          sync ${file}.zwc ; \
+        done && \
+        export ZSH_COMPDUMP="/var/run/user/docker-skel/cache/zsh/zcompcache/.zcompdump-$(zsh -c 'echo -n ${ZSH_VERSION}')" && \
+        export XDG_CACHE_HOME=/var/run/user/docker-skel/cache && \
+        zsh -l -i -c 'echo "Generating $ZSH_COMPDUMP" && source /usr/share/oh-my-zsh/zshrc && sync "$ZSH_COMPDUMP"' && \
+        chown -R 1000:1000 "$(dirname "${ZSH_COMPDUMP}")" && touch "${ZSH_COMPDUMP}".zwc && \
+        git config --global --add safe.directory /usr/share/zsh-theme-powerlevel10k
+    COPY _build/profile.d/p10k-centos.zsh /etc/profile.d/p10k-centos.zsh
+    COPY _build/profile.d/zsh-profile.sh /etc/profile.d/zsh-profile.sh
+    RUN echo '[[ ! -f /etc/profile.d/p10k-centos.zsh ]] || source /etc/profile.d/p10k-centos.zsh' >> \
+        /usr/share/oh-my-zsh/zshrc
+    RUN echo '[[ ! -f /etc/profile ]] || source /etc/profile' >> \
+        /usr/share/oh-my-zsh/zshrc
+    COPY _build/profile.d/bat-themes.sh /etc/profile.d/bat-themes.sh
+    RUN mkdir -p /run/user/docker-skel/cache/bat && \
+        echo 'export BAT_CACHE_PATH=/run/user/$(id -u)/cache/bat' > /etc/profile.d/bat-cache.sh && \
+        export BAT_CACHE_PATH=/run/user/docker-skel/cache/bat && \
+        bat cache --build && \
+        chmod 0775 /run/user/docker-skel/cache/bat && \
+        chown -R 1000:users /run/user/docker-skel/cache/bat && \
+        chmod 0664 /run/user/docker-skel/cache/bat/*
+    # ARG FOOT_TERMINFO_RPM='https://kojipkgs.fedoraproject.org//vol/fedora_koji_archive06/packages/foot/1.10.1/1.fc34/x86_64/foot-terminfo-1.10.1-1.fc34.x86_64.rpm'\
+    ARG FOOT_TERMINFO_RPM='https://kojipkgs.fedoraproject.org//vol/fedora_koji_archive06/packages/foot/1.10.1/1.fc34/x86_64/foot-terminfo-1.10.1-1.fc34.x86_64.rpm'
+    ARG GIT_DELTA_RPM=''
+    ARG EZA_RPM='https://kojipkgs.fedoraproject.org/packages/rust-eza/0.18.11/1.el8/x86_64/eza-0.18.11-1.el8.x86_64.rpm'
+    RUN $PKGMGR install -y --nodocs --setopt install_weak_deps=0 git-delta
+    RUN rpm -i "$FOOT_TERMINFO_RPM"
+    RUN rpm -i "$EZA_RPM" && \
+        $PKGMGR clean all
+
+# RUN dnf localinstall -y --nodocs --setopt install_weak_deps=0 https://yum.jc21.com/jc21.rpm
+# https://yum.jc21.com/el/base/el/8/x86_64/git-delta-0.18.2-1.el8.x86_64.rpm
+# https://yum.jc21.com/el/base/el/9/x86_64/git-delta-0.18.2-1.el9.x86_64.rpm
