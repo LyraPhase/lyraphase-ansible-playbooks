@@ -16,7 +16,7 @@ dependencies:
     package_pip: ansible-base~=2.10.0
   ansible_runner:
     package_pip: ansible-runner==1.4.7
-  python: ee/ee-requirements.txt
+  python: ee/ee-requirements.py2-ansible2.10.txt
   system: ee/ee-bindep.txt
   galaxy: requirements.yml
 additional_build_files:
