@@ -18,7 +18,7 @@ dependencies:
     package_pip: ansible-runner==1.4.7
   python: ee/ee-requirements.py2-ansible2.10.txt
   system: ee/ee-bindep.txt
-  galaxy: requirements.yml
+  galaxy: ee/galaxy-requirements.py2-ansible2.10.yml
 additional_build_files:
   - src: ee/profile.d/00-xdg-docker-config.sh
     dest: profile.d
