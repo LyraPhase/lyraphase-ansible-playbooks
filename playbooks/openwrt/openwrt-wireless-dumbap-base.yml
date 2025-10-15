@@ -1,0 +1,41 @@
+---
+# This playbook bootstraps an OpenWRT LEDE router with dumbap-base settings using
+# imp1sh MMN openwrtwireless role
+
+- name: OpenWRT Wireless Dumb AP Base
+  hosts: openwrt
+  user: root
+  gather_facts: true
+  vars_files:
+    - "vars/openwrt-wireless-dumbap.yml"
+
+  roles:
+    - role: imp1sh.ansible_managemynetwork.ansible_openwrtwireless
+      when: not (ansible_bootstrap | default(false))
+      tags:
+        - ansible_openwrtwireless
+        - openwrt_wireless
+        - hostapd
+        - wireless
+  tasks:
+    - name: Are vars set?
+      ansible.builtin.debug:
+        msg: openwrt_wifi_interfaces is {{ openwrt_wifi_interfaces }}
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      tags:
+        - openwrt_wireless
+        - debug
+
+#  tasks:
+#    - name: Install Extra packages
+#      opkg: >
+#        name={{ item }}
+#        state=installed
+#      with_items:
+#        - ethtool
+#      tags:
+#        - opkg_packages
+#        - packages
+#        - install_packages
