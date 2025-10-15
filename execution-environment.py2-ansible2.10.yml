@@ -1,4 +1,8 @@
 ---
+# Ansible Execution Environment for Ansible 2.10 with Python 2.7
+# Based on CentOS Stream 8
+# Build with:
+#   TAG='lyraphase/ansible-playbooks-ee:stream8-ansible-2.10' ./bin/ansible-builder-build.sh --file execution-environment.py2-ansible2.10.yml
 version: 3
 
 images:
