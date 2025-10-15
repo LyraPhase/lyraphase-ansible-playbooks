@@ -27,15 +27,7 @@ py_bin = which(python)
 args = [py_bin, script]
 args.extend(sys.argv)
 args.remove("/output/scripts/introspect.py")
-# print(sys.version)
-# print("__file__ = %s" % __file__)
-# print("sys.path = %s" % sys.path)
-# print("which( %s ) = %s" % (python, py_bin))
-# print("args = %s" % args)
-# print("env = %s" % env)
-# print(os.access(script, os.R_OK))
 if os.access(script, os.R_OK):
-    # print("os.execve(%s, %s, env)" % (py_bin, args))
     os.execve(py_bin, args, env)
 else:
     sys.stderr.write("Error: Could not execute script: %s" % script)
