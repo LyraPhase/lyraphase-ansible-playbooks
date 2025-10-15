@@ -78,6 +78,13 @@
     {{ pkg_manager | default('opkg') }} status python-openssl
   register: python_openssl_installed
 
+- name: Check for python-distutils
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} status python-distutils
+  register: python_distutils_installed
+
 - name: Check for python-codecs
   check_mode: false
   changed_when: false
@@ -150,6 +157,13 @@
     not python_openssl_installed.stdout is search("Status: install (ok|user) installed")
   register: opkg_install_python_openssl
   changed_when: opkg_install_python_openssl.rc == 0
+
+- name: Install python-distutils
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} install python-distutils"
+  when: >
+    not python_distutils_installed.stdout is search("Status: install (ok|user) installed")
+  register: opkg_install_python_distutils
+  changed_when: opkg_install_python_distutils.rc == 0
 
 - name: Install python-codecs
   ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} install python-codecs"
