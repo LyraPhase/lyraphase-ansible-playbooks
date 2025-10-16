@@ -188,7 +188,7 @@ fi
 
 COLIMA_VM_NAME="$(colima list | grep -i 'Running.*docker' | awk '{ print $1 }' | head -n1)"
 # If Docker Host is running gpg-agent, volmount socketdir & import GNUPGHOME into container env
-if env | grep -q GNUPGHOME ; then
+if env | grep -q GNUPGHOME || pgrep -U "${MY_UID}" gpg-agent; then
   if pgrep -U "${MY_UID}" gpg-agent ; then
     if [ -n "$COLIMA_VM_NAME" ] || [ -n "$DOCKER_MACHINE_NAME" ]; then
       # Use socket dir from $XDG_RUNTIME_DIR in VM
@@ -197,7 +197,7 @@ if env | grep -q GNUPGHOME ; then
       # Use socket dir from docker host
       _GNUPG_SOCKET_DIR="$(gpgconf --list-dirs socketdir)"
     fi
-    DOCKER_RUN_GPG_AGENT_ARGS="${DOCKER_RUN_GPG_AGENT_ARGS:-} -v \"${_GNUPG_SOCKET_DIR}:${_GNUPG_SOCKET_DIR}\""
+    DOCKER_RUN_GPG_AGENT_ARGS="${DOCKER_RUN_GPG_AGENT_ARGS:-} -v ${_GNUPG_SOCKET_DIR}:${_GNUPG_SOCKET_DIR}"
   fi
   export GNUPGHOME="${GNUPGHOME:-/run/user/${MY_UID}/gnupg}"
   DOCKER_RUN_GPG_AGENT_ARGS="${DOCKER_RUN_GPG_AGENT_ARGS:-} -e GNUPGHOME=${GNUPGHOME}"
