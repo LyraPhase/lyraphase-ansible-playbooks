@@ -28,7 +28,7 @@ def output_list_inventory(json_output):
     '''
     Output the --list data structure as JSON
     '''
-    print json.dumps(json_output)
+    print(json.dumps(json_output))
 
 
 def find_host(search_host, inventory):
@@ -36,7 +36,7 @@ def find_host(search_host, inventory):
     Find the given variables for the given host and output them as JSON
     '''
     host_attribs = inventory.get(search_host, {})
-    print json.dumps(host_attribs)
+    print(json.dumps(host_attribs))
 
 
 def main():
