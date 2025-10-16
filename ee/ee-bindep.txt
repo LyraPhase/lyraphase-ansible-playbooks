@@ -39,6 +39,9 @@ vim
 vim-ansible [epel platform:redhat]
 glibc-langpack-en
 zsh
+nodejs
+libatomic
+ShellCheck [epel platform:redhat]
 # CentOS/RHEL 8 deps
 sshpass [platform:centos-8 platform:rhel-8]
 # CentOS/RHEL 9 Override all python 3.x deps w/3.11
