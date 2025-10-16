@@ -376,12 +376,14 @@ if [ -n "$EXEC_CONTAINER" ]; then
   RET=$?
 else
   CACHE_VOLUME_NAME="xdg-cache-${MY_USERNAME}-$(docker inspect --format '{{range $index, $rt := .RepoDigests}}{{if eq $index 0}}{{$rt}}{{end}}{{end}}' "${CONTAINER_ID}" | tr '/@' '_' | tr ':' '.' | tr -d '[[:space:]]' )"
+  _container_arch="$(docker inspect --format '{{.Architecture}}' "${CONTAINER_ID}" | tr -d '[[:space:]]' )"
   if ! docker volume ls -q | grep -q "$CACHE_VOLUME_NAME"; then
     #docker volume create --name "$CACHE_VOLUME_NAME" --driver local --label "purpose=xdg-cache" --label "image_name=${CONTAINER_ID}" --label "user=${MY_USERNAME}" --label "group=${MY_GROUPNAME}" --label "uid=${MY_UID}" --label "gid=${MY_GID}" --opt type=tmpfs --opt device=tmpfs --opt "o=rw,nosuid,nodev,relatime,exec,uid=${MY_UID},gid=${MY_GID},size=64M"
     docker volume create --name "$CACHE_VOLUME_NAME" --driver local \
       --label "purpose=xdg-cache" --label "image_name=${CONTAINER_ID}" \
       --label "user=${MY_USERNAME}" --label "group=${MY_GROUPNAME}" \
-      --label "uid=${MY_UID}" --label "gid=${MY_GID}"
+      --label "uid=${MY_UID}" --label "gid=${MY_GID}" \
+      --label "arch=${_container_arch}"
   fi
   docker run ${DOCKER_INTERACT_ARGS:-} --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}/cache" --name="${CONTAINER_NAME}" ${DOCKER_RUN_SSH_AGENT_ARGS:-} ${DOCKER_RUN_GPG_AGENT_ARGS:-} ${DOCKER_RUN_ARGS:-} "${CONTAINER_ID}" "${RUN_SCRIPT}"
   RET=$?
