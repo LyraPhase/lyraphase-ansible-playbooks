@@ -186,6 +186,23 @@ if env | grep -q SSH_AUTH_SOCK ; then
   fi
 fi
 
+COLIMA_VM_NAME="$(colima list | grep -i 'Running.*docker' | awk '{ print $1 }' | head -n1)"
+# If Docker Host is running gpg-agent, volmount socketdir & import GNUPGHOME into container env
+if env | grep -q GNUPGHOME ; then
+  if pgrep -U "${MY_UID}" gpg-agent ; then
+    if [ -n "$COLIMA_VM_NAME" ] || [ -n "$DOCKER_MACHINE_NAME" ]; then
+      # Use socket dir from $XDG_RUNTIME_DIR in VM
+      _GNUPG_SOCKET_DIR="/run/user/${MY_UID}/gnupg"
+    else
+      # Use socket dir from docker host
+      _GNUPG_SOCKET_DIR="$(gpgconf --list-dirs socketdir)"
+    fi
+    DOCKER_RUN_GPG_AGENT_ARGS="${DOCKER_RUN_GPG_AGENT_ARGS:-} -v \"${_GNUPG_SOCKET_DIR}:${_GNUPG_SOCKET_DIR}\""
+  fi
+  export GNUPGHOME="${GNUPGHOME:-/run/user/${MY_UID}/gnupg}"
+  DOCKER_RUN_GPG_AGENT_ARGS="${DOCKER_RUN_GPG_AGENT_ARGS:-} -e GNUPGHOME=${GNUPGHOME}"
+fi
+
 # If CMD passed is init, avoid using RUN_SCRIPT
 if [[ "$CMD" == *"/init" ]]; then
   # For first 'docker run', just run the init process as pid 1
@@ -286,6 +303,20 @@ if env | grep -q SSH_AUTH_SOCK ; then
   fi
 fi
 
+# Import GNUPGHOME into container env & symlink hashed dir into /run/user/$UID/gnupg
+if env | grep -q GNUPGHOME ; then
+
+	cat <<-EOGPGPROFILE > /etc/profile.d/99-container-gnupghome.sh
+	export GNUPGHOME="\$GNUPGHOME"
+	_GNUPG_SOCKET_DIR="\\\$(gpgconf --list-dirs socketdir)"
+	if echo "\\\${_GNUPG_SOCKET_DIR}" | grep -q '/d.' && [ ! -L "\\\${_GNUPG_SOCKET_DIR}" ] ; then
+	  [ -d "\\\${_GNUPG_SOCKET_DIR}" ] && rmdir "\\\${_GNUPG_SOCKET_DIR}"
+	  ln -sf --no-dereference "\\\$GNUPGHOME" "\\\${_GNUPG_SOCKET_DIR}"
+	fi
+	EOGPGPROFILE
+
+fi
+
 # Create user & group with names matching host, GID/UID matching volume permissions (ideally)
 if (! grep -E -q "^${MY_GROUPNAME}:x:\${MY_GID}:" /etc/group); then
     groupadd \${groupadd_args} -g \${MY_GID} "${MY_GROUPNAME}"
@@ -352,7 +383,7 @@ else
       --label "user=${MY_USERNAME}" --label "group=${MY_GROUPNAME}" \
       --label "uid=${MY_UID}" --label "gid=${MY_GID}"
   fi
-  docker run ${DOCKER_INTERACT_ARGS:-} --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}" --name="${CONTAINER_NAME}" ${DOCKER_RUN_SSH_AGENT_ARGS:-} ${DOCKER_RUN_ARGS:-} "${CONTAINER_ID}" "${RUN_SCRIPT}"
+  docker run ${DOCKER_INTERACT_ARGS:-} --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}/cache" --name="${CONTAINER_NAME}" ${DOCKER_RUN_SSH_AGENT_ARGS:-} ${DOCKER_RUN_GPG_AGENT_ARGS:-} ${DOCKER_RUN_ARGS:-} "${CONTAINER_ID}" "${RUN_SCRIPT}"
   RET=$?
   rm ${RUN_SCRIPT}
 fi
