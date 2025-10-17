@@ -311,8 +311,13 @@ if env | grep -q GNUPGHOME ; then
 	_GNUPG_SOCKET_DIR="\\\$(gpgconf --list-dirs socketdir)"
 	if echo "\\\${_GNUPG_SOCKET_DIR}" | grep -q '/d.' && [ ! -L "\\\${_GNUPG_SOCKET_DIR}" ] ; then
 	  [ -d "\\\${_GNUPG_SOCKET_DIR}" ] && rmdir "\\\${_GNUPG_SOCKET_DIR}"
-	  ln -sf --no-dereference "\\\$GNUPGHOME" "\\\${_GNUPG_SOCKET_DIR}"
+	  ln -sf --no-dereference "\\\${XDG_RUNTIME_DIR:-/run/user/\${MY_UID}}/gnupg" "\\\${_GNUPG_SOCKET_DIR}"
 	fi
+	# no agent in the container
+	[ -n "\\\$GNUPGHOME" -a -d "\\\$GNUPGHOME" ] || ( mkdir -p "\\\$GNUPGHOME" && chmod 0700 "\\\$GNUPGHOME" )
+	[ "\\\$(realpath \\\$GNUPGHOME)" != "\\\$(realpath \\\${HOME}/.gnupg)" ] && echo -e "no-autostart\nquiet\nkeyserver hkps://keyserver.ubuntu.com\n" > "\\\$GNUPGHOME/gpg.conf"
+	# make the public keys, private SC private keygrips, and trustdb available in containers
+	rsync -avu --ignore-missing-args "${HOME}"/.gnupg/{trustdb.gpg,pubring.{kbx,gpg,db},public-keys.d,private-keys-v1.d} "\\\${XDG_RUNTIME_DIR:-/run/user/\${MY_UID}}/gnupg/"
 	EOGPGPROFILE
 
 fi
