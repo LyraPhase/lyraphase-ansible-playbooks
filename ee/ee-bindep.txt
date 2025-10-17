@@ -39,7 +39,7 @@ vim
 vim-ansible [epel platform:redhat]
 glibc-langpack-en
 zsh
-nodejs
+nodejs [platform:centos-10 platform:rhel-10]
 libatomic
 ShellCheck [epel platform:redhat]
 # CentOS/RHEL 8 deps
