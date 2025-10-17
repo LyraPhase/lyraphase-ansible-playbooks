@@ -8,7 +8,7 @@ boot2docker.local ansible_ssh_port=2022 ansible_ssh_host=127.0.0.1 ansible_ssh_u
 OPNsense.internal ansible_python_interpreter=/usr/local/bin/python3
 
 [openwrt]
-192.168.1.2 ansible_ssh_user=root
+vega.internal ansible_ssh_user=root
 
 [edisons]
 mu-lyrae.local
