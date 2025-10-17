@@ -1,0 +1,30 @@
+openwrt_system_ttylogin: 1
+openwrt_system_logsize: "64"
+openwrt_system_log_port: 514
+openwrt_system_log_proto: "udp"
+openwrt_system_log_ip: "192.168.1.100"
+openwrt_system_conloglevel: 8
+openwrt_system_cronloglevel: 8
+# Disable urandom seed file to avoid mmc wear
+openwrt_system_urandom_seed: 0
+# NTP config
+openwrt_system_timezone: "GMT0"
+openwrt_system_zonename: "UTC"
+openwrt_system_ntp_server:
+  - "utcnist.colorado.edu"
+  - "utcnist2.colorado.edu"
+  - "time-c-b.nist.gov"
+  - "time-d-b.nist.gov"
+  - "time-e-b.nist.gov"
+  - "utcnist3.colorado.edu"
+openwrt_system_ntp_enabled: 1
+openwrt_system_ntp_enable_server: 1
+openwrt_system_ntp_use_dhcp: 0
+# Dropbear SSH config
+openwrt_dropbear_passwordauth: 'off'
+openwrt_dropbear_rootpasswordauth: 'off'
+openwrt_dropbear_port: '22'
+openwrt_dropbear_interface: 'lan'
+openwrt_dropbear_bannerfile: '/etc/config/lyra-vega-banner'
+openwrt_dropbear_mdns: 1
+openwrt_dropbear_maxauthtries: 3

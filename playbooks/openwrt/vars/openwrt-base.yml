@@ -7,9 +7,3 @@ openwrt_base_wireless:
     key: "{{ lyraphase_vault_wireless.radio1.key }}"
 # For package install list...
 # See packages_installgroup.openwrt in inventory/group_vars/all/vars.yml
-# Dropbear SSH config
-openwrt_dropbear_passwordauth: 'off'
-openwrt_dropbear_rootpasswordauth: 'off'
-openwrt_dropbear_port: '22'
-openwrt_dropbear_interface: 'lan'
-openwrt_dropbear_bannerfile: '/etc/config/lyra-vega-banner'
