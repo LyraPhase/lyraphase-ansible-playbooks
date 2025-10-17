@@ -167,7 +167,7 @@ if env | grep -q SSH_AUTH_SOCK ; then
     # Use "magic" ssh-auth.sock path provided as of Docker for Mac >= 2.2.0.0
     SSH_AUTH_SOCK_MAGIC_PATH='/run/host-services/ssh-auth.sock'
     ANSIBLE_SSH_ARGS=" -o ForwardAgent=yes -o ControlPath=/tmp/ssh-%r@%h:%p -o ControlMaster=auto -o ControlPersist=60s ${ANSIBLE_SSH_ARGS:-}"
-    DOCKER_RUN_SSH_AGENT_ARGS="-v ${SSH_AUTH_SOCK_MAGIC_PATH}:${SSH_AUTH_SOCK_MAGIC_PATH} -e SSH_AUTH_SOCK=${SSH_AUTH_SOCK_MAGIC_PATH}"
+    DOCKER_RUN_SSH_AGENT_ARGS=(-v "${SSH_AUTH_SOCK_MAGIC_PATH}:${SSH_AUTH_SOCK_MAGIC_PATH}" -e "SSH_AUTH_SOCK=${SSH_AUTH_SOCK_MAGIC_PATH}")
     EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK="export SSH_AUTH_SOCK=$SSH_AUTH_SOCK_MAGIC_PATH ; export ANSIBLE_SSH_ARGS=\"$ANSIBLE_SSH_ARGS\" ; "
   else
     SOCK_PATH="$SSH_AUTH_SOCK" # Default to passing through SSH_AUTH_SOCK (if on angus00.*)
@@ -179,7 +179,7 @@ if env | grep -q SSH_AUTH_SOCK ; then
     if [[ -z "$SOCK_PATH" || ( "${SOCK_PATH}" != "${DM_AGENT_SOCK}" && ! -e "$SOCK_PATH" ) ]]; then
        echo "ERROR: SSH_AGENT_SOCK path: $SOCK_PATH does not exist... is your ssh-agent running?"
     else
-      DOCKER_RUN_SSH_AGENT_ARGS="-v $(dirname $SOCK_PATH):/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent/$(basename $SOCK_PATH)"
+      DOCKER_RUN_SSH_AGENT_ARGS=(-v "$(dirname "$SOCK_PATH"):/ssh-agent" -e "SSH_AUTH_SOCK=/ssh-agent/$(basename "$SOCK_PATH")")
       ANSIBLE_SSH_ARGS=" -o ForwardAgent=yes -o ControlPath=/tmp/ssh-%r@%h:%p -o ControlMaster=auto -o ControlPersist=60s ${ANSIBLE_SSH_ARGS:-}"
       EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK="export SSH_AUTH_SOCK=/ssh-agent/$(basename "$SOCK_PATH") ; export ANSIBLE_SSH_ARGS=\"$ANSIBLE_SSH_ARGS\" ; "
     fi
@@ -197,10 +197,10 @@ if env | grep -q GNUPGHOME || pgrep -U "${MY_UID}" gpg-agent; then
       # Use socket dir from docker host
       _GNUPG_SOCKET_DIR="$(gpgconf --list-dirs socketdir)"
     fi
-    DOCKER_RUN_GPG_AGENT_ARGS="${DOCKER_RUN_GPG_AGENT_ARGS:-} -v ${_GNUPG_SOCKET_DIR}:${_GNUPG_SOCKET_DIR}"
+    DOCKER_RUN_GPG_AGENT_ARGS+=(-v "${_GNUPG_SOCKET_DIR}:${_GNUPG_SOCKET_DIR}")
   fi
   export GNUPGHOME="${GNUPGHOME:-/run/user/${MY_UID}/gnupg}"
-  DOCKER_RUN_GPG_AGENT_ARGS="${DOCKER_RUN_GPG_AGENT_ARGS:-} -e GNUPGHOME=${GNUPGHOME}"
+  DOCKER_RUN_GPG_AGENT_ARGS+=(-e "GNUPGHOME=${GNUPGHOME}")
 fi
 
 # If CMD passed is init, avoid using RUN_SCRIPT
@@ -208,7 +208,7 @@ if [[ "$CMD" == *"/init" ]]; then
   # For first 'docker run', just run the init process as pid 1
   RUN_SCRIPT="$CMD"
   # Spawn the init process as a background container
-  DOCKER_INTERACT_ARGS='-d'
+  DOCKER_INTERACT_ARGS=('-d')
   echo "INFO: Detected that you are running an init container"
   echo "WARN: Running background init container in detached mode"
   echo "WARN: You will need to re-run this script with CMD=bash to exec into it"
@@ -216,7 +216,7 @@ if [[ "$CMD" == *"/init" ]]; then
   # If we are using docker-machine / boot2docker, then ensure the VM has DBus installed
   [ -n "$DOCKER_MACHINE_NAME" ] && docker-machine ssh "$DOCKER_MACHINE_NAME" 'tce-status -i | grep -q dbus || tce-load -wi dbus'
 else
-  DOCKER_INTERACT_ARGS='-ti --rm=true'
+  DOCKER_INTERACT_ARGS=('-ti' '--rm=true')
 
   # Always use sudo when running pip commands inside container
   # If pip is run without sudo it hangs in deadlock condition
@@ -377,7 +377,7 @@ for container_name in $RUNNING_CONTAINERS; do
 done
 
 if [ -n "$EXEC_CONTAINER" ]; then
-  docker exec ${DOCKER_INTERACT_ARGS:-} --user=root "${EXEC_CONTAINER}" "${RUN_SCRIPT}"
+  docker exec "${DOCKER_INTERACT_ARGS[@]:-}" --user=root "${EXEC_CONTAINER}" "${RUN_SCRIPT}"
   RET=$?
 else
   docker images --format '{{.Repository}}:{{.Tag}}' | grep -q "${CONTAINER_ID##docker.io/}" || docker pull "${CONTAINER_ID}"
@@ -391,7 +391,7 @@ else
       --label "uid=${MY_UID}" --label "gid=${MY_GID}" \
       --label "arch=${_container_arch}"
   fi
-  docker run ${DOCKER_INTERACT_ARGS:-} --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}/cache" --name="${CONTAINER_NAME}" ${DOCKER_RUN_SSH_AGENT_ARGS:-} ${DOCKER_RUN_GPG_AGENT_ARGS:-} ${DOCKER_RUN_ARGS:-} "${CONTAINER_ID}" "${RUN_SCRIPT}"
+  docker run "${DOCKER_INTERACT_ARGS[@]:-}" --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}/cache" --name="${CONTAINER_NAME}" "${DOCKER_RUN_SSH_AGENT_ARGS[@]:-}" "${DOCKER_RUN_GPG_AGENT_ARGS[@]:-}" "${DOCKER_RUN_ARGS[@]:-}" "${CONTAINER_ID}" "${RUN_SCRIPT}"
   RET=$?
   rm "${RUN_SCRIPT}"
 fi
