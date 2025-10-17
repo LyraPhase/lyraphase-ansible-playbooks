@@ -126,7 +126,7 @@ additional_build_steps:
     RUN rpm -i "$FOOT_TERMINFO_RPM"
     RUN rpm -i "$EZA_RPM" && \
         $PKGMGR clean all
-    RUN $PYCMD -m pip install --no-cache-dir pre-commit
+    RUN python3.9 -m pip install --no-cache-dir pre-commit
 
 # RUN dnf localinstall -y --nodocs --setopt install_weak_deps=0 https://yum.jc21.com/jc21.rpm
 # https://yum.jc21.com/el/base/el/8/x86_64/git-delta-0.18.2-1.el8.x86_64.rpm
