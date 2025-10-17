@@ -317,7 +317,7 @@ if env | grep -q GNUPGHOME ; then
 	[ -n "\\\$GNUPGHOME" -a -d "\\\$GNUPGHOME" ] || ( mkdir -p "\\\$GNUPGHOME" && chmod 0700 "\\\$GNUPGHOME" )
 	[ "\\\$(realpath \\\$GNUPGHOME)" != "\\\$(realpath \\\${HOME}/.gnupg)" ] && echo -e "no-autostart\nquiet\nkeyserver hkps://keyserver.ubuntu.com\n" > "\\\$GNUPGHOME/gpg.conf"
 	# make the public keys, private SC private keygrips, and trustdb available in containers
-	rsync -avu --ignore-missing-args "${HOME}"/.gnupg/{trustdb.gpg,pubring.{kbx,gpg,db},public-keys.d,private-keys-v1.d} "\\\${XDG_RUNTIME_DIR:-/run/user/\${MY_UID}}/gnupg/"
+	rsync -au --ignore-missing-args "${HOME}"/.gnupg/{trustdb.gpg,pubring.{kbx,gpg,db},public-keys.d,private-keys-v1.d} "\\\${XDG_RUNTIME_DIR:-/run/user/\${MY_UID}}/gnupg/"
 	EOGPGPROFILE
 
 fi
