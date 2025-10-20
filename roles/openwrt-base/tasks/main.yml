@@ -14,13 +14,15 @@
 - name: "Run tasks: logrotate"
   ansible.builtin.import_tasks: logrotate.yml
   tags: logrotate-openwrt
-- name: "Run tasks: wireless"
-  ansible.builtin.import_tasks: wireless.yml
-  tags:
-    - wireless-openwrt
-    - openwrt-base-wireless
 - name: "Run tasks: crontabs"
   ansible.builtin.import_tasks: crontabs.yml
   tags:
     - crontabs-openwrt
     - openwrt-base-crontabs
+- name: "Run tasks: kernel (sysctl.d)"
+  ansible.builtin.import_tasks: kernel.yml
+  tags:
+    - kernel-openwrt
+    - sysctl-openwrt
+    - openwrt-base-kernel
+    - openwrt-base-sysctl
