@@ -1,2 +1,6 @@
 ---
 # openwrt-base: entry point for defaults
+
+openwrt_base_sysctl_d:
+  local:
+    - "# ": "local sysctl settings can be stored in this directory"

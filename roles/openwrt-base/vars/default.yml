@@ -18,6 +18,3 @@ openwrt_opkg_packages:
 openwrt_base_crontab_files:
   - root
 
-openwrt_base_sysctl_d:
-  local:
-    - "# ": "local sysctl settings can be stored in this directory"
