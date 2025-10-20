@@ -186,10 +186,12 @@ if env | grep -q SSH_AUTH_SOCK ; then
   fi
 fi
 
-COLIMA_VM_NAME="$(colima list | grep -i 'Running.*docker' | awk '{ print $1 }' | head -n1)"
+if command -v colima 2>/dev/null 1>&2; then
+  COLIMA_VM_NAME="$(colima list | grep -i 'Running.*docker' | awk '{ print $1 }' | head -n1)"
+fi
 # If Docker Host is running gpg-agent, volmount socketdir & import GNUPGHOME into container env
-if env | grep -q GNUPGHOME || pgrep -U "${MY_UID}" gpg-agent; then
-  if pgrep -U "${MY_UID}" gpg-agent ; then
+if env | grep -q GNUPGHOME || pgrep -U "${MY_UID}" gpg-agent 2>/dev/null 1>&2; then
+  if pgrep -U "${MY_UID}" gpg-agent 2>/dev/null 1>&2; then
     if [ -n "$COLIMA_VM_NAME" ] || [ -n "$DOCKER_MACHINE_NAME" ]; then
       # Use socket dir from $XDG_RUNTIME_DIR in VM
       _GNUPG_SOCKET_DIR="/run/user/${MY_UID}/gnupg"
