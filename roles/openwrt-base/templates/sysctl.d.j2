@@ -1,12 +1,14 @@
 # {{ ansible_managed }}
-{% for key, value in item.value.items() %}
-{%   if (key | string | length > 0) and (value | string | length > 0) %}
-{%     if key is regex('^#') %}
-{%       for comment_line in value.rstrip('\n').split('\n') %}
+{% for sysctl_line in item.value %}
+{%   for key, value in sysctl_line.items() %}
+{%     if (key | string | length > 0) and (value | string | length > 0) %}
+{%       if key is regex('^#') %}
+{%         for comment_line in value.rstrip('\n').split('\n') %}
 # {{ comment_line }}
-{%       endfor %}
-{%     else %}
+{%         endfor %}
+{%       else %}
 {{ key }} = {{ value }}
+{%       endif %}
 {%     endif %}
-{%   endif %}
+{%   endfor %}
 {% endfor %}

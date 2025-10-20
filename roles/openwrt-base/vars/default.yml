@@ -20,4 +20,4 @@ openwrt_base_crontab_files:
 
 openwrt_base_sysctl_d:
   local:
-    "# ": "local sysctl settings can be stored in this directory"
+    - "# ": "local sysctl settings can be stored in this directory"
