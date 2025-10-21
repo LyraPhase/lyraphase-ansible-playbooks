@@ -41,7 +41,7 @@
   changed_when: uci_set_ipaddr.rc == 0
   notify:
     - RAW uci commit
-    - RAW network restart
+    - RAW reboot
 
 - name: UCI - Set bootstrap netmask
   ansible.builtin.raw: "uci set network.lan.netmask={{ openwrt_base_bootstrap_netmask }}"
@@ -53,7 +53,7 @@
   changed_when: uci_set_netmask.rc == 0
   notify:
     - RAW uci commit
-    - RAW network restart
+    - RAW reboot
 
 - name: UCI - Set bootstrap DHCP proto
   ansible.builtin.raw: "uci set network.lan.proto={{ openwrt_base_bootstrap_dhcp_proto }}"
@@ -65,7 +65,7 @@
   changed_when: uci_set_dhcp_proto.rc == 0
   notify:
     - RAW uci commit
-    - RAW network restart
+    - RAW reboot
 
 # Run uci commit handlers immediately
 # (Should fix initial Ansible run on factory OpenWrt image)
