@@ -17,6 +17,9 @@
 - name: "Run tasks: opkg-openwrt"
   ansible.builtin.import_tasks: opkg-openwrt.yml
   tags: opkg-openwrt
+- name: "Run tasks: apk-openwrt"
+  ansible.builtin.import_tasks: apk-openwrt.yml
+  tags: apk-openwrt
 - name: "Run tasks: logrotate"
   ansible.builtin.import_tasks: logrotate.yml
   tags: logrotate-openwrt

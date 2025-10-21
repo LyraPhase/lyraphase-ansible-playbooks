@@ -1,6 +1,9 @@
 # openwrt-base: entry point for defaults
 # default.yml - default vars for unsupported / unknown OS
-# (Assumes this is OpenWRT LEDE Image)
+# - Assumes this is OpenWrt LEDE Image for opkg
+# - Assumes OpenWRt for apk
+# - ansible_distribution* vars are unset during bootstrap,
+#   so these defaults apply when ansible_bootstrap is true
 ---
 openwrt_opkg_repo_files:
   - distfeeds.conf
@@ -14,6 +17,19 @@ openwrt_opkg_packages:
   - curl
   - uclient-fetch
   - arp-scan
+
+openwrt_apk_repo_files:
+  - distfeeds.list
+  - customfeeds.list
+
+#openwrt_apk_packages:
+#  - ca-certificates
+#  - ca-bundle
+#  - zlib
+#  - libopenssl
+#  - curl
+#  - uclient-fetch
+#  - arp-scan
 
 openwrt_base_crontab_files:
   - root
