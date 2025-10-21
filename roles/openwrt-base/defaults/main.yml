@@ -1,6 +1,11 @@
 ---
 # openwrt-base: entry point for defaults
 
+# Bootstrap IP to set
+openwrt_base_bootstrap_ip: 192.168.1.2
+openwrt_base_bootstrap_netmask: 255.255.255.0
+openwrt_base_bootstrap_dhcp_proto: 'static'
+
 openwrt_base_sysctl_d:
   local:
     - "# ": "local sysctl settings can be stored in this directory"

@@ -1,0 +1,50 @@
+---
+# openwrt-base: bootstrap-ip Tasks entry point. Called by main.yml
+
+- name: Check for current OpenWRT IP
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: uci get network.lan.ipaddr | cut -f1
+  register: openwrt_ipaddr
+  tags: openwrt_ip_check
+
+- name: Check for current OpenWRT netmask
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: uci get network.lan.netmask | cut -f1
+  register: openwrt_netmask
+  tags: openwrt_netmask_check
+
+- name: Check for current OpenWRT DHCP proto
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: uci get network.lan.proto | cut -f1
+  register: openwrt_dhcp_proto
+  tags: openwrt_dhcp_check
+
+- name: UCI - Set bootstrap IP
+  ansible.builtin.raw: "uci set network.lan.ipaddr={{ openwrt_base_bootstrap_ip }}"
+  when: >
+    (openwrt_ipaddr.stdout_lines[0] | trim) != openwrt_base_bootstrap_ip and
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
+  register: uci_set_ipaddr
+  changed_when: uci_set_ipaddr.rc == 0
+
+- name: UCI - Set bootstrap netmask
+  ansible.builtin.raw: "uci set network.lan.netmask={{ openwrt_base_bootstrap_ip }}"
+  when: >
+    openwrt_netmask.stdout_lines[0] != openwrt_base_bootstrap_netmask and
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
+  register: uci_set_netmask
+  changed_when: uci_set_netmask.rc == 0
+
+- name: UCI - Set bootstrap DHCP proto
+  ansible.builtin.raw: "uci set network.lan.proto={{ openwrt_base_bootstrap_ip }}"
+  when: >
+    openwrt_dhcp_proto.stdout_lines[0] != openwrt_base_bootstrap_dhcp_proto and
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
+  register: uci_set_dhcp_proto
+  changed_when: uci_set_dhcp_proto.rc == 0
