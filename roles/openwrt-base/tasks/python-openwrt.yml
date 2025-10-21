@@ -9,7 +9,10 @@
     - "../vars/{{ ansible_distribution }}.yml"
     - "../vars/{{ ansible_os_family }}.yml"
     - "../vars/default.yml"
-  when: openwrt_opkg_repo_files is not defined
+  when: >
+    openwrt_opkg_bootstrap_packages is not defined or
+    openwrt_apk_bootstrap_packages is not defined
+
 
 - name: Check for OpenWRT version
   check_mode: false
@@ -39,6 +42,9 @@
   changed_when: false
   ansible.builtin.set_fact:
     pkg_manager: opkg
+    pkg_manager_check_cmd: status
+    pkg_manager_install_cmd: install
+    pkg_manager_pkgs: "{{ openwrt_opkg_bootstrap_packages }}"
   when: >
     (openwrt_version.stdout_lines[0] != "snapshot" and ((openwrt_version.stdout_lines[0].split('.')[0] | int) < 24))
     or ((openwrt_version.stdout_lines[0] != "snapshot"
@@ -51,6 +57,9 @@
   changed_when: false
   ansible.builtin.set_fact:
     pkg_manager: apk
+    pkg_manager_check_cmd: "info --installed"
+    pkg_manager_install_cmd: add
+    pkg_manager_pkgs: "{{ openwrt_apk_bootstrap_packages }}"
   when: >
     (openwrt_version.stdout_lines[0] == "snapshot"
       or ((openwrt_version.stdout_lines[0].split('.')[0] | int) >= 24
@@ -72,7 +81,7 @@
   changed_when: false
   failed_when: false
   ansible.builtin.raw: >
-    {{ pkg_manager | default('opkg') }} {% if pkg_manager == "apk" %} info {% else %} status {% endif %} python-light
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs.python | default('python-light') }}
   register: python_light_installed
 
 - name: Check for python-logging
@@ -80,7 +89,7 @@
   changed_when: false
   failed_when: false
   ansible.builtin.raw: >
-    {{ pkg_manager | default('opkg') }} {% if pkg_manager == "apk" %} info {% else %} status {% endif %} python-logging
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-logging'] | default('python-logging') }}
   register: python_logging_installed
 
 - name: Check for python-openssl
@@ -88,7 +97,7 @@
   changed_when: false
   failed_when: false
   ansible.builtin.raw: >
-    {{ pkg_manager | default('opkg') }} {% if pkg_manager == "apk" %} info {% else %} status {% endif %} python-openssl
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-openssl'] | default('python-openssl') }}
   register: python_openssl_installed
 
 - name: Check for python-distutils
@@ -96,7 +105,7 @@
   changed_when: false
   failed_when: false
   ansible.builtin.raw: >
-    {{ pkg_manager | default('opkg') }} {% if pkg_manager == "apk" %} info {% else %} status {% endif %} python-distutils
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-distutils'] | default('python-distutils') }}
   register: python_distutils_installed
 
 - name: Check for python-codecs
@@ -104,7 +113,7 @@
   changed_when: false
   failed_when: false
   ansible.builtin.raw: >
-    {{ pkg_manager | default('opkg') }} {% if pkg_manager == "apk" %} info {% else %} status {% endif %} python-codecs
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-codecs'] | default('python-codecs') }}
   register: python_codecs_installed
 
 - name: Check for python-multiprocessing
@@ -112,7 +121,7 @@
   changed_when: false
   failed_when: false
   ansible.builtin.raw: >
-    {{ pkg_manager | default('opkg') }} {% if pkg_manager == "apk" %} info {% else %} status {% endif %} python-multiprocessing
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-multiprocessing'] | default('python-multiprocessing') }}
   register: python_multiprocessing_installed
 
 - name: Check for python-ctypes
@@ -120,7 +129,7 @@
   changed_when: false
   failed_when: false
   ansible.builtin.raw: >
-    {{ pkg_manager | default('opkg') }} {% if pkg_manager == "apk" %} info {% else %} status {% endif %} python-ctypes
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-ctypes'] | default('python-ctypes') }}
   register: python_ctypes_installed
 
 - name: Check for openssh-sftp-server
@@ -128,7 +137,7 @@
   changed_when: false
   failed_when: false
   ansible.builtin.raw: >
-    {{ pkg_manager | default('opkg') }} {% if pkg_manager == "apk" %} info {% else %} status {% endif %} openssh-sftp-server
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['openssh-sftp-server'] | default('openssh-sftp-server') }}
   register: openssh_server_installed
 
 # Bootstrap python interpreter for Ansible
@@ -156,81 +165,81 @@
   check_mode: false
 
 - name: Install python interpreter
-  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-light"
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs.python | default('python-light') }}"
   when: >
     (pkg_manager == 'opkg' and
      not python_light_installed.stdout is search("Status: install (ok|user) installed")) or
     (pkg_manager == 'apk' and
-     not python_light_installed.stdout is search("installed size"))
+     python_light_installed.rc == 1)
   register: opkg_install_python_light
   changed_when: opkg_install_python_light.rc == 0
 
 - name: Install python-logging
-  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-logging"
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-logging'] | default('python-logging') }}"
   when: >
     (pkg_manager == 'opkg' and
      not python_logging_installed.stdout is search("Status: install (ok|user) installed")) or
     (pkg_manager == 'apk' and
-     not python_logging_installed.stdout is search("installed size"))
+     python_logging_installed.rc == 1)
   register: opkg_install_python_logging
   changed_when: opkg_install_python_logging.rc == 0
 
 - name: Install python-openssl
-  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-openssl"
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-openssl'] | default('python-openssl') }}"
   when: >
     (pkg_manager == 'opkg' and
      not python_openssl_installed.stdout is search("Status: install (ok|user) installed")) or
     (pkg_manager == 'apk' and
-     not python_openssl_installed.stdout is search("installed size"))
+     python_openssl_installed.rc == 1)
   register: opkg_install_python_openssl
   changed_when: opkg_install_python_openssl.rc == 0
 
 - name: Install python-distutils
-  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-distutils"
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-distutils'] | default('python-distutils') }}"
   when: >
     (pkg_manager == 'opkg' and
      not python_distutils_installed.stdout is search("Status: install (ok|user) installed")) or
     (pkg_manager == 'apk' and
-     not python_distutils_installed.stdout is search("installed size"))
+     python_distutils_installed.rc == 1)
   register: opkg_install_python_distutils
   changed_when: opkg_install_python_distutils.rc == 0
 
 - name: Install python-codecs
-  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-codecs"
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-codecs'] | default('python-codecs') }}"
   when: >
     (pkg_manager == 'opkg' and
      not python_codecs_installed.stdout is search("Status: install (ok|user) installed")) or
     (pkg_manager == 'apk' and
-     not python_codecs_installed.stdout is search("installed size"))
+     python_codecs_installed.rc == 1)
   register: opkg_install_python_codecs
   changed_when: opkg_install_python_codecs.rc == 0
 
 - name: Install python-multiprocessing
-  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-multiprocessing"
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-multiprocessing'] | default('python-multiprocessing') }}"
   when: >
     (pkg_manager == 'opkg' and
      not python_multiprocessing_installed.stdout is search("Status: install (ok|user) installed")) or
     (pkg_manager == 'apk' and
-     not python_multiprocessing_installed.stdout is search("installed size"))
+     python_multiprocessing_installed.rc == 1)
   register: opkg_install_python_multiprocessing
   changed_when: opkg_install_python_multiprocessing.rc == 0
 
 - name: Install python-ctypes
-  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-ctypes"
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-ctypes'] | default('python-ctypes') }}"
   when: >
     (pkg_manager == 'opkg' and
      not python_ctypes_installed.stdout is search("Status: install (ok|user) installed")) or
     (pkg_manager == 'apk' and
-     not python_ctypes_installed.stdout is search("installed size"))
+     python_ctypes_installed.rc == 1)
   register: opkg_install_python_ctypes
   changed_when: opkg_install_python_ctypes.rc == 0
 
 - name: Install openssh-sftp-server
-  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} openssh-sftp-server"
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['openssh-sftp-server'] | default('openssh-sftp-server') }}"
   when: >
     (pkg_manager == 'opkg' and
      not openssh_server_installed.stdout is search("Status: install (ok|user) installed")) or
     (pkg_manager == 'apk' and
-     not openssh_server_installed.stdout is search("installed size"))
+     openssh_server_installed.rc == 1)
   register: opkg_install_openssh_sftp_server
   changed_when: opkg_install_openssh_sftp_server.rc == 0

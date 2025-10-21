@@ -31,5 +31,25 @@ openwrt_apk_repo_files:
 #  - uclient-fetch
 #  - arp-scan
 
+openwrt_opkg_bootstrap_packages:
+  python: python-light
+  python-logging: python-logging
+  python-openssl: python-openssl
+  python-distutils: python-distutils
+  python-codecs: python-codecs
+  python-multiprocessing: python-multiprocessing
+  python-ctypes: python-ctypes
+  openssh-sftp-server: openssh-sftp-server
+
+openwrt_apk_bootstrap_packages:
+  python: python3
+  python-logging: python3-logging
+  python-openssl: python3-openssl
+  python-distutils: python3-distutils
+  python-codecs: python3-codecs
+  python-multiprocessing: python3-multiprocessing
+  python-ctypes: python3-ctypes
+  openssh-sftp-server: openssh-sftp-server
+
 openwrt_base_crontab_files:
   - root
