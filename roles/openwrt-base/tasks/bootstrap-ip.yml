@@ -31,6 +31,17 @@
     ansible_bootstrap is truthy
   tags: openwrt_dhcp_check
 
+- name: Check for current OpenWRT DHCP LAN ignore setting
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: uci get dhcp.lan.ignore | cut -f1
+  register: openwrt_dhcp_ignore
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
+  tags: openwrt_dhcp_check
+
+
 - name: UCI - Set bootstrap IP
   ansible.builtin.raw: "uci set network.lan.ipaddr={{ openwrt_base_bootstrap_ip }}"
   when: >
@@ -63,6 +74,20 @@
     ansible_bootstrap is truthy
   register: uci_set_dhcp_proto
   changed_when: uci_set_dhcp_proto.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW reboot
+
+- name: UCI - Set bootstrap DHCP LAN ignore
+  ansible.builtin.raw: "uci set dhcp.lan.ignore=1"
+  when: >
+    (openwrt_dhcp_ignore.stdout_lines[0] != "1" or
+     (openwrt_dhcp_ignore.rc == 1 and openwrt_dhcp_ignore.stdout_lines[0] | regex_search('.*Entry not found'))
+    ) and
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
+  register: uci_set_dhcp_ignore
+  changed_when: uci_set_dhcp_ignore.rc == 0
   notify:
     - RAW uci commit
     - RAW reboot
