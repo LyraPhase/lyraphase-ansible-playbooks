@@ -53,6 +53,13 @@
   until: uci_commit_result is defined and uci_commit_result.rc == 0
   changed_when: uci_commit_result.rc == 0
 
+- name: RAW network restart
+  ansible.builtin.raw: /etc/init.d/network restart
+  check_mode: false
+  register: network_restart_result
+  until: network_restart_result is defined and network_restart_result.rc == 0
+  changed_when: network_restart_result.rc == 0
+
 - name: reload wifi
   ansible.builtin.raw: wifi
   register: openwrt_wifi_result
