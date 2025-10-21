@@ -40,8 +40,9 @@
   ansible.builtin.set_fact:
     pkg_manager: opkg
   when: >
-    (openwrt_version.stdout_lines[0].split('.')[0] | int) < 24
-    or ((openwrt_version.stdout_lines[0].split('.')[0] | int) >= 24
+    (openwrt_version.stdout_lines[0] != "snapshot" and ((openwrt_version.stdout_lines[0].split('.')[0] | int) < 24))
+    or ((openwrt_version.stdout_lines[0] != "snapshot"
+          or (openwrt_version.stdout_lines[0].split('.')[0] | int) >= 24)
         and openwrt_apk.rc != 0)
   tags: openwrt_version_check
 
@@ -51,17 +52,26 @@
   ansible.builtin.set_fact:
     pkg_manager: apk
   when: >
-    (openwrt_version.stdout_lines[0].split('.')[0] | int) >= 24
-    and (openwrt_version.stdout_lines[0].split('.')[1] | int) >= 10
+    (openwrt_version.stdout_lines[0] == "snapshot"
+      or ((openwrt_version.stdout_lines[0].split('.')[0] | int) >= 24
+      and (openwrt_version.stdout_lines[0].split('.')[1] | int) >= 10))
     and openwrt_apk.rc == 0
     and openwrt_apk.stdout_lines[0] | regex_search('.*/apk$')
   tags: openwrt_version_check
+
+- name: Run apk update
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} update
+  register: apk_update
+  when: pkg_manager == "apk"
 
 - name: Check for python interpreter
   check_mode: false
   changed_when: false
   ansible.builtin.raw: >
-    {{ pkg_manager | default('opkg') }} status python-light
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager == "apk" ? "info" : "status" }} python-light
   register: python_light_installed
 
 - name: Check for python-logging
