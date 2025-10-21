@@ -11,7 +11,7 @@
     - "../vars/default.yml"
   when: openwrt_apk_repo_files is not defined
 
-- name: Install opkg repo definition files
+- name: Install apk repo definition files
   ansible.builtin.template:
     src: "etc-apk/{{ item }}.j2"
     dest: "/etc/apk/repositories.d/{{ item }}"
@@ -21,7 +21,8 @@
   with_items: "{{ openwrt_apk_repo_files }}"
   when: >
     (pkg_manager is defined and pkg_manager == "apk") or
-    (ansible_pkg_mgr is defined and ansible_pkg_mgr == "apk")
+    (not pkg_manager is defined and
+     ansible_pkg_mgr is defined and ansible_pkg_mgr == "apk")
   notify:
     - destroy apk cache
     - create apk cache dir

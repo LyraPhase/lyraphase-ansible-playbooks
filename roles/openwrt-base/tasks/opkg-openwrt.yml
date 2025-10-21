@@ -21,7 +21,8 @@
   with_items: "{{ openwrt_opkg_repo_files }}"
   when: >
     (pkg_manager is defined and pkg_manager == "opkg") or
-    (ansible_pkg_mgr is defined and ansible_pkg_mgr == "opkg")
+    (not pkg_manager is defined and
+     ansible_pkg_mgr is defined and ansible_pkg_mgr == "opkg")
   notify:
     - destroy opkg cache
     - create opkg cache dir
