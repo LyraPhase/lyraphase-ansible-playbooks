@@ -68,13 +68,32 @@
     and openwrt_apk.stdout_lines[0] | regex_search('.*/apk$')
   tags: openwrt_version_check
 
-- name: Run apk update
+# Note: apk pkg cache must exist to perform installed checks
+- name: Check apk pkg cache indices exist
   check_mode: false
   changed_when: false
   ansible.builtin.raw: >
-    {{ pkg_manager | default('opkg') }} update
-  register: apk_update
+    ls -1 /var/cache/apk/APKINDEX.*.tar.gz 2>/dev/null | wc -l
+  register: apk_cache_files
   when: pkg_manager == "apk"
+
+- name: Raw update apk cache
+  ansible.builtin.raw: echo 'Triggering RAW apk update'
+  when: >
+    pkg_manager is defined and
+    pkg_manager == 'apk' and
+    (apk_cache_files.stdout | trim | int) == 0
+  changed_when: false
+  notify:
+    - RAW destroy apk cache
+    - RAW create apk cache dir
+    - RAW apk update
+
+# Run apk makecache handlers immediately
+# (Should fix Ansible runs on hosts with pre-existing apk repo problems or missing apk pkg cache)
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+  check_mode: false
 
 - name: Check for python interpreter
   check_mode: false

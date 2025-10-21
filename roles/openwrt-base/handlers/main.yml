@@ -15,7 +15,7 @@
     state: directory
     mode: "0755"
 
-- name: Run opkg update
+- name: opkg update
   ansible.builtin.command: opkg update
   check_mode: false
   register: opkg_update_result
@@ -23,6 +23,28 @@
   retries: 3
   delay: 1
   changed_when: opkg_update_result.rc == 0
+
+- name: Destroy apk cache
+  ansible.builtin.file:
+    path: /var/cache/apk
+    force: true
+    state: absent
+
+- name: Create apk cache dir
+  ansible.builtin.file:
+    path: /var/cache/apk
+    force: true
+    state: directory
+    mode: "0755"
+
+- name: apk update
+  ansible.builtin.command: apk update
+  check_mode: false
+  register: apk_update_result
+  until: apk_update_result is defined and apk_update_result.rc == 0
+  retries: 3
+  delay: 1
+  changed_when: apk_update_result.rc == 0
 
 # RAW command handlers for bootstrap steps
 - name: RAW destroy opkg cache
@@ -45,6 +67,15 @@
   retries: 3
   delay: 1
   changed_when: opkg_makecache_result.rc == 0
+
+- name: RAW apk update
+  ansible.builtin.raw: apk update
+  check_mode: false
+  register: apk_makecache_result
+  until: apk_makecache_result is defined and apk_makecache_result.rc == 0
+  retries: 3
+  delay: 1
+  changed_when: apk_makecache_result.rc == 0
 
 - name: RAW uci commit
   ansible.builtin.raw: uci commit
