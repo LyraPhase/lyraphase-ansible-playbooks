@@ -17,4 +17,3 @@ openwrt_opkg_packages:
 
 openwrt_base_crontab_files:
   - root
-
