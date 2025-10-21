@@ -54,7 +54,7 @@
   changed_when: uci_commit_result.rc == 0
 
 - name: RAW network restart
-  ansible.builtin.raw: /etc/init.d/network restart
+  ansible.builtin.raw: "/bin/sh -c 'sleep 1; (/etc/init.d/network restart) &'"
   check_mode: false
   register: network_restart_result
   until: network_restart_result is defined and network_restart_result.rc == 0
