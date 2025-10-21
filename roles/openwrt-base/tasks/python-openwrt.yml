@@ -158,55 +158,79 @@
 - name: Install python interpreter
   ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-light"
   when: >
-    not python_light_installed.stdout is search("Status: install (ok|user) installed")
+    (pkg_manager == 'opkg' and
+     not python_light_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     not python_light_installed.stdout is search("installed size"))
   register: opkg_install_python_light
   changed_when: opkg_install_python_light.rc == 0
 
 - name: Install python-logging
   ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-logging"
   when: >
-    not python_logging_installed.stdout is search("Status: install (ok|user) installed")
+    (pkg_manager == 'opkg' and
+     not python_logging_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     not python_logging_installed.stdout is search("installed size"))
   register: opkg_install_python_logging
   changed_when: opkg_install_python_logging.rc == 0
 
 - name: Install python-openssl
   ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-openssl"
   when: >
-    not python_openssl_installed.stdout is search("Status: install (ok|user) installed")
+    (pkg_manager == 'opkg' and
+     not python_openssl_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     not python_openssl_installed.stdout is search("installed size"))
   register: opkg_install_python_openssl
   changed_when: opkg_install_python_openssl.rc == 0
 
 - name: Install python-distutils
   ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-distutils"
   when: >
-    not python_distutils_installed.stdout is search("Status: install (ok|user) installed")
+    (pkg_manager == 'opkg' and
+     not python_distutils_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     not python_distutils_installed.stdout is search("installed size"))
   register: opkg_install_python_distutils
   changed_when: opkg_install_python_distutils.rc == 0
 
 - name: Install python-codecs
   ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-codecs"
   when: >
-    not python_codecs_installed.stdout is search("Status: install (ok|user) installed")
+    (pkg_manager == 'opkg' and
+     not python_codecs_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     not python_codecs_installed.stdout is search("installed size"))
   register: opkg_install_python_codecs
   changed_when: opkg_install_python_codecs.rc == 0
 
 - name: Install python-multiprocessing
   ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-multiprocessing"
   when: >
-    not python_multiprocessing_installed.stdout is search("Status: install (ok|user) installed")
+    (pkg_manager == 'opkg' and
+     not python_multiprocessing_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     not python_multiprocessing_installed.stdout is search("installed size"))
   register: opkg_install_python_multiprocessing
   changed_when: opkg_install_python_multiprocessing.rc == 0
 
 - name: Install python-ctypes
   ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} python-ctypes"
   when: >
-    not python_ctypes_installed.stdout is search("Status: install (ok|user) installed")
+    (pkg_manager == 'opkg' and
+     not python_ctypes_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     not python_ctypes_installed.stdout is search("installed size"))
   register: opkg_install_python_ctypes
   changed_when: opkg_install_python_ctypes.rc == 0
 
 - name: Install openssh-sftp-server
   ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {% if pkg_manager == 'apk' %} add {% else %} install {% endif %} openssh-sftp-server"
   when: >
-    not openssh_server_installed.stdout is search("Status: install (ok|user) installed")
+    (pkg_manager == 'opkg' and
+     not openssh_server_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     not openssh_server_installed.stdout is search("installed size"))
   register: opkg_install_openssh_sftp_server
   changed_when: opkg_install_openssh_sftp_server.rc == 0
