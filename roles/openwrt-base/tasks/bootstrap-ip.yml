@@ -30,21 +30,51 @@
     ansible_bootstrap is truthy
   register: uci_set_ipaddr
   changed_when: uci_set_ipaddr.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW network restart
 
 - name: UCI - Set bootstrap netmask
-  ansible.builtin.raw: "uci set network.lan.netmask={{ openwrt_base_bootstrap_ip }}"
+  ansible.builtin.raw: "uci set network.lan.netmask={{ openwrt_base_bootstrap_netmask }}"
   when: >
     openwrt_netmask.stdout_lines[0] != openwrt_base_bootstrap_netmask and
     ansible_bootstrap is defined and
     ansible_bootstrap is truthy
   register: uci_set_netmask
   changed_when: uci_set_netmask.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW network restart
 
 - name: UCI - Set bootstrap DHCP proto
-  ansible.builtin.raw: "uci set network.lan.proto={{ openwrt_base_bootstrap_ip }}"
+  ansible.builtin.raw: "uci set network.lan.proto={{ openwrt_base_bootstrap_dhcp_proto }}"
   when: >
     openwrt_dhcp_proto.stdout_lines[0] != openwrt_base_bootstrap_dhcp_proto and
     ansible_bootstrap is defined and
     ansible_bootstrap is truthy
   register: uci_set_dhcp_proto
   changed_when: uci_set_dhcp_proto.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW network restart
+
+# Run uci commit handlers immediately
+# (Should fix initial Ansible run on factory OpenWrt image)
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+  check_mode: false
+
+- name: Wait for host to come up on new IP + netmask
+  ansible.builtin.wait_for:
+    host: "{{ openwrt_base_bootstrap_ip }}"
+    port: 22
+    timeout: 300
+  delegate_to: localhost
+  when: >
+    ansible_host != openwrt_base_bootstrap_ip or
+    uci_set_ipaddr or
+    uci_set_netmask.changed or
+    uci_set_dhcp_proto.changed
+
+- name: Reset connection for subsequent tasks
+  ansible.builtin.meta: reset_connection
