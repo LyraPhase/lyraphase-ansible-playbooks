@@ -4,7 +4,7 @@ SCRIPT=$(basename "$0")
 PLAYBOOK_BASE=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )
 REPO_BASE=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../../../" && pwd )
 ROLE_NAME=$(basename "$(cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd)" )
-source "${REPO_BASE}/bin/setup-ansible-vault.sh"
+#source "${REPO_BASE}/bin/setup-ansible-vault.sh"
 
 echo "${ROLE_NAME}: ${SCRIPT}"
 
@@ -18,4 +18,7 @@ if [ -n "${DOCKER_MACHINE_NAME}" ]; then
 fi
 
 # First run must SSH in as root with asked password (we assume you have set a password first)
-ansible-playbook -i "${PLAYBOOK_BASE}"/inventory/hosts "${PLAYBOOK_BASE}"/base.yml --extra-vars 'ansible_bootstrap=true' -vv --diff --user=root --ask-pass --tags=openwrt_bootstrap "$@"
+ansible-playbook -i "${PLAYBOOK_BASE}"/inventory/hosts "${PLAYBOOK_BASE}"/base.yml \
+  --extra-vars 'ansible_bootstrap=true' \
+  --extra-vars 'ansible_ssh_common_args="-F /dev/null -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PubkeyAcceptedKeyTypes=+ssh-rsa -o HostKeyAlgorithms=+ssh-rsa"' \
+  -vv --diff --user=root --ask-pass --ask-vault-pass --tags=openwrt_bootstrap "$@"
