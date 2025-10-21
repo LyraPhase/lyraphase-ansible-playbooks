@@ -8,7 +8,6 @@
     - bootstrap_ip
     - openwrt_bootstrap
     - ansible_bootstrap
-  when: ansible_bootstrap is truthy
 - name: "Run tasks: python-openwrt"
   ansible.builtin.import_tasks: python-openwrt.yml
   tags:

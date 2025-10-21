@@ -6,6 +6,9 @@
   changed_when: false
   ansible.builtin.raw: uci get network.lan.ipaddr | cut -f1
   register: openwrt_ipaddr
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
   tags: openwrt_ip_check
 
 - name: Check for current OpenWRT netmask
@@ -13,6 +16,9 @@
   changed_when: false
   ansible.builtin.raw: uci get network.lan.netmask | cut -f1
   register: openwrt_netmask
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
   tags: openwrt_netmask_check
 
 - name: Check for current OpenWRT DHCP proto
@@ -20,6 +26,9 @@
   changed_when: false
   ansible.builtin.raw: uci get network.lan.proto | cut -f1
   register: openwrt_dhcp_proto
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
   tags: openwrt_dhcp_check
 
 - name: UCI - Set bootstrap IP
@@ -71,10 +80,12 @@
     timeout: 300
   delegate_to: localhost
   when: >
-    ansible_host != openwrt_base_bootstrap_ip or
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy and
+    (ansible_host != openwrt_base_bootstrap_ip or
     uci_set_ipaddr or
     uci_set_netmask.changed or
-    uci_set_dhcp_proto.changed
+    uci_set_dhcp_proto.changed)
 
 - name: Reset connection for subsequent tasks
   ansible.builtin.meta: reset_connection
