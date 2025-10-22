@@ -2,13 +2,13 @@
 # openwrt-base: entry point for handlers
 # This should fix any weird opkg cache bugs
 # Use this if you're seeing 0 packages for a repo,
-- name: Destroy opkg cache
+- name: destroy opkg cache
   ansible.builtin.file:
     path: /var/opkg-lists
     force: true
     state: absent
 
-- name: Create opkg cache dir
+- name: create opkg cache dir
   ansible.builtin.file:
     path: /var/opkg-lists
     force: true
@@ -24,13 +24,13 @@
   delay: 1
   changed_when: opkg_update_result.rc == 0
 
-- name: Destroy apk cache
+- name: destroy apk cache
   ansible.builtin.file:
     path: /var/cache/apk
     force: true
     state: absent
 
-- name: Create apk cache dir
+- name: create apk cache dir
   ansible.builtin.file:
     path: /var/cache/apk
     force: true
