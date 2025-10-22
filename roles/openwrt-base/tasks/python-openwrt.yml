@@ -65,7 +65,7 @@
       or ((openwrt_version.stdout_lines[0].split('.')[0] | int) >= 24
       and (openwrt_version.stdout_lines[0].split('.')[1] | int) >= 10))
     and openwrt_apk.rc == 0
-    and openwrt_apk.stdout_lines[0] | regex_search('.*/apk$')
+    and (openwrt_apk.stdout_lines[0] | regex_search('.*/apk$')) is truthy
   tags: openwrt_version_check
 
 # Note: apk pkg cache must exist to perform installed checks
