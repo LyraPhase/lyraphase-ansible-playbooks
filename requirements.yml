@@ -6,5 +6,5 @@ collections:
   - name: community.general
   - name: https://github.com/trinitronx/ansible_managemynetwork.git
     type: git
-    version: lede
+    version: fix-broken-conditionals-ansible-deprecation
 #  - name: imp1sh.ansible_managemynetwork

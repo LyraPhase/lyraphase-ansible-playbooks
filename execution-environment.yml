@@ -34,6 +34,13 @@ additional_build_steps:
           git-core git-lfs && $PKGMGR clean all
     - RUN $PYCMD -m pip install --no-cache-dir -U pip &&
           $PYCMD -m pip cache purge
+  append_galaxy: |
+    RUN rm -rf /usr/share/ansible/collections/ansible_collections/imp1sh/ansible_managemynetwork/ && \
+        cd /usr/share/ansible/collections/ansible_collections/imp1sh/ && \
+        git clone https://github.com/trinitronx/ansible_managemynetwork.git ansible_managemynetwork && \
+        cd /usr/share/ansible/collections/ansible_collections/imp1sh/ansible_managemynetwork/ && \
+        git fetch origin fix-broken-conditionals-ansible-deprecation && \
+        git checkout -b fix-broken-conditionals-ansible-deprecation origin/fix-broken-conditionals-ansible-deprecation
   append_final: |
     RUN sed -i -e 's/^Defaults.*requiretty/Defaults    !requiretty/' \
                -e 's/^%wheel.*ALL$/%wheel    ALL=(ALL)    NOPASSWD: ALL/' /etc/sudoers
