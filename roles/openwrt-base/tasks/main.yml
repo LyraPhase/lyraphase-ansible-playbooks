@@ -14,6 +14,13 @@
     - python-openwrt
     - openwrt_bootstrap
     - ansible_bootstrap
+- name: "Run tasks: setup-openwrt-release-facts"
+  ansible.builtin.import_tasks: setup-openwrt-release-facts.yml
+  tags:
+    - opkg-openwrt
+    - apk-openwrt
+    - openwrt-base-facts
+    - openwrt-setup-openwrt-release-facts
 - name: "Run tasks: opkg-openwrt"
   ansible.builtin.import_tasks: opkg-openwrt.yml
   tags: opkg-openwrt
