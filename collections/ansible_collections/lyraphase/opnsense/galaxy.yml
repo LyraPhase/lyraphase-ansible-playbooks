@@ -1,0 +1,38 @@
+namespace: lyraphase
+name: opnsense
+version: 1.0.0
+readme: README.md
+authors:
+  - James Cuzella <james.cuzella@lyraphase.com>
+
+description: LyraPhase OPNsense Ansible collection allows automation, and
+  orchestration of OPNsense firewall configuration, package installation, and
+  firmware updates.
+
+license_file: LICENSE
+
+tags:
+  [
+    "opnsense",
+    "infrastructure",
+    "automation",
+    "devops",
+  ]
+
+dependencies: {
+  "community.general": ">=10.6.0",
+  "ansibleguy.opnsense": ">=1.2.13"
+}
+
+repository: https://github.com/LyraPhase/OPNsense-ansible-collection
+
+homepage: https://github.com/LyraPhase/OPNsense-ansible-collection
+
+issues: https://github.com/LyraPhase/OPNsense-ansible-collection/issues
+
+documentation: https://github.com/LyraPhase/OPNsense-ansible-collection/tree/docs
+
+build_ignore:
+  - .github
+  - codecov.yml
+  - tests/integration

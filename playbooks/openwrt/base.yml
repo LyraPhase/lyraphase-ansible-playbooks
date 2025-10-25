@@ -1,48 +1,48 @@
 ---
 # This playbook bootstraps an OpenWRT LEDE router with base settings
 
-- hosts: openwrt
+- name: OpenWRT Base
+  hosts: openwrt
   user: root
-  gather_facts: no
+  gather_facts: "{{ not (ansible_bootstrap | default(false)) }}"
+  vars_files:
+    - "vars/openwrt-base.yml"
 
   roles:
     - openwrt-base
 #    - openwrt-logrotate
-  tasks:
-    - name: Install Extra packages
-      opkg: >
-        name={{ item }}
-        state=installed
-      with_items:
-        - ethtool
-#        - ip-full
-#        - ca-certificates
-#        - ca-bundle
-#        - curl
-#        - bind-host
-#        - bind-dig
-#        - bind-libs
-#        - ddns-scripts
-#        - luci-app-ddns
-#        - iptables
-#        - ip6tables
-#        - iptables-mod-conntrack-extra
-#        - logrotate
-#        - luci-app-firewall
-#        - luci-proto-ipv6
-#        - openvpn-openssl
-#        - libopenssl
-#        - libustream-openssl
-#        - libmbedtls
-#        - kmod-tun
-#        - luci-app-openvpn
-#        - luci-proto-ppp
-#        - ppp-mod-pppoe
-#        - ppp
-#        - mdns-utils
-#        - mdnsd
-#        - mdnsresponder
+    - role: imp1sh.ansible_managemynetwork.ansible_users
+      tags:
+        - ansible_users
+        - users
+    - role: imp1sh.ansible_managemynetwork.ansible_openwrtsystem
+      tags:
+        - ansible_openwrtsystem
+        - system
+    - role: imp1sh.ansible_managemynetwork.ansible_openwrtdropbear
+      tags:
+        - ansible_openwrtdropbear
+        - sshkeys
+    - role: imp1sh.ansible_managemynetwork.ansible_packages
+      when: not (ansible_bootstrap | default(false))
       tags:
         - opkg_packages
         - packages
         - install_packages
+  tasks:
+    - name: Get original banner contents
+      ansible.builtin.slurp:
+        src: "/etc/banner"
+      register: openwrt_banner
+      tags:
+        - openwrt_banner
+    - name: Install SSH banner file
+      ansible.builtin.template:
+        src: templates/lyra-vega-banner.j2
+        dest: "{{ openwrt_dropbear_bannerfile | default('/etc/config/lyra-vega-banner') }}"
+        owner: root
+        group: root
+        mode: "0644"
+      register: openwrt_custom_banner
+      tags:
+        - openwrt_banner

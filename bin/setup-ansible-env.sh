@@ -13,5 +13,8 @@ REPO_BASE=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 # Set Ansible Inventory (can be overridden by plays, cmdline, etc.)
 export ANSIBLE_HOSTS=${REPO_BASE}/inventory
 
+# Set playbooks repo Ansible config
+export ANSIBLE_CONFIG=${REPO_BASE}/ansible.cfg
+
 # Setup Ansible Dynamic Inventory script dependencies
-$USE_SUDO pip list --format=columns | grep -q ipaddress || $USE_SUDO pip install -r "${REPO_BASE}"/inventory/requirements.txt
+$USE_SUDO pip list --format=columns 2>/dev/null | grep -q ipaddress || $USE_SUDO pip install -r "${REPO_BASE}"/inventory/requirements.txt

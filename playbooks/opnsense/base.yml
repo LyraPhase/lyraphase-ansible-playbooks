@@ -1,0 +1,26 @@
+---
+# This playbook bootstraps an OPNSense firewall/router with base settings
+
+- name: OPNSense Base
+  hosts: opnsense
+  connection: local # execute modules on ansible controller host
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: python3
+    opnsense_static_dhcp: "{{ lyraphase_static_dhcp }}"
+    opnsense_pkgs_list:
+      - lsblk
+    opnsense_pkgs_auth:
+      ssl_verify: false
+      ssl_ca_file: files/pki/opnsense-web-ca.crt
+      api_key: "{{ opnsense.firewall.api_key }}"
+      api_secret: "{{ opnsense.firewall.api_secret }}"
+
+  roles:
+    - role: lyraphase.opnsense_users
+      tags:
+        - opnsense_users
+    - role: lyraphase.opnsense.opnsense_pkgs
+      tags:
+        - opnsense_packages
+        - opnsense_pkgs

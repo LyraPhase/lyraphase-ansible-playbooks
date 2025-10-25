@@ -1,0 +1,422 @@
+---
+# This playbook creates a BSD Boot Environment and updates OPNSense firewall OS
+
+- name: Upgrade OPNSense OS
+  hosts: opnsense
+  serial: 1
+  gather_facts: false
+  vars:
+    opnsense_upgrade_require_boot_environments: true
+
+  # TODO: Maybe wrap tasks in role
+  # roles:
+  #   - opnsense-upgrade
+
+  tasks:
+    - name: Check boot environment support
+      ansible.builtin.command:
+        bectl check
+      changed_when: false
+      register: bectl_sanity_check
+      check_mode: false
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+        - upgrade
+
+    - name: Are boot environments supported?
+      ansible.builtin.debug:
+        msg: Boot environments are {{ "NOT" if bectl_sanity_check.rc != 0 }} supported
+      changed_when: false
+      failed_when: false
+      check_mode: false
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+        - debug
+
+    - name: Assert Boot Environments are supported
+      ansible.builtin.assert:
+        that:
+          - bectl_sanity_check.rc is defined
+          - bectl_sanity_check.rc == 0
+      changed_when: false
+      when: opnsense_upgrade_require_boot_environments
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+        - upgrade
+
+    - name: Check if OPNSense update is available
+      ansible.builtin.command:
+        opnsense-update -v -c -up
+      become: true
+      become_method: ansible.builtin.sudo
+      ignore_errors: true
+      failed_when: false
+      changed_when: false
+      check_mode: false
+      register: opnsense_update_available
+      tags:
+        - opnsense_update
+        - opnsense_update_check
+        - upgrade
+
+    - name: Assert OPNSense update is available
+      ansible.builtin.assert:
+        that:
+          - opnsense_update_available.rc is defined
+          - opnsense_update_available.rc == 0
+      changed_when: false
+      check_mode: false
+      tags:
+        - opnsense_update
+        - opnsense_update_check
+        - upgrade
+
+    - name: Set OPNSense new version
+      ansible.builtin.set_fact:
+        opnsense_upgrade_version: "{{ opnsense_update_available.stdout }}"
+      when: opnsense_update_available.rc == 0
+      changed_when: false
+      check_mode: false
+      tags:
+        - opnsense_update
+        - opnsense_update_check
+        - upgrade
+
+    - name: OPNSense Upgrade Version
+      ansible.builtin.debug:
+        msg: "OPNSense Upgrade Available to: {{ opnsense_upgrade_version }}"
+      check_mode: false
+      tags:
+        - opnsense_update
+        - opnsense_update_check
+        - upgrade
+        - debug
+
+    - name: List boot environments (creation time descending order)
+      ansible.builtin.command: >-
+        bectl list -H -C creation
+      changed_when: false
+      check_mode: false
+      register: bectl_list_result
+      when: bectl_sanity_check.rc == 0
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+
+    - name: Get boot environments
+      ansible.builtin.set_fact:
+        bectl_boot_environments: "{{ bectl_boot_environments | default([]) + [keys | zip(item | ansible.builtin.split('\t')) | community.general.dict] }}"
+      loop: "{{ bectl_list_result.stdout_lines }}"
+      vars:
+        keys:
+          - name
+          - active
+          - mountpoint
+          - space
+          - created
+      check_mode: false
+
+    - name: Show boot environments
+      ansible.builtin.debug:
+        var: bectl_boot_environments
+      changed_when: false
+      when: bectl_sanity_check.rc == 0
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+        - debug
+
+    - name: Show non-default boot environments
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ bectl_boot_environments | rejectattr('name', 'eq', 'default') }}"
+      changed_when: false
+      when: bectl_sanity_check.rc == 0
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+        - debug
+
+    - name: Gather facts about ZFS pool zroot
+      community.general.zpool_facts:
+        pool: zroot
+      tags:
+        - bsd_zpool
+        - bsd_zpool_facts
+
+    - name: DEBUG ZFS pool facts
+      ansible.builtin.debug:
+        var: ansible_zfs_pools
+      tags:
+        - bsd_zpool
+        - bsd_zpool_facts
+        - debug
+
+    - name: List zpool checkpoints
+      ansible.builtin.command:
+        zpool list -H -o name,checkpoint
+      changed_when: false
+      check_mode: false
+      register: zpool_checkpoints_result
+      tags:
+        - bsd_zpool
+        - bsd_zpool_list
+
+    - name: Show zpool checkpoint space used
+      ansible.builtin.debug:
+        msg: "{{ item | ansible.builtin.split('\t') }}"
+      loop: "{{ zpool_checkpoints_result.stdout_lines }}"
+      check_mode: false
+      tags:
+        - bsd_zpool
+        - bsd_zpool_list
+        - debug
+
+    - name: Show zpool checkpoint space used via facts
+      ansible.builtin.debug:
+        msg: "{% for pool in ansible_zfs_pools %}\
+          {{ [pool.name, pool.checkpoint] }}\n
+          {% endfor %}"
+      tags:
+        - bsd_zpool
+        - bsd_zpool_facts
+        - debug
+
+    - name: Check for any old checkpoints
+      ansible.builtin.shell:
+        zpool status zroot | grep checkpoint
+      register: zpool_status_has_checkpoint
+      ignore_errors: true
+      failed_when: false
+      changed_when: false
+      check_mode: false
+      tags:
+        - bsd_zpool
+        - bsd_zpool_status
+
+    - name: Show zpool checkpoint status
+      ansible.builtin.debug:
+        var: zpool_status_has_checkpoint
+      changed_when: false
+      tags:
+        - bsd_zpool
+        - bsd_zpool_status
+        - debug
+
+    - name: Get OLD OPNSense Release Version
+      ansible.builtin.shell: |
+        set -o pipefail
+        opnsense-version | awk '{ print $2 }'
+      changed_when: false
+      check_mode: false
+      register: opnsense_current_version
+      tags:
+        - opnsense_version
+        - opnsense_upgrade
+        - upgrade
+
+    - name: Assert OLD OPNSense Release Version is Defined
+      ansible.builtin.assert:
+        that:
+          - opnsense_current_version is defined
+          - opnsense_current_version.stdout is defined
+          - opnsense_current_version.stdout is string
+          - opnsense_current_version.stdout is match ('^[0-9.]+$')
+      changed_when: false
+      check_mode: false
+      tags:
+        - opnsense_version
+        - opnsense_upgrade
+        - upgrade
+
+    - name: Prompt to delete old checkpoints
+      ansible.builtin.pause:
+        prompt: |-
+          {{ 'CHECK MODE is ON! No changes will be made. It is safe to continue.' if ansible_check_mode else '' }}
+          ZFS checkpoint found! Please confirm you want to discard the old checkpoint!
+          Remember: A ZFS pool can only have a single checkpoint.
+          This playbook needs to create a checkpoint before upgrading OPNSense.
+          Press return to continue. Press Ctrl+c and then "a" to abort
+      when: zpool_status_has_checkpoint.rc == 0
+      tags:
+        - pause
+        - prompt
+        - destructive
+
+    - name: Delete OLD zpool checkpoint
+      ansible.builtin.command:
+        zpool checkpoint --discard --wait zroot
+      changed_when: zpool_checkpoint_discard_result.rc == 0
+      become: true
+      become_method: ansible.builtin.sudo
+      register: zpool_checkpoint_discard_result
+      when: zpool_status_has_checkpoint.rc == 0
+      tags:
+        - bsd_zpool
+        - bsd_zpool_checkpoint_discard
+        - destructive
+
+    - name: Create NEW zpool checkpoint
+      ansible.builtin.command:
+        zpool checkpoint zroot
+      changed_when: zpool_checkpoint_create_result.rc == 0
+      become: true
+      become_method: ansible.builtin.sudo
+      register: zpool_checkpoint_create_result
+      tags:
+        - bsd_zpool
+        - bsd_zpool_checkpoint_create
+
+    - name: Create boot environment for OLD OPNSense Version
+      ansible.builtin.command:
+        bectl create {{ opnsense_current_version.stdout }}
+      changed_when: opnsense_be_create_result.rc == 0
+      become: true
+      become_method: ansible.builtin.sudo
+      register: opnsense_be_create_result
+      when: bectl_sanity_check.rc == 0
+      tags:
+        - opnsense_upgrade
+        - bsd_bectl
+        - bsd_be_create
+        - upgrade
+
+    - name: Activate boot environment for OLD OPNSense Version
+      ansible.builtin.command:
+        bectl activate {{ opnsense_current_version.stdout }}
+      changed_when: opnsense_be_activate_result.rc == 0
+      become: true
+      become_method: ansible.builtin.sudo
+      register: opnsense_be_activate_result
+      when: bectl_sanity_check.rc == 0
+      tags:
+        - opnsense_upgrade
+        - bsd_bectl
+        - bsd_be_create
+        - upgrade
+
+    - name: Reboot OPNSense to test the restore boot environment and wait for it to restart
+      ansible.builtin.reboot:
+        msg: "Reboot initiated by Ansible"
+        connect_timeout: 5
+        reboot_timeout: 600
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
+        test_command: whoami
+      become: true
+      become_method: ansible.builtin.sudo
+      when: not ansible_check_mode
+      register: opnsense_be_reboot_result
+      tags:
+        - reboot
+        - opnsense_upgrade
+        - upgrade
+
+    - name: Wait for OPNSense host to reboot
+      ansible.builtin.command:
+        echo TODO
+      become: true
+      become_method: ansible.builtin.sudo
+      register: opnsense_be_create_result
+      tags:
+        - reboot
+        - opnsense_upgrade
+        - upgrade
+
+    - name: List boot environments
+      ansible.builtin.command: >-
+        bectl list -a
+      changed_when: false
+      check_mode: false
+      register: bectl_pre_upgrade_list_result
+      when: bectl_sanity_check.rc == 0
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+
+    - name: Show pre-upgrade boot environments
+      ansible.builtin.debug:
+        var: bectl_pre_upgrade_list_result
+      changed_when: false
+      when: bectl_sanity_check.rc == 0
+      tags:
+        - bsd_bectl
+        - bsd_be_create
+        - debug
+
+    - name: List zpool checkpoints
+      ansible.builtin.command:
+        zpool list -H -o name,checkpoint
+      changed_when: false
+      check_mode: false
+      register: zpool_checkpoints_pre_upgrade_result
+      tags:
+        - bsd_zpool
+        - bsd_zpool_list
+
+    - name: Show zpool checkpoints
+      ansible.builtin.debug:
+        msg: "{{ item | ansible.builtin.split('\t') }}"
+      loop: "{{ zpool_checkpoints_pre_upgrade_result.stdout_lines }}"
+      tags:
+        - bsd_zpool
+        - bsd_zpool_list
+        - debug
+
+    - name: Perform the upgrade
+      ansible.builtin.command:
+        echo TODO
+      changed_when: opnsense_upgrade_result.rc == 0
+      become: true
+      become_method: ansible.builtin.sudo
+      register: opnsense_upgrade_result
+      tags:
+        - opnsense_upgrade
+        - upgrade
+
+## Reboot if upgrade does not do this on it's own
+## OR: Wait here for SSH reconnect
+## TODO: Set var by prompt, then rollback if needed
+# zpool import -- rewind-to-checkpoint <pool>
+
+    - name: Prompt to delete NEW checkpoint
+      ansible.builtin.pause:
+        prompt: |-
+          {{ 'CHECK MODE is ON! No changes will be made. It is safe to continue.' if ansible_check_mode else '' }}
+          OPNSense has been upgraded! Check whether everything is working properly.
+          Please confirm you want to discard the old checkpoint and activate the new boot environment.
+          Remember: A ZFS pool can only have a single checkpoint.
+          This playbook wants to discard the checkpoint once the new OPNSense release is verified working.
+          Press return to continue. Press Ctrl+c and then "a" to abort
+      when: opnsense_upgrade_result.rc == 0
+      tags:
+        - pause
+        - prompt
+        - destructive
+
+    - name: Delete NEW zpool checkpoint
+      ansible.builtin.command:
+        zpool checkpoint --discard --wait zroot
+      changed_when: zpool_checkpoint_discard_new_result.rc == 0
+      become: true
+      become_method: ansible.builtin.sudo
+      register: zpool_checkpoint_discard_new_result
+      when: opnsense_upgrade_result.rc == 0
+      tags:
+        - bsd_zpool
+        - bsd_zpool_checkpoint_discard
+        - destructive
+
+#    - name: Install Extra packages
+#      opkg: >
+#        name={{ item }}
+#        state=installed
+#      with_items:
+#        - ethtool
+#      tags:
+#        - opkg_packages
+#        - packages
+#        - install_packages

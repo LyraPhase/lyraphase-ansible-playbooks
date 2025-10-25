@@ -1,0 +1,34 @@
+---
+# openwrt-base: apk-openwrt Tasks entry point. Called by main.yml
+
+# Load a variable file based on the OS type, or a default if not found.
+- name: Include OS-specific vars
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version | int }}.yml"
+    - "../vars/{{ ansible_distribution }}.yml"
+    - "../vars/{{ ansible_os_family }}.yml"
+    - "../vars/default.yml"
+  when: openwrt_apk_repo_files is not defined
+
+- name: Install apk repo definition files
+  ansible.builtin.template:
+    src: "etc-apk/{{ item }}.j2"
+    dest: "/etc/apk/repositories.d/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  with_items: "{{ openwrt_apk_repo_files }}"
+  when: >
+    (pkg_manager is defined and pkg_manager == "apk") or
+    (not pkg_manager is defined and
+     ansible_pkg_mgr is defined and ansible_pkg_mgr == "apk")
+  notify:
+    - destroy apk cache
+    - create apk cache dir
+    - apk update
+
+# Run yum makecache handlers immediately
+# (Should fix Ansible runs on hosts with pre-existing opkg repo problems)
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

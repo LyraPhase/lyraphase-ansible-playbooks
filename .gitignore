@@ -18,7 +18,6 @@
 .idea/
 .project
 .pydevproject
-*.sublime-project
 *.sublime-workspace
 
 # Compiled source #

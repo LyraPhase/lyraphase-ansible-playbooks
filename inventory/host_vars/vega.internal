@@ -1,0 +1,51 @@
+openwrt_system_hostname: "vega"
+openwrt_system_description: "wrt1900ac v1 AP"
+openwrt_system_notes: "upstairs office"
+openwrt_system_maintainer: "James Cuzella @trinitronx"
+openwrt_system_ttylogin: 1
+openwrt_system_logsize: "128"
+openwrt_system_log_port: 514
+openwrt_system_log_proto: "udp"
+openwrt_system_log_ip: "192.168.1.100"
+openwrt_system_conloglevel: 8
+openwrt_system_cronloglevel: 8
+openwrt_system_compat_version: '2.0'
+# Disable urandom seed file to avoid mmc wear
+openwrt_system_urandom_seed: 0
+# NTP config
+openwrt_system_timezone: "GMT0"
+openwrt_system_zonename: "UTC"
+openwrt_system_ntp_server:
+  - "utcnist.colorado.edu"
+  - "utcnist2.colorado.edu"
+  - "time-c-b.nist.gov"
+  - "time-d-b.nist.gov"
+  - "time-e-b.nist.gov"
+  - "utcnist3.colorado.edu"
+openwrt_system_ntp_enabled: 1
+openwrt_system_ntp_enable_server: 1
+openwrt_system_ntp_use_dhcp: 0
+openwrt_system_led:
+  - itemname: "led_wan"
+    name: "WAN"
+    sysfs: "mamba:white:wan"
+    trigger: "netdev"
+    mode: "link tx rx"
+    dev: "wan"
+  - itemname: "led_usb1"
+    name: "USB 1"
+    sysfs: "mamba:white:usb2"
+    trigger: "usbport"
+    ports: ["usb1-port1"]
+  - itemname: "led_usb2"
+    name: "USB 2"
+    sysfs: "mamba:white:usb3_1"
+    trigger: "usbport"
+    ports:
+      - "usb2-port1"
+      - "usb3-port1"
+  - itemname: "led_usb2_ss"
+    name: "USB 2 SS"
+    sysfs: "mamba:white:usb3_2"
+    trigger: "usbport"
+    ports: ["usb3-port2"]

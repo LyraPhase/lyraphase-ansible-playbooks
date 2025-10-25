@@ -1,0 +1,7 @@
+openwrt_dumbap_base_wireless:
+  radio0:
+    ssid: "{{ lyraphase_vault_wireless.radio0.ssid | default('OpenWRT_5Ghz') }}"
+    key: "{{ lyraphase_vault_wireless.radio0.key }}"
+  radio1:
+    ssid: "{{ lyraphase_vault_wireless.radio1.ssid | default('OpenWRT') }}"
+    key: "{{ lyraphase_vault_wireless.radio1.key }}"

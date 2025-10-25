@@ -1,0 +1,31 @@
+---
+# tasks file for lyraphase.opnsense-users bootstrap
+- name: Bootstrap ansible group
+  ansible.builtin.group:
+    name: ansible
+    state: present
+    gid: "{{ lyraphase_opnsense_users_ansible_gid }}"
+
+- name: >-
+    Allow the ansible group to run sudo
+    without requiring a password on any host
+  community.general.sudoers:
+    name: ansible-passwordless-sudo
+    group: ansible
+    host: ALL
+    commands: ALL
+    nopassword: true
+    sudoers_path: "{{ lyraphase_opnsense_users_sudoers_path }}"
+
+- name: Reset root user password (once first-run)
+  ansible.builtin.user:
+    name: root
+    user: root
+    ## TODO: Figure out /conf/config.xml bcrypt / argon2 support, how to change password in OPNSense
+    ## https://github.com/opnsense/core/blob/stable/24.7/src/etc/inc/auth.inc#L441
+    ## Password is '*' inside shadowed /etc/master.passwd, /etc/pwd.db, and /etc/spwd.db
+    ## How does OPNSense use the hash from `/conf/config.xml` in PAM?
+    ## /etc/pam.d/system:10:auth    sufficient  pam_opnsense.so
+    # password: "{{ lookup('ansible.builtin.password', chars=['ascii_letters', 'digits', 'punctuation'], encrypt=bcrypt ) }}"
+  tags:
+    - never

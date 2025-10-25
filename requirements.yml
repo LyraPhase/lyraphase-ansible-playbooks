@@ -1,0 +1,10 @@
+---
+#roles:
+collections:
+  # OPNSense requirements
+  - name: ansibleguy.opnsense
+  - name: community.general
+  - name: https://github.com/trinitronx/ansible_managemynetwork.git
+    type: git
+    version: lede
+#  - name: imp1sh.ansible_managemynetwork

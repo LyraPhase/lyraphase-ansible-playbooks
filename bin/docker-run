@@ -3,13 +3,13 @@
 # ---------------------------------
 # Debug logging for this script
 # To use: export DOCKER_RUN_LOG=DEBUG
-DOCKER_RUN_LOG="$(echo $DOCKER_RUN_LOG | tr '[a-z]' '[A-Z]')"
+DOCKER_RUN_LOG="$(echo "$DOCKER_RUN_LOG" | tr '[a-z]' '[A-Z]')"
 if [[ "${DOCKER_RUN_LOG}" == "DEBUG" ]]; then
   PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }' ## Debugging prompt (for bash -x || set -x)
   set -x
 fi
 
-CONTAINER_ID="${CONTAINER_ID-trinitronx/ansible-base:devel-centos7-2.5.0}"
+CONTAINER_ID="${CONTAINER_ID-docker.io/lyraphase/ansible-playbooks-ee:latest}"
 
 REPO_BASE=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
 if [ $# -ge   1 ]; then
@@ -22,23 +22,26 @@ MY_UID=$(id -u)
 MY_GID=$(id -g)
 # Because some OSX environments use MS AD style group name, we must fudge it
 # Reference: http://unix.stackexchange.com/questions/11477/what-are-the-allowed-group-names-for-groupadd
-MY_GROUPNAME=$(id -gn | tr '\' '-' | tr ' ' '_')
+MY_GROUPNAME=$(id -gn | tr '\\' '-' | tr ' ' '_')
 MY_USERNAME=$(id -un)
 # name to give the running container. Should be unique.
 CONTAINER_NAME=ansible_run.${MY_USERNAME}.${RANDOM}
 MY_HOSTNAME=$(hostname)   # Only used for warning message clarity
 
-RUN_SCRIPT=$(mktemp ${REPO_BASE}/dockerized_run.XXXXX)
+RUN_SCRIPT="$(mktemp "${REPO_BASE}"/dockerized_run.XXXXX)"
 
 # Cleanup on exit
-trap "bash -c 'rm ${RUN_SCRIPT} ' &>/dev/null" EXIT HUP INT QUIT KILL TERM
+__cleanup_bash_profile() {
+  sed -i -e "\|# Added by ${RUN_SCRIPT} to unload rvm$|d" ~/.bash_profile &>/dev/null
+}
+trap "bash -c 'rm ${RUN_SCRIPT} ' &>/dev/null; __cleanup_bash_profile" EXIT HUP INT QUIT KILL TERM
 
 # HACK: this is to allow 'docker-run' to work when DNS is unavailable.
 # For environments without DNS, we use /etc/hosts.
 # The container needs the /etc/hosts file to find
 # machines.
 if [ -n "$DOCKER_NO_DNS" -a "$DOCKER_NO_DNS" == '1'  ]; then
-    DOCKER_RUN_ARGS="-v /etc/hosts:/etc/hosts ${DOCKER_RUN_ARGS:-}"
+    DOCKER_RUN_ARGS+=(-v /etc/hosts:/etc/hosts)
 fi
 
 # Hack for importing ssh-agent into docker-machine VM
@@ -49,21 +52,21 @@ if env | grep -q SSH_AUTH_SOCK && test -n "${DOCKER_MACHINE_NAME}"; then
   # From https://gist.github.com/rcoup/53e8dee9f5ea27a51855
   SSH_SOCK=docker.${DOCKER_MACHINE_NAME}.$$.ssh.socket
 
-  SSH_PORT=$(docker-machine inspect -f '{{.Driver.SSHPort}}' ${DOCKER_MACHINE_NAME})
-  [[ -z "$SSH_PORT" || "$SSH_PORT" == "<no value>" ]] && SSH_PORT=$(docker-machine inspect -f '{{.Driver.Driver.SSHPort}}' ${DOCKER_MACHINE_NAME})
+  SSH_PORT=$(docker-machine inspect -f '{{.Driver.SSHPort}}' "${DOCKER_MACHINE_NAME}")
+  [[ -z "$SSH_PORT" || "$SSH_PORT" == "<no value>" ]] && SSH_PORT=$(docker-machine inspect -f '{{.Driver.Driver.SSHPort}}' "${DOCKER_MACHINE_NAME}")
 
   # Support for docker-xhyve-driver + docker-machine
   # Detect the IP of the VM to SSH into for ssh-agent forwarding
-  DM_HOST=$(docker-machine inspect -f '{{.Driver.IPAddress}}' ${DOCKER_MACHINE_NAME})
-  [[ -z "$DM_HOST" || "$DM_HOST" == "<no value>" ]] && DM_HOST=$(docker-machine inspect -f '{{.Driver.Driver.IPAddress}}' ${DOCKER_MACHINE_NAME})
+  DM_HOST=$(docker-machine inspect -f '{{.Driver.IPAddress}}' "${DOCKER_MACHINE_NAME}")
+  [[ -z "$DM_HOST" || "$DM_HOST" == "<no value>" ]] && DM_HOST=$(docker-machine inspect -f '{{.Driver.Driver.IPAddress}}' "${DOCKER_MACHINE_NAME}")
   # Test an SSH connection to the docker machine VM via IPAddress first...
   # if this does not work, it is likely that virtualbox driver is being used, and
   # VBoxHeadless process has grabbed a port listening on the Host's SSH_PORT, probably with 127.0.0.1 loopback (host-only networking)
   # However, this is dynamic depending on the user's docker-machine driver and VirtualBox network settings (in the case of virtualbox)
   # so we must grab the listening interface IP manually
-  if ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no \
+  if ssh -i "$HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa" -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 \
-    -p ${SSH_PORT} docker@${DM_HOST} "echo ssh-success for docker@${DM_HOST}:${SSH_PORT}"
+    -p "${SSH_PORT}" docker@"${DM_HOST}" "echo ssh-success for docker@${DM_HOST}:${SSH_PORT}"
   then
     # Pass... we may use docker@${DM_HOST}:${SSH_PORT}
     echo "INFO: Found docker-machine VM listening on ${DM_HOST}:${SSH_PORT}"
@@ -76,7 +79,7 @@ if env | grep -q SSH_AUTH_SOCK && test -n "${DOCKER_MACHINE_NAME}"; then
     #
     LSOF_PATTERN_REGEX='n((.*?):.*?->)?(.*?):.*'
     # Passing in at least -F 'n' to lsof shows all TCP interface:port lines beginning with character 'n'
-    DM_HOST_CANDIDATES=$(lsof -F 'PnLt' -n -i:$SSH_PORT | grep -E '^n')
+    DM_HOST_CANDIDATES=$(lsof -F 'PnLt' -n -i:"$SSH_PORT" | grep -E '^n')
     DM_HOST_CANDIDATES_REAL_IP=$(echo -ne "$DM_HOST_CANDIDATES" | perl -n -e "if (m/^n/) { s/${LSOF_PATTERN_REGEX}/\3/; print $_ ; }" | uniq)
     DM_HOST_CANDIDATES_BRIDGE_IP=$(echo -ne "$DM_HOST_CANDIDATES" | perl -n -e "if (m/^n/) { s/${LSOF_PATTERN_REGEX}/\2/; print $_ ; }" | uniq)
     # If we get more than one, we must search through the list of interfaces to find the right one
@@ -84,30 +87,30 @@ if env | grep -q SSH_AUTH_SOCK && test -n "${DOCKER_MACHINE_NAME}"; then
     if [ "$(echo "$DM_HOST_CANDIDATES_REAL_IP" | wc -l )" -eq 1 ]; then
       DM_HOST=$DM_HOST_CANDIDATES_REAL_IP
     elif echo "$DM_HOST_CANDIDATES_REAL_IP" | grep -q -c "127.0.0.1" && \
-         ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no \
+         ssh -i "$HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa" -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 \
-    -p ${SSH_PORT} docker@127.0.0.1 "docker version"
+    -p "${SSH_PORT}" docker@127.0.0.1 "docker version"
     then
       # Localhost listener takes priority, as this is most likely VBoxHeadless
       DM_HOST='127.0.0.1'
     else
       echo "INFO: Found multiple docker-machine VM candidates listening on $SSH_PORT"
-      if echo "$DM_HOST_CANDIDATES_REAL_IP" | grep -q -c "$(docker-machine ip ${DOCKER_MACHINE_NAME})"; then
+      if echo "$DM_HOST_CANDIDATES_REAL_IP" | grep -q -c "$(docker-machine ip "${DOCKER_MACHINE_NAME}")"; then
         echo "INFO: Found docker-machine VM candidate matching 'docker-machine ip ${DOCKER_MACHINE_NAME}'"
-        DM_HOST=$(echo "$DM_HOST_CANDIDATES_REAL_IP" | grep "$(docker-machine ip ${DOCKER_MACHINE_NAME})")
+        DM_HOST=$(echo "$DM_HOST_CANDIDATES_REAL_IP" | grep "$(docker-machine ip "${DOCKER_MACHINE_NAME}")")
       else
         # Loop through haphazardly hoping we guess right
         for iface in $(ifconfig -l) ; do
           for ip in $DM_HOST_CANDIDATES_BRIDGE_IP; do
-            if ifconfig $iface | grep $ip ; then
+            if ifconfig "$iface" | grep "$ip" ; then
               # Now we know the interface and bridge IP
               # Figure out what the listening IP was
-              docker_host_real_ip=$(echo "$DM_HOST_CANDIDATES" | grep $ip | perl -n -e "if (m/^n/) { s/${LSOF_PATTERN_REGEX}/\3/; print $_ ; }" | uniq)
+              docker_host_real_ip=$(echo "$DM_HOST_CANDIDATES" | grep "$ip" | perl -n -e "if (m/^n/) { s/${LSOF_PATTERN_REGEX}/\3/; print $_ ; }" | uniq)
               echo "INFO: Trying to detect docker on ${DM_HOST}:${SSH_PORT}"
 
-              if ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no \
+              if ssh -i "$HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa" -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 \
-    -p ${SSH_PORT} docker@${docker_host_real_ip} "docker version"
+    -p "${SSH_PORT}" docker@"${docker_host_real_ip}" "docker version"
               then
                 echo "INFO: Found docker-machine VM listening on ${DM_HOST}:${SSH_PORT}"
                 DM_HOST="$docker_host_real_ip"
@@ -128,7 +131,7 @@ if env | grep -q SSH_AUTH_SOCK && test -n "${DOCKER_MACHINE_NAME}"; then
   #  -f - Requests ssh to go to background just before command execution
   #  -n - Redirects stdin from /dev/null
   #  tail -f /dev/null - command that never ends
-  ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa \
+  ssh -i "$HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa" \
     -o PasswordAuthentication=no \
     -o IdentitiesOnly=yes \
     -o StrictHostKeyChecking=no \
@@ -136,9 +139,9 @@ if env | grep -q SSH_AUTH_SOCK && test -n "${DOCKER_MACHINE_NAME}"; then
     -o LogLevel=quiet \
     -o ConnectionAttempts=3 \
     -o ConnectTimeout=10 \
-    -p ${SSH_PORT} \
-    docker@${DM_HOST} \
-    -A -M -S $SSH_SOCK -f -n \
+    -p "${SSH_PORT}" \
+    docker@"${DM_HOST}" \
+    -A -M -S "$SSH_SOCK" -f -n \
     tail -f /dev/null
 
   ssh_forwarding_pid=$!
@@ -146,14 +149,14 @@ if env | grep -q SSH_AUTH_SOCK && test -n "${DOCKER_MACHINE_NAME}"; then
     ssh_forwarding_pid=$(ps aux | grep "ssh.*docker@${DM_HOST}" | grep -v grep | head -n1 | awk '{print $2}')
   fi
 
-  export DM_AGENT_SOCK=$(ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -S $SSH_SOCK docker@${DM_HOST} echo \$SSH_AUTH_SOCK)
+  export DM_AGENT_SOCK="$(ssh -i "$HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa" -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -S "$SSH_SOCK" docker@"${DM_HOST}" echo \$SSH_AUTH_SOCK)"
   echo "INFO: Found $DM_AGENT_SOCK"
   echo "INFO: Running ssh forwarding pid: $ssh_forwarding_pid"
   # Try our best to kill the socket on exit
   trap "bash -c 'ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -S $SSH_SOCK -O exit docker@${DM_HOST} ; rm ${RUN_SCRIPT}; sleep 1; kill $ssh_forwarding_pid ; ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -p ${SSH_PORT} -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10  docker@${DM_HOST} rm -f ${DM_AGENT_SOCK} ' &>/dev/null" EXIT HUP INT QUIT KILL TERM
 
   # Check if DM_AGENT_SOCK exists in docker-machine VM
-  ssh -S $SSH_SOCK docker@${DM_HOST} "[ -e \"$DM_AGENT_SOCK\" ]"
+  ssh -S "$SSH_SOCK" docker@"${DM_HOST}" "[ -e \"$DM_AGENT_SOCK\" ]"
   [ $? -eq 0 ] || echo "ERROR: DM_AGENT_SOCK path: $DM_AGENT_SOCK does not exist... could not forward SSH_AUTH_SOCK into docker-machine!  Is your ssh-agent running?"
 fi
 
@@ -164,23 +167,42 @@ if env | grep -q SSH_AUTH_SOCK ; then
     # Use "magic" ssh-auth.sock path provided as of Docker for Mac >= 2.2.0.0
     SSH_AUTH_SOCK_MAGIC_PATH='/run/host-services/ssh-auth.sock'
     ANSIBLE_SSH_ARGS=" -o ForwardAgent=yes -o ControlPath=/tmp/ssh-%r@%h:%p -o ControlMaster=auto -o ControlPersist=60s ${ANSIBLE_SSH_ARGS:-}"
-    DOCKER_RUN_SSH_AGENT_ARGS="-v ${SSH_AUTH_SOCK_MAGIC_PATH}:${SSH_AUTH_SOCK_MAGIC_PATH} -e SSH_AUTH_SOCK=${SSH_AUTH_SOCK_MAGIC_PATH}"
+    DOCKER_RUN_SSH_AGENT_ARGS=(-v "${SSH_AUTH_SOCK_MAGIC_PATH}:${SSH_AUTH_SOCK_MAGIC_PATH}" -e "SSH_AUTH_SOCK=${SSH_AUTH_SOCK_MAGIC_PATH}")
     EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK="export SSH_AUTH_SOCK=$SSH_AUTH_SOCK_MAGIC_PATH ; export ANSIBLE_SSH_ARGS=\"$ANSIBLE_SSH_ARGS\" ; "
   else
     SOCK_PATH="$SSH_AUTH_SOCK" # Default to passing through SSH_AUTH_SOCK (if on angus00.*)
     if [[ -h $SOCK_PATH ]]; then
-      SOCK_PATH=$(readlink -f $SOCK_PATH)
+      SOCK_PATH=$(readlink -f "$SOCK_PATH")
     fi
     # If docker-machine was detected, pass that socket through instead
     env | grep -q DM_AGENT_SOCK && SOCK_PATH="$DM_AGENT_SOCK"
     if [[ -z "$SOCK_PATH" || ( "${SOCK_PATH}" != "${DM_AGENT_SOCK}" && ! -e "$SOCK_PATH" ) ]]; then
        echo "ERROR: SSH_AGENT_SOCK path: $SOCK_PATH does not exist... is your ssh-agent running?"
     else
-      DOCKER_RUN_SSH_AGENT_ARGS="-v $(dirname $SOCK_PATH):/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent/$(basename $SOCK_PATH)"
+      DOCKER_RUN_SSH_AGENT_ARGS=(-v "$(dirname "$SOCK_PATH"):/ssh-agent" -e "SSH_AUTH_SOCK=/ssh-agent/$(basename "$SOCK_PATH")")
       ANSIBLE_SSH_ARGS=" -o ForwardAgent=yes -o ControlPath=/tmp/ssh-%r@%h:%p -o ControlMaster=auto -o ControlPersist=60s ${ANSIBLE_SSH_ARGS:-}"
-      EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK="export SSH_AUTH_SOCK=/ssh-agent/$(basename $SOCK_PATH) ; export ANSIBLE_SSH_ARGS=\"$ANSIBLE_SSH_ARGS\" ; "
+      EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK="export SSH_AUTH_SOCK=/ssh-agent/$(basename "$SOCK_PATH") ; export ANSIBLE_SSH_ARGS=\"$ANSIBLE_SSH_ARGS\" ; "
     fi
   fi
+fi
+
+if command -v colima 2>/dev/null 1>&2; then
+  COLIMA_VM_NAME="$(colima list | grep -i 'Running.*docker' | awk '{ print $1 }' | head -n1)"
+fi
+# If Docker Host is running gpg-agent, volmount socketdir & import GNUPGHOME into container env
+if env | grep -q GNUPGHOME || pgrep -U "${MY_UID}" gpg-agent 2>/dev/null 1>&2; then
+  if pgrep -U "${MY_UID}" gpg-agent 2>/dev/null 1>&2; then
+    if [ -n "$COLIMA_VM_NAME" ] || [ -n "$DOCKER_MACHINE_NAME" ]; then
+      # Use socket dir from $XDG_RUNTIME_DIR in VM
+      _GNUPG_SOCKET_DIR="/run/user/${MY_UID}/gnupg"
+    else
+      # Use socket dir from docker host
+      _GNUPG_SOCKET_DIR="$(gpgconf --list-dirs socketdir)"
+    fi
+    DOCKER_RUN_GPG_AGENT_ARGS+=(-v "${_GNUPG_SOCKET_DIR}:${_GNUPG_SOCKET_DIR}")
+  fi
+  export GNUPGHOME="${GNUPGHOME:-/run/user/${MY_UID}/gnupg}"
+  DOCKER_RUN_GPG_AGENT_ARGS+=(-e "GNUPGHOME=${GNUPGHOME}")
 fi
 
 # If CMD passed is init, avoid using RUN_SCRIPT
@@ -188,15 +210,15 @@ if [[ "$CMD" == *"/init" ]]; then
   # For first 'docker run', just run the init process as pid 1
   RUN_SCRIPT="$CMD"
   # Spawn the init process as a background container
-  DOCKER_INTERACT_ARGS='-d'
+  DOCKER_INTERACT_ARGS=('-d')
   echo "INFO: Detected that you are running an init container"
   echo "WARN: Running background init container in detached mode"
   echo "WARN: You will need to re-run this script with CMD=bash to exec into it"
   echo "WARN: This container is long-lived and will require you to stop it manually when you are done!"
   # If we are using docker-machine / boot2docker, then ensure the VM has DBus installed
-  [ -n "$DOCKER_MACHINE_NAME" ] && docker-machine ssh $DOCKER_MACHINE_NAME 'tce-status -i | grep -q dbus || tce-load -wi dbus'
+  [ -n "$DOCKER_MACHINE_NAME" ] && docker-machine ssh "$DOCKER_MACHINE_NAME" 'tce-status -i | grep -q dbus || tce-load -wi dbus'
 else
-  DOCKER_INTERACT_ARGS='-ti --rm=true'
+  DOCKER_INTERACT_ARGS=('-ti' '--rm=true')
 
   # Always use sudo when running pip commands inside container
   # If pip is run without sudo it hangs in deadlock condition
@@ -207,8 +229,11 @@ else
     unset EXPORT_DOCKER_PIP_USE_SUDO
   fi
 
+  # Generate temporary lastpass-cli home dir name
+  TMP_LPASS_HOME=$(mktemp /tmp/lpass.XXXXX)
+
   # Create script to run inside docker container
-cat << EOF > ${RUN_SCRIPT}
+cat << EOF > "${RUN_SCRIPT}"
 #!/usr/bin/env bash
 # Debug logging for ${RUN_SCRIPT}
 # To use: export DOCKER_RUN_ARGS='-e DOCKER_RUN_LOG=DEBUG'
@@ -280,8 +305,27 @@ if env | grep -q SSH_AUTH_SOCK ; then
   fi
 fi
 
+# Import GNUPGHOME into container env & symlink hashed dir into /run/user/$UID/gnupg
+if env | grep -q GNUPGHOME ; then
+
+	cat <<-EOGPGPROFILE > /etc/profile.d/99-container-gnupghome.sh
+	export GNUPGHOME="\$GNUPGHOME"
+	_GNUPG_SOCKET_DIR="\\\$(gpgconf --list-dirs socketdir)"
+	if echo "\\\${_GNUPG_SOCKET_DIR}" | grep -q '/d.' && [ ! -L "\\\${_GNUPG_SOCKET_DIR}" ] ; then
+	  [ -d "\\\${_GNUPG_SOCKET_DIR}" ] && rmdir "\\\${_GNUPG_SOCKET_DIR}"
+	  ln -sf --no-dereference "\\\${XDG_RUNTIME_DIR:-/run/user/\${MY_UID}}/gnupg" "\\\${_GNUPG_SOCKET_DIR}"
+	fi
+	# no agent in the container
+	[ -n "\\\$GNUPGHOME" -a -d "\\\$GNUPGHOME" ] || ( mkdir -p "\\\$GNUPGHOME" && chmod 0700 "\\\$GNUPGHOME" )
+	[ "\\\$(realpath \\\$GNUPGHOME)" != "\\\$(realpath \\\${HOME}/.gnupg)" ] && echo -e "no-autostart\nquiet\nkeyserver hkps://keyserver.ubuntu.com\n" > "\\\$GNUPGHOME/gpg.conf"
+	# make the public keys, private SC private keygrips, and trustdb available in containers
+	rsync -au --ignore-missing-args "${HOME}"/.gnupg/{trustdb.gpg,pubring.{kbx,gpg,db},public-keys.d,private-keys-v1.d} "\\\${XDG_RUNTIME_DIR:-/run/user/\${MY_UID}}/gnupg/"
+	EOGPGPROFILE
+
+fi
+
 # Create user & group with names matching host, GID/UID matching volume permissions (ideally)
-if (! egrep -q "^${MY_GROUPNAME}:x:\${MY_GID}:" /etc/group); then
+if (! grep -E -q "^${MY_GROUPNAME}:x:\${MY_GID}:" /etc/group); then
     groupadd \${groupadd_args} -g \${MY_GID} "${MY_GROUPNAME}"
 fi
 useradd -u \${MY_UID} -g \${MY_GID} -G \${USERS_GID}\${WHEEL_GID:+,\${WHEEL_GID}} -d ${HOME} -M ${MY_USERNAME}
@@ -290,34 +334,67 @@ if [[ "\$SSH_AUTH_SOCK" == \$SSH_AUTH_SOCK_MAGIC_PATH ]]; then
   chown \$SSH_AUTH_SOCK_UID:\$SSH_AUTH_SOCK_GID \$SSH_AUTH_SOCK_MAGIC_PATH
 fi
 
+mkdir -p "${TMP_LPASS_HOME}"
+chown "\${MY_UID}":"\${MY_GID}" "${TMP_LPASS_HOME}"
+chmod 700 "${TMP_LPASS_HOME}"
+
+if mount | grep -E "\$(realpath /var/run/user/\${MY_UID})" | grep -qE 'tmpfs|ext4' ; then
+  chown "\${MY_UID}:\${MY_GID}" "/var/run/user/\${MY_UID}/"
+  rsync -a -u --chown="\${MY_UID}:\${MY_GID}" "/var/run/user/docker-skel/" "/var/run/user/\${MY_UID}/"
+  chmod 0700 "/var/run/user/\${MY_UID}/"
+else
+  ln -s "/var/run/user/docker-skel" "/var/run/user/\${MY_UID}"
+fi
+
+cp ${REPO_BASE}/bin/setup-ansible-ee-docker-env.sh /etc/profile.d/
+
 su - ${MY_USERNAME} -c \
 '$EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK $EXPORT_DOCKER_PIP_USE_SUDO \
 cd ${REPO_BASE} && \
 source bin/setup-ansible-env.sh && [ -e /opt/ansible/ansible/hacking/env-setup ] && source /opt/ansible/ansible/hacking/env-setup ; \
-${CMD}'
+export LPASS_HOME="${TMP_LPASS_HOME}"; \
+export ENV="/etc/profile.d/setup-ansible-ee-docker-env.sh" ; \
+export BASH_ENV="\${ENV}" ; \
+export ANSIBLE_EE="1"; \
+printf "[[ \"\\\${ANSIBLE_EE}\" == 1 ]] && source \${ENV} ; \
+  __cleanup_bash_profile() { sed -i -e \"\\|# Added by ${RUN_SCRIPT} to unload rvm$|d\" ~/.bash_profile &>/dev/null ; } ; \
+  trap __cleanup_bash_profile EXIT HUP INT QUIT KILL TERM ; \
+  # Added by ${RUN_SCRIPT} to unload rvm" >> ~/.bash_profile ; \
+exec script -q -c "exec ${CMD}" /dev/null'
 EOF
 
 fi # End init check
 
-[[ "$CMD" == *"/init" ]] || chmod +x ${RUN_SCRIPT}
+[[ "$CMD" == *"/init" ]] || chmod +x "${RUN_SCRIPT}"
 # Check for previously spawned init container
 # If init container is running, exec into that, otherwise run the RUN_SCRIPT as normal
 RUNNING_CONTAINERS="$(docker ps --filter status=running --format '{{.Names}}' | grep "ansible_run.$USER")"
 
 # Use first found init container
 for container_name in $RUNNING_CONTAINERS; do
-  if docker inspect --format '{{.Config.Cmd}}' $container_name | grep -Eq '.*/init' ; then
+  if docker inspect --format '{{.Config.Cmd}}' "$container_name" | grep -Eq '.*/init' ; then
     EXEC_CONTAINER="$container_name"
     break
   fi
 done
 
 if [ -n "$EXEC_CONTAINER" ]; then
-  docker exec ${DOCKER_INTERACT_ARGS:-} ${EXEC_CONTAINER} ${RUN_SCRIPT}
+  docker exec "${DOCKER_INTERACT_ARGS[@]:-}" --user=root "${EXEC_CONTAINER}" "${RUN_SCRIPT}"
   RET=$?
 else
-  docker run ${DOCKER_INTERACT_ARGS:-} -v ${REPO_BASE}:${REPO_BASE} -v ${HOME}:${HOME} --name="${CONTAINER_NAME}" ${DOCKER_RUN_SSH_AGENT_ARGS:-} ${DOCKER_RUN_ARGS:-} ${CONTAINER_ID} ${RUN_SCRIPT}
+  docker images --format '{{.Repository}}:{{.Tag}}' | grep -q "${CONTAINER_ID##docker.io/}" || docker pull "${CONTAINER_ID}"
+  CACHE_VOLUME_NAME="xdg-cache-${MY_USERNAME}-$(docker inspect --format '{{range $index, $rt := .RepoDigests}}{{if eq $index 0}}{{$rt}}{{end}}{{end}}' "${CONTAINER_ID}" | tr '/@' '_' | tr ':' '.' | tr -d '[[:space:]]' )"
+  _container_arch="$(docker inspect --format '{{.Architecture}}' "${CONTAINER_ID}" | tr -d '[[:space:]]' )"
+  if ! docker volume ls -q | grep -q "$CACHE_VOLUME_NAME"; then
+    #docker volume create --name "$CACHE_VOLUME_NAME" --driver local --label "purpose=xdg-cache" --label "image_name=${CONTAINER_ID}" --label "user=${MY_USERNAME}" --label "group=${MY_GROUPNAME}" --label "uid=${MY_UID}" --label "gid=${MY_GID}" --opt type=tmpfs --opt device=tmpfs --opt "o=rw,nosuid,nodev,relatime,exec,uid=${MY_UID},gid=${MY_GID},size=64M"
+    docker volume create --name "$CACHE_VOLUME_NAME" --driver local \
+      --label "purpose=xdg-cache" --label "image_name=${CONTAINER_ID}" \
+      --label "user=${MY_USERNAME}" --label "group=${MY_GROUPNAME}" \
+      --label "uid=${MY_UID}" --label "gid=${MY_GID}" \
+      --label "arch=${_container_arch}"
+  fi
+  docker run "${DOCKER_INTERACT_ARGS[@]:-}" --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}/cache" --name="${CONTAINER_NAME}" "${DOCKER_RUN_SSH_AGENT_ARGS[@]:-}" "${DOCKER_RUN_GPG_AGENT_ARGS[@]:-}" "${DOCKER_RUN_ARGS[@]}" "${CONTAINER_ID}" "${RUN_SCRIPT}"
   RET=$?
-  rm ${RUN_SCRIPT}
+  rm "${RUN_SCRIPT}"
 fi
 exit $RET

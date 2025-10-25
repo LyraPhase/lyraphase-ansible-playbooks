@@ -1,0 +1,12 @@
+/var/log/ddns/*.log {
+  daily
+  copytruncate
+  missingok
+  compress
+  rotate 7
+  maxsize 512k
+  dateformat -%Y%m%d-%s
+  postrotate
+    /usr/bin/killall -HUP dynamic_dns_updater.sh
+  endscript
+}
