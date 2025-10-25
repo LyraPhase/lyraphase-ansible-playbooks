@@ -1,3 +1,4 @@
+ansible_remote_tmp: /tmp/ansible
 openwrt_system_ttylogin: 1
 openwrt_system_logsize: "128"
 openwrt_system_log_port: 514
