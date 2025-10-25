@@ -17,6 +17,7 @@
         - openwrt_wireless
         - hostapd
         - wireless
+        - wifi
   tasks:
     - name: Are vars set?
       ansible.builtin.debug:
