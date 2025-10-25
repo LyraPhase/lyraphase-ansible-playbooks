@@ -31,7 +31,7 @@ openwrt_system_led:
     sysfs: "mamba:white:wan"
     trigger: "netdev"
     mode: "link tx rx"
-    dev: "eth1"
+    dev: "wan"
   - itemname: "led_usb1"
     name: "USB 1"
     sysfs: "mamba:white:usb2"
