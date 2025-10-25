@@ -7,13 +7,13 @@ openwrt_wifi_devicesgroup:
       type: mac80211
       hwmode: "{{ (not (openwrt_version_supports_band | bool)) | ternary('11g', omit) }}"
       band: "{{ (openwrt_version_supports_band | bool) | ternary('2g', omit) }}"
-      chanbw: 20
       path: 'soc/{{ openwrt_soc_devicetree_pcie }}/pci0000:00/0000:00:02.0/0000:02:00.0'
       country: US
       distance: 17
       txpower: 17
       legacy_rates: 0
       channel: 3
+      htmode: HT20
     radio1:
       type: mac80211
       hwmode: "{{ (not (openwrt_version_supports_band | bool)) | ternary('11a', omit) }}"
