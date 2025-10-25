@@ -1,10 +1,11 @@
 openwrt_system_ttylogin: 1
-openwrt_system_logsize: "64"
+openwrt_system_logsize: "128"
 openwrt_system_log_port: 514
 openwrt_system_log_proto: "udp"
 openwrt_system_log_ip: "192.168.1.100"
 openwrt_system_conloglevel: 8
 openwrt_system_cronloglevel: 8
+openwrt_system_compat_version: '2.0'
 # Disable urandom seed file to avoid mmc wear
 openwrt_system_urandom_seed: 0
 # NTP config
