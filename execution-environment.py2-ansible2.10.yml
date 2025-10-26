@@ -119,7 +119,7 @@ additional_build_steps:
         chown -R 1000:users /run/user/docker-skel/cache/bat && \
         chmod 0664 /run/user/docker-skel/cache/bat/*
     # ARG FOOT_TERMINFO_RPM='https://kojipkgs.fedoraproject.org//vol/fedora_koji_archive06/packages/foot/1.10.1/1.fc34/x86_64/foot-terminfo-1.10.1-1.fc34.x86_64.rpm'
-    ARG FOOT_TERMINFO_RPM='https://dl.fedoraproject.org/pub/fedora/linux/updates/42/Everything/x86_64/Packages/f/foot-terminfo-1.24.0-1.fc42.x86_64.rpm'
+    ARG FOOT_TERMINFO_RPM='https://dl.fedoraproject.org/pub/fedora/linux/updates/42/Everything/x86_64/Packages/f/foot-terminfo-1.25.0-1.fc42.x86_64.rpm'
     ARG GIT_DELTA_RPM=''
     ARG EZA_RPM='https://kojipkgs.fedoraproject.org/packages/rust-eza/0.18.11/1.el8/x86_64/eza-0.18.11-1.el8.x86_64.rpm'
     RUN $PKGMGR install -y --nodocs --setopt install_weak_deps=0 git-delta

@@ -86,7 +86,7 @@ additional_build_steps:
         chmod 0775 /run/user/docker-skel/cache/bat && \
         chown -R 1000:users /run/user/docker-skel/cache/bat && \
         chmod 0664 /run/user/docker-skel/cache/bat/*
-    RUN rpm -i 'https://dl.fedoraproject.org/pub/fedora/linux/updates/42/Everything/x86_64/Packages/f/foot-terminfo-1.24.0-1.fc42.x86_64.rpm'
+    RUN rpm -i 'https://dl.fedoraproject.org/pub/fedora/linux/updates/42/Everything/x86_64/Packages/f/foot-terminfo-1.25.0-1.fc42.x86_64.rpm'
     RUN rpm -i 'https://dl.fedoraproject.org/pub/fedora/linux/updates/42/Everything/x86_64/Packages/g/git-delta-0.18.2-9.fc42.x86_64.rpm'
     ARG TERRA_RELEASEVER=42
     RUN rpm -i 'https://repos.fyralabs.com/terra42/eza-0%3A0.23.4-1.fc42.x86_64.rpm' && \
