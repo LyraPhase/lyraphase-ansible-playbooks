@@ -1,6 +1,18 @@
 ---
 # opkg-edison: Tasks entry point. Called by main.yml
 
+- name: "Run tasks: bootstrap-ansible-vars"
+  ansible.builtin.include_tasks: bootstrap-ansible-vars.yml
+  when: >
+    not (ansible_distribution is defined or
+         ansible_distribution_major_version is defined or
+         ansible_os_family is defined)
+  tags:
+    - openwrt_bootstrap
+    - openwrt-python
+    - openwrt-base-facts
+    - openwrt-base-setup-os-release-facts
+
 # Load a variable file based on the OS type, or a default if not found.
 - name: Include OS-specific vars
   ansible.builtin.include_vars: "{{ item }}"
@@ -12,7 +24,6 @@
   when: >
     openwrt_opkg_bootstrap_packages is not defined or
     openwrt_apk_bootstrap_packages is not defined
-
 
 - name: Check for OpenWRT version
   check_mode: false
