@@ -12,16 +12,21 @@ packages_installgroup:
     - bind-libs
     - ddns-scripts
     - luci-app-ddns
-    - iptables
-    - ip6tables
+    # Was iptables on legacy
+    - iptables-nft
+    #- ip6tables
     - iptables-mod-conntrack-extra
     - logrotate
     - luci-app-firewall
     - luci-proto-ipv6
     - openvpn-openssl
-    - libopenssl
-    - libustream-openssl
-    - libmbedtls
+    # OLD
+    #- libopenssl
+    #- libustream-openssl
+    #- libmbedtls
+    #- libmbedtls21
+    - libopenssl3
+    - libustream-mbedtls20201210
     - kmod-tun
     - luci-app-openvpn
     - luci-proto-ppp
