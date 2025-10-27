@@ -14,8 +14,8 @@
 {% elif ansible_distribution_major_version is defined -%}
 {%   set dist_vers = ansible_distribution_version -%}
 {% endif -%}
-{% if os_release_data is defined and 'distrib_arch' in os_release_data -%}
-{%   set dist_arch = os_release_data.distrib_arch -%}
+{% if openwrt_release_data is defined and 'distrib_arch' in openwrt_release_data -%}
+{%   set dist_arch = openwrt_release_data.distrib_arch -%}
 {% else -%}
 {#%  Best guess ... ¯\_(ツ)_/¯ %#}
 # Warning: Cound not detect DISTRIB_ARCH from /etc/openwrt_release
@@ -41,8 +41,8 @@
 -%}
 {%   set dist_arch = arch_specific_packages[ansible_architecture] -%}
 {% endif -%}
-{% if os_release_data is defined and 'distrib_target' in os_release_data -%}
-{%   set dist_target = os_release_data.distrib_target -%}
+{% if openwrt_release_data is defined and 'distrib_target' in openwrt_release_data -%}
+{%   set dist_target = openwrt_release_data.distrib_target -%}
 {% else -%}
 {#%  Best guess ... ¯\_(ツ)_/¯ %#}
 # Warning: Cound not detect DISTRIB_TARGET from /etc/openwrt_release
