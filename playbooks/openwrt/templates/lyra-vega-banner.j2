@@ -1,4 +1,32 @@
-{{ openwrt_banner.content | b64decode }}
+{% if openwrt_release_data is defined and 'distrib_target' in openwrt_release_data -%}
+{%   set dist_target = openwrt_release_data.distrib_target -%}
+{% else -%}
+{%   set dist_target = 'unknown target' -%}
+{% endif -%}
+{% if openwrt_release_data is defined and 'distrib_release' in openwrt_release_data -%}
+{%   set dist_release = openwrt_release_data.distrib_release -%}
+{% else -%}
+{%   set dist_release = '' -%}
+{% endif -%}
+{% if openwrt_release_data is defined and 'distrib_revision' in openwrt_release_data -%}
+{%   set dist_revision = openwrt_release_data.distrib_revision -%}
+{% else -%}
+{%   set dist_revision = '' -%}
+{% endif -%}
+{% if openwrt_release_data is defined and 'distrib_arch' in openwrt_release_data -%}
+{%   set dist_arch = openwrt_release_data.distrib_arch -%}
+{% else -%}
+{%   set dist_arch = '' -%}
+{% endif -%}
+,     .˚
+ ˚ |                    . ✦ 
+   |..  |   |☄  _| _` | 
+  ____| \_, | _| \__,_|  .
+        ___/            
+ -----------------------------------------------------
+ {{ "{:<53}".format(' '.join([ansible_distribution, dist_release, dist_target, ansible_architecture])) }}
+ {{ "{:>53}".format(' '.join([dist_revision, dist_arch])) }}
+ -----------------------------------------------------
                                  ✰ (ε2)
                                 / \
                                /   ✸ ⇨vega (α)⇦
