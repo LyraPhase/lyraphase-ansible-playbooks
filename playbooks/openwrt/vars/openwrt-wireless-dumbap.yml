@@ -13,7 +13,8 @@ openwrt_wifi_devicesgroup:
       txpower: 17
       legacy_rates: 0
       channel: 3
-      htmode: HT20
+      htmode: NOHT
+      ldpc: 0
     radio1:
       type: mac80211
       hwmode: "{{ (not (openwrt_version_supports_band | bool)) | ternary('11a', omit) }}"
