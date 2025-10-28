@@ -19,6 +19,7 @@ openwrt_dhcp_poolshost:
     domain:
       - "internal"
 # dnsmasq global options
+openwrt_dhcp_dnsmasq_authoritative: '0'
 openwrt_dhcp_dnsmasq_domainneeded: '1'
 openwrt_dhcp_dnsmasq_localise_queries: '1'
 openwrt_dhcp_dnsmasq_rebind_protection: '1'
