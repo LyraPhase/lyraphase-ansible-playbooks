@@ -9,8 +9,8 @@ openwrt_dhcp_poolshost:
     start: "100"
     limit: "150"
     leasetime: "12h"
-    dhcpv4: "server"
-    dhcpv6: "server"
+    dhcpv4: "disabled"
+    dhcpv6: "disabled"
     ra: "hybrid"
     ra_default: "0"
     ra_flags:
