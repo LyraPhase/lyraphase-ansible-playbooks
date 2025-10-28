@@ -11,7 +11,7 @@ openwrt_dhcp_poolshost:
     leasetime: "12h"
     dhcpv4: "disabled"
     dhcpv6: "disabled"
-    ra: "hybrid"
+    ra: "disabled"
     ra_default: "0"
     ra_flags:
       - "managed-config"
