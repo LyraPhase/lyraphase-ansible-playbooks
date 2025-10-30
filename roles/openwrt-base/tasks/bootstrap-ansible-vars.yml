@@ -2,6 +2,8 @@
 # opkg-edison: bootstrap-ansible-vars - Tasks entry point. Called by main.yml
 
 - name: "Gather /etc/os-release"
+  check_mode: false
+  changed_when: false
   ansible.builtin.raw:
     cat /etc/os-release
   register: os_release
