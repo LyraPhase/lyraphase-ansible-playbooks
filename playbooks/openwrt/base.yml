@@ -20,6 +20,10 @@
             ansible_distribution is defined and
             ansible_distribution_major_version is defined and
             ansible_os_family is defined
+      tags:
+        - opkg_packages
+        - packages
+        - install_packages
   roles:
     - openwrt-base
 #    - openwrt-logrotate
