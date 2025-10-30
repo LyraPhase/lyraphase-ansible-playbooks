@@ -3,6 +3,7 @@ packages_installgroup:
     - arp-scan
     - ethtool
     - ip-full
+    - blkid
     - ca-certificates
     - ca-bundle
     - curl
@@ -16,6 +17,7 @@ packages_installgroup:
     #- ip6tables
     - iptables-mod-conntrack-extra
     - logrotate
+    - lsblk
     - luci-app-firewall
     - luci-proto-ipv6
     - openvpn-openssl

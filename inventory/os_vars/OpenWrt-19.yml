@@ -3,6 +3,7 @@ packages_installgroup:
     - arp-scan
     - ethtool
     - ip-full
+    - blkid
     - ca-certificates
     - ca-bundle
     - curl
@@ -14,6 +15,7 @@ packages_installgroup:
     - nftables
     - libnetfilter-conntrack3
     - logrotate
+    - lsblk
     - luci-app-firewall
     - luci-proto-ipv6
     - openvpn-openssl
