@@ -386,8 +386,8 @@ if [ -n "$EXEC_CONTAINER" ]; then
   RET=$?
 else
   docker images --format '{{.Repository}}:{{.Tag}}' | grep -q "${CONTAINER_ID##docker.io/}" || docker pull "${CONTAINER_ID}"
-  CACHE_VOLUME_NAME="xdg-cache-${MY_USERNAME}-$(docker inspect --format '{{range $index, $rt := .RepoDigests}}{{if eq $index 0}}{{$rt}}{{end}}{{end}}' "${CONTAINER_ID}" | tr '/@' '_' | tr ':' '.' | tr -d '[[:space:]]' )"
-  _container_arch="$(docker inspect --format '{{.Architecture}}' "${CONTAINER_ID}" | tr -d '[[:space:]]' )"
+  CACHE_VOLUME_NAME="xdg-cache-${MY_USERNAME}-$(docker inspect --format '{{range $index, $rt := .RepoDigests}}{{if eq $index 0}}{{$rt}}{{end}}{{end}}' "${CONTAINER_ID}" | tr '/@' '_' | tr ':' '.' | tr -d '[:space:]' )"
+  _container_arch="$(docker inspect --format '{{.Architecture}}' "${CONTAINER_ID}" | tr -d '[:space:]' )"
   if ! docker volume ls -q | grep -q "$CACHE_VOLUME_NAME"; then
     #docker volume create --name "$CACHE_VOLUME_NAME" --driver local --label "purpose=xdg-cache" --label "image_name=${CONTAINER_ID}" --label "user=${MY_USERNAME}" --label "group=${MY_GROUPNAME}" --label "uid=${MY_UID}" --label "gid=${MY_GID}" --opt type=tmpfs --opt device=tmpfs --opt "o=rw,nosuid,nodev,relatime,exec,uid=${MY_UID},gid=${MY_GID},size=64M"
     docker volume create --name "$CACHE_VOLUME_NAME" --driver local \
