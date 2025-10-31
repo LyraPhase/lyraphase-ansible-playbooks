@@ -42,7 +42,7 @@ trap "bash -c 'rm ${RUN_SCRIPT} ' &>/dev/null; __cleanup_bash_profile" EXIT HUP 
 # For environments without DNS, we use /etc/hosts.
 # The container needs the /etc/hosts file to find
 # machines.
-if [ -n "$DOCKER_NO_DNS" -a "$DOCKER_NO_DNS" == '1'  ]; then
+if [ -n "$DOCKER_NO_DNS" ] && [ "$DOCKER_NO_DNS" == '1' ]; then
     DOCKER_RUN_ARGS+=(-v /etc/hosts:/etc/hosts)
 fi
 
