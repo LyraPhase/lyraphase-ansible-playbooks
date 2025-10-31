@@ -155,6 +155,7 @@ if env | grep -q SSH_AUTH_SOCK && test -n "${DOCKER_MACHINE_NAME}"; then
   echo "INFO: Found $DM_AGENT_SOCK"
   echo "INFO: Running ssh forwarding pid: $ssh_forwarding_pid"
   # Try our best to kill the socket on exit
+  # shellcheck disable=SC2064
   trap "bash -c 'ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -S $SSH_SOCK -O exit docker@${DM_HOST} ; rm ${RUN_SCRIPT}; sleep 1; kill $ssh_forwarding_pid ; ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -p ${SSH_PORT} -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10  docker@${DM_HOST} rm -f ${DM_AGENT_SOCK} ' &>/dev/null" EXIT HUP INT QUIT KILL TERM
 
   # Check if DM_AGENT_SOCK exists in docker-machine VM
