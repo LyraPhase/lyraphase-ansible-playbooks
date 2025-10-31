@@ -32,6 +32,7 @@ MY_HOSTNAME=$(hostname)   # Only used for warning message clarity
 RUN_SCRIPT="$(mktemp "${REPO_BASE}"/dockerized_run.XXXXX)"
 
 # Cleanup on exit
+# shellcheck disable=SC2329
 __cleanup_bash_profile() {
   sed -i -e "\|# Added by ${RUN_SCRIPT} to unload rvm$|d" ~/.bash_profile &>/dev/null
 }
