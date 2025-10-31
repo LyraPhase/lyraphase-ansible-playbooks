@@ -148,7 +148,7 @@ if env | grep -q SSH_AUTH_SOCK && test -n "${DOCKER_MACHINE_NAME}"; then
 
   ssh_forwarding_pid=$!
   if test -z "${ssh_forwarding_pid}"; then
-    ssh_forwarding_pid=$(ps aux | grep "ssh.*docker@${DM_HOST}" | grep -v grep | head -n1 | awk '{print $2}')
+    ssh_forwarding_pid=$(pgrep -f "ssh.*docker@${DM_HOST}" | head -n1)
   fi
 
   export DM_AGENT_SOCK="$(ssh -i "$HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa" -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -S "$SSH_SOCK" docker@"${DM_HOST}" echo \$SSH_AUTH_SOCK)"
