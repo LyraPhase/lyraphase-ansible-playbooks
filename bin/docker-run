@@ -22,6 +22,7 @@ MY_UID=$(id -u)
 MY_GID=$(id -g)
 # Because some OSX environments use MS AD style group name, we must fudge it
 # Reference: http://unix.stackexchange.com/questions/11477/what-are-the-allowed-group-names-for-groupadd
+# shellcheck disable=SC1003
 MY_GROUPNAME=$(id -gn | tr '\\' '-' | tr ' ' '_')
 MY_USERNAME=$(id -un)
 # name to give the running container. Should be unique.
