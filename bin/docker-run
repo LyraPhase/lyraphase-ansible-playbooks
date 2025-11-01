@@ -51,8 +51,13 @@ RUN_SCRIPT="$(mktemp "${REPO_BASE}"/dockerized_run.XXXXX)"
 __cleanup_bash_profile() {
   sed -i -e "\|# Added by ${RUN_SCRIPT} to unload rvm$|d" ~/.bash_profile &>/dev/null
 }
+if [[ "${CMD[0]}" == *"/init" ]]; then
+  CLEANUP_RUN_SCRIPTS=':' # no-op
+else
+  CLEANUP_RUN_SCRIPTS="rm ${RUN_SCRIPT}; rm ${RUN_SCRIPT}.cmd.sh; "
+fi
 # shellcheck disable=SC2064
-trap "bash -c 'rm ${RUN_SCRIPT} ' &>/dev/null; __cleanup_bash_profile" EXIT HUP INT QUIT TERM
+trap "bash -c '${CLEANUP_RUN_SCRIPTS}' &>/dev/null; __cleanup_bash_profile" EXIT HUP INT QUIT TERM
 
 # HACK: this is to allow 'docker-run' to work when DNS is unavailable.
 # For environments without DNS, we use /etc/hosts.
@@ -172,7 +177,7 @@ if env | grep -q SSH_AUTH_SOCK && test -n "${DOCKER_MACHINE_NAME}"; then
   echo "INFO: Running ssh forwarding pid: $ssh_forwarding_pid"
   # Try our best to kill the socket on exit
   # shellcheck disable=SC2064
-  trap "bash -c 'ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -S $SSH_SOCK -O exit docker@${DM_HOST} ; rm ${RUN_SCRIPT}; sleep 1; kill $ssh_forwarding_pid ; ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -p ${SSH_PORT} -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10  docker@${DM_HOST} rm -f ${DM_AGENT_SOCK} ' &>/dev/null" EXIT HUP INT QUIT TERM
+  trap "bash -c 'ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -S $SSH_SOCK -O exit docker@${DM_HOST} ; ${CLEANUP_RUN_SCRIPTS} sleep 1; kill $ssh_forwarding_pid ; ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -p ${SSH_PORT} -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10  docker@${DM_HOST} rm -f ${DM_AGENT_SOCK} ' &>/dev/null" EXIT HUP INT QUIT TERM
 
   # Check if DM_AGENT_SOCK exists in docker-machine VM
   ssh -S "$SSH_SOCK" docker@"${DM_HOST}" "[ -e \"$DM_AGENT_SOCK\" ]"
@@ -423,6 +428,6 @@ else
   fi
   docker run "${DOCKER_INTERACT_ARGS[@]:-}" --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}/cache" --name="${CONTAINER_NAME}" "${DOCKER_RUN_SSH_AGENT_ARGS[@]:-}" "${DOCKER_RUN_GPG_AGENT_ARGS[@]:-}" "${DOCKER_RUN_ARGS[@]}" "${CONTAINER_ID}" "${RUN_SCRIPT}"
   RET=$?
-  rm "${RUN_SCRIPT}"
+  [[ "${CMD[0]}" == *"/init" ]] || rm "${RUN_SCRIPT}"
 fi
 exit $RET
