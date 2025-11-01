@@ -44,17 +44,20 @@ MY_USERNAME=$(id -un)
 CONTAINER_NAME=ansible_run.${MY_USERNAME}.${RANDOM}
 MY_HOSTNAME=$(hostname)   # Only used for warning message clarity
 
-RUN_SCRIPT="$(mktemp "${REPO_BASE}"/dockerized_run.XXXXX)"
+RUN_SCRIPT=("$(mktemp "${REPO_BASE}"/dockerized_run.XXXXX)")
 
 # Cleanup on exit
 # shellcheck disable=SC2329
 __cleanup_bash_profile() {
-  sed -i -e "\|# Added by ${RUN_SCRIPT} to unload rvm$|d" ~/.bash_profile &>/dev/null
+  sed -i -e "\|# Added by ${RUN_SCRIPT[*]} to unload rvm$|d" ~/.bash_profile &>/dev/null
 }
-if [[ "${CMD[0]}" == *"/init" ]]; then
+INIT_PATTERN="*@(/init|/dumb-init|/tini|/supervisord|/runit?(-init)|/monit|/s6-svscan)"
+
+# shellcheck disable=SC2053
+if [[ "${CMD[0]}" == $INIT_PATTERN ]]; then
   CLEANUP_RUN_SCRIPTS=':' # no-op
 else
-  CLEANUP_RUN_SCRIPTS="rm ${RUN_SCRIPT}; rm ${RUN_SCRIPT}.cmd.sh; "
+  CLEANUP_RUN_SCRIPTS="rm ${RUN_SCRIPT[0]}; rm ${RUN_SCRIPT[0]}.cmd.sh; "
 fi
 # shellcheck disable=SC2064
 trap "bash -c '${CLEANUP_RUN_SCRIPTS}' &>/dev/null; __cleanup_bash_profile" EXIT HUP INT QUIT TERM
@@ -230,9 +233,15 @@ if env | grep -q GNUPGHOME || pgrep -U "${MY_UID}" gpg-agent 2>/dev/null 1>&2; t
 fi
 
 # If CMD passed is init, avoid using RUN_SCRIPT
-if [[ "${CMD[0]}" == *"/init" ]]; then
+# shellcheck disable=SC2053
+if [[ "${CMD[0]}" == $INIT_PATTERN ]]; then
+  # Early cleanup of unused mktemp file
+  rm -f "${RUN_SCRIPT[0]}" >/dev/null 2>&1
   # For first 'docker run', just run the init process as pid 1
-  RUN_SCRIPT="${CMD[@]}"
+  RUN_SCRIPT=("${CMD[@]}")
+  DOCKER_RUN_ARGS+=("--entrypoint=${RUN_SCRIPT[0]}")
+  unset "RUN_SCRIPT[0]"
+
   # Spawn the init process as a background container
   DOCKER_INTERACT_ARGS=('-d')
   echo "INFO: Detected that you are running an init container"
@@ -258,15 +267,15 @@ else
 
   # Create CMD to run inside docker container as script to sidestep
   # complications with quoting, escaping, and word splitting
-  cat << EOCMD > "${RUN_SCRIPT}.cmd.sh"
+  cat << EOCMD > "${RUN_SCRIPT[0]}.cmd.sh"
 ${CMD[@]}
 EOCMD
-  chmod +x "${RUN_SCRIPT}.cmd.sh"
+  chmod +x "${RUN_SCRIPT[0]}.cmd.sh"
 
   # Create script to run inside docker container
-  cat << EOF > "${RUN_SCRIPT}"
+  cat << EOF > "${RUN_SCRIPT[0]}"
 #!/usr/bin/env bash
-# Debug logging for ${RUN_SCRIPT}
+# Debug logging for ${RUN_SCRIPT[0]}
 # To use: export DOCKER_RUN_ARGS='-e DOCKER_RUN_LOG=DEBUG'
 DOCKER_RUN_LOG="\$(echo \$DOCKER_RUN_LOG | tr '[:lower:]' '[:upper:]')"
 if [[ "\${DOCKER_RUN_LOG}" == "DEBUG" ]]; then
@@ -379,7 +388,7 @@ fi
 
 cp ${REPO_BASE}/bin/setup-ansible-ee-docker-env.sh /etc/profile.d/
 
-[ -x "${RUN_SCRIPT}.cmd.sh" ] || chmod +x "${RUN_SCRIPT}.cmd.sh"
+[ -x "${RUN_SCRIPT[0]}.cmd.sh" ] || chmod +x "${RUN_SCRIPT[0]}.cmd.sh"
 
 su - ${MY_USERNAME} -c \
 '$EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK $EXPORT_DOCKER_PIP_USE_SUDO \
@@ -390,29 +399,33 @@ export ENV="/etc/profile.d/setup-ansible-ee-docker-env.sh" ; \
 export BASH_ENV="\${ENV}" ; \
 export ANSIBLE_EE="1"; \
 printf "[[ \"\\\${ANSIBLE_EE}\" == 1 ]] && source \${ENV} ; \
-  __cleanup_bash_profile() { sed -i -e \"\\|# Added by ${RUN_SCRIPT} to unload rvm$|d\" ~/.bash_profile &>/dev/null ; } ; \
+  __cleanup_bash_profile() { sed -i -e \"\\|# Added by ${RUN_SCRIPT[*]} to unload rvm$|d\" ~/.bash_profile &>/dev/null ; } ; \
   trap __cleanup_bash_profile EXIT HUP INT QUIT TERM ; \
-  # Added by ${RUN_SCRIPT} to unload rvm" >> ~/.bash_profile ; \
-exec script -q -c "exec ${RUN_SCRIPT}.cmd.sh" /dev/null'
+  # Added by ${RUN_SCRIPT[*]} to unload rvm" >> ~/.bash_profile ; \
+exec script -q -c "exec ${RUN_SCRIPT[0]}.cmd.sh" /dev/null'
 EOF
 
 fi # End init check
 
-[[ "${CMD[0]}" == *"/init" ]] || chmod +x "${RUN_SCRIPT}"
+# shellcheck disable=SC2053
+[[ "${CMD[0]}" == $INIT_PATTERN ]] || chmod +x "${RUN_SCRIPT[0]}"
 # Check for previously spawned init container
 # If init container is running, exec into that, otherwise run the RUN_SCRIPT as normal
 RUNNING_CONTAINERS="$(docker ps --filter status=running --format '{{.Names}}' | grep "ansible_run.$USER")"
 
 # Use first found init container
 for container_name in $RUNNING_CONTAINERS; do
-  if docker inspect --format '{{.Config.Cmd}}' "$container_name" | grep -Eq '.*/init' ; then
+  # shellcheck disable=SC2053
+  if [[ "$(docker inspect --format '{{.Config.Cmd}}' "$container_name")" == $INIT_PATTERN ]] || \
+     [[ "$(docker inspect --format '{{ range .Config.Entrypoint }}{{ printf "%s " .  }}{{ end }}' "$container_name")" == $INIT_PATTERN ]]; then
     EXEC_CONTAINER="$container_name"
     break
   fi
 done
 
 if [ -n "$EXEC_CONTAINER" ]; then
-  docker exec "${DOCKER_INTERACT_ARGS[@]:-}" --user=root "${EXEC_CONTAINER}" "${RUN_SCRIPT}"
+  DOCKER_INTERACT_ARGS=( '-ti' )
+  docker exec "${DOCKER_INTERACT_ARGS[@]:-}" --user=root "${EXEC_CONTAINER}" "${RUN_SCRIPT[@]}"
   RET=$?
 else
   docker images --format '{{.Repository}}:{{.Tag}}' | grep -q "${CONTAINER_ID##docker.io/}" || docker pull "${CONTAINER_ID}"
@@ -426,8 +439,9 @@ else
       --label "uid=${MY_UID}" --label "gid=${MY_GID}" \
       --label "arch=${_container_arch}"
   fi
-  docker run "${DOCKER_INTERACT_ARGS[@]:-}" --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}/cache" --name="${CONTAINER_NAME}" "${DOCKER_RUN_SSH_AGENT_ARGS[@]:-}" "${DOCKER_RUN_GPG_AGENT_ARGS[@]:-}" "${DOCKER_RUN_ARGS[@]}" "${CONTAINER_ID}" "${RUN_SCRIPT}"
+  docker run "${DOCKER_INTERACT_ARGS[@]:-}" --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}/cache" --name="${CONTAINER_NAME}" "${DOCKER_RUN_SSH_AGENT_ARGS[@]:-}" "${DOCKER_RUN_GPG_AGENT_ARGS[@]:-}" "${DOCKER_RUN_ARGS[@]}" "${CONTAINER_ID}" "${RUN_SCRIPT[@]}"
   RET=$?
-  [[ "${CMD[0]}" == *"/init" ]] || rm "${RUN_SCRIPT}"
+  # shellcheck disable=SC2053
+  [[ "${CMD[0]}" == $INIT_PATTERN ]] || rm "${RUN_SCRIPT[0]}"
 fi
 exit $RET
