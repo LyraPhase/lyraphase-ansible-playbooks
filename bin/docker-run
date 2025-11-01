@@ -21,8 +21,7 @@ if [ $# -ge 1 ]; then
       CMD+=("$el")
     else
       if [[ "$el" =~ [[:space:]] ]]; then
-        # CMD+=("'$el'")
-        CMD+=("$(printf "%q" "$el")")
+        CMD+=("$(builtin printf "%q" "$el")")
       else
         CMD+=("$el")
       fi
