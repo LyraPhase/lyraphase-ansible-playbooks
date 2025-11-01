@@ -32,14 +32,6 @@ else
   echo -n "Enter cmd: "
   read -r -a CMD
 fi
-# Escape quotes and backslashes per arg
-# CMD=( "${CMD[@]//\\/\\\\}" )
-# CMD=( "${CMD[@]//\'/\'\\\'\'}" )
-# CMD=( "${CMD[@]//\"/\\\"}" )
-# echo "CMD=${CMD[@]}"
-# for c in "${CMD[@]}"; do
-  # echo "_${c}_"
-# done
 
 MY_UID=$(id -u)
 MY_GID=$(id -g)
