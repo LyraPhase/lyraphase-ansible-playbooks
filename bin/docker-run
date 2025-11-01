@@ -12,11 +12,26 @@ fi
 CONTAINER_ID="${CONTAINER_ID-docker.io/lyraphase/ansible-playbooks-ee:latest}"
 
 REPO_BASE=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
-if [ $# -ge   1 ]; then
-   CMD=$@
+if [ $# -ge 1 ]; then
+  _i=0
+  _args=( "$@" )
+  CMD=()
+  for el in "${_args[@]}"; do
+    if [ "$_i" -eq 0 ]; then
+      CMD+=("$el")
+    else
+      if [[ "$el" =~ [[:space:]] ]]; then
+        # CMD+=("'$el'")
+        CMD+=("$(printf "%q" "$el")")
+      else
+        CMD+=("$el")
+      fi
+    fi
+    (( _i++ ))
+  done
 else
-   echo -n "Enter cmd: "
-   read CMD
+  echo -n "Enter cmd: "
+  read -r -a CMD
 fi
 MY_UID=$(id -u)
 MY_GID=$(id -g)
@@ -210,9 +225,9 @@ if env | grep -q GNUPGHOME || pgrep -U "${MY_UID}" gpg-agent 2>/dev/null 1>&2; t
 fi
 
 # If CMD passed is init, avoid using RUN_SCRIPT
-if [[ "$CMD" == *"/init" ]]; then
+if [[ "${CMD[0]}" == *"/init" ]]; then
   # For first 'docker run', just run the init process as pid 1
-  RUN_SCRIPT="$CMD"
+  RUN_SCRIPT="${CMD[@]}"
   # Spawn the init process as a background container
   DOCKER_INTERACT_ARGS=('-d')
   echo "INFO: Detected that you are running an init container"
@@ -236,8 +251,15 @@ else
   # Generate temporary lastpass-cli home dir name
   TMP_LPASS_HOME=$(mktemp /tmp/lpass.XXXXX)
 
+  # Create CMD to run inside docker container as script to sidestep
+  # complications with quoting, escaping, and word splitting
+  cat << EOCMD > "${RUN_SCRIPT}.cmd.sh"
+${CMD[@]}
+EOCMD
+  chmod +x "${RUN_SCRIPT}.cmd.sh"
+
   # Create script to run inside docker container
-cat << EOF > "${RUN_SCRIPT}"
+  cat << EOF > "${RUN_SCRIPT}"
 #!/usr/bin/env bash
 # Debug logging for ${RUN_SCRIPT}
 # To use: export DOCKER_RUN_ARGS='-e DOCKER_RUN_LOG=DEBUG'
@@ -352,6 +374,8 @@ fi
 
 cp ${REPO_BASE}/bin/setup-ansible-ee-docker-env.sh /etc/profile.d/
 
+[ -x "${RUN_SCRIPT}.cmd.sh" ] || chmod +x "${RUN_SCRIPT}.cmd.sh"
+
 su - ${MY_USERNAME} -c \
 '$EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK $EXPORT_DOCKER_PIP_USE_SUDO \
 cd ${REPO_BASE} && \
@@ -364,12 +388,12 @@ printf "[[ \"\\\${ANSIBLE_EE}\" == 1 ]] && source \${ENV} ; \
   __cleanup_bash_profile() { sed -i -e \"\\|# Added by ${RUN_SCRIPT} to unload rvm$|d\" ~/.bash_profile &>/dev/null ; } ; \
   trap __cleanup_bash_profile EXIT HUP INT QUIT TERM ; \
   # Added by ${RUN_SCRIPT} to unload rvm" >> ~/.bash_profile ; \
-exec script -q -c "exec ${CMD}" /dev/null'
+exec script -q -c "exec ${RUN_SCRIPT}.cmd.sh" /dev/null'
 EOF
 
 fi # End init check
 
-[[ "$CMD" == *"/init" ]] || chmod +x "${RUN_SCRIPT}"
+[[ "${CMD[0]}" == *"/init" ]] || chmod +x "${RUN_SCRIPT}"
 # Check for previously spawned init container
 # If init container is running, exec into that, otherwise run the RUN_SCRIPT as normal
 RUNNING_CONTAINERS="$(docker ps --filter status=running --format '{{.Names}}' | grep "ansible_run.$USER")"
