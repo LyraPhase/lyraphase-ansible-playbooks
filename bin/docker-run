@@ -51,7 +51,7 @@ RUN_SCRIPT=("$(mktemp "${REPO_BASE}"/dockerized_run.XXXXX)")
 __cleanup_bash_profile() {
   sed -i -e "\|# Added by ${RUN_SCRIPT[*]} to unload rvm$|d" ~/.bash_profile &>/dev/null
 }
-INIT_PATTERN="*@(/init|/dumb-init|/tini|/supervisord|/runit?(-init)|/monit|/s6-svscan)"
+INIT_PATTERN="*@(?(/)init|?(/)dumb-init|?(/)tini|?(/)supervisord|?(/)runit?(-init)|?(/)monit|?(/)s6-svscan)*([[:space:]])"
 
 # shellcheck disable=SC2053
 if [[ "${CMD[0]}" == $INIT_PATTERN ]]; then
