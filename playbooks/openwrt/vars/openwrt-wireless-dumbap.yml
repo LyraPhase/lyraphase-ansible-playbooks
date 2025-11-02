@@ -25,7 +25,7 @@ openwrt_wifi_devicesgroup:
       txpower: 23
       legacy_rates: 0
       channel: 100
-      htmode: VHT40
+      htmode: VHT80
 
 openwrt_wifi_interfacesgroup:
   openwrt:
