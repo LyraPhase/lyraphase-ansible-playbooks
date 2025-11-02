@@ -49,3 +49,44 @@ openwrt_system_led:
     sysfs: "mamba:white:usb3_2"
     trigger: "usbport"
     ports: ["usb3-port2"]
+openwrt_network_deviceshost:
+  br-lan:
+    type: 'bridge'
+    ports:
+      - 'lan1'
+      - 'lan2'
+      - 'lan3'
+      - 'lan4'
+    igmp_snooping: '1'
+    multicast_querier: '0'
+  lan1:
+    macaddr: &eth0_mac "{{ vault_lyraphase_vega_deviceshost.eth0.macaddr }}"
+  lan2:
+    macaddr: *eth0_mac
+  lan3:
+    macaddr: *eth0_mac
+  lan4:
+    macaddr: *eth0_mac
+  wan:
+    macaddr: *eth0_mac
+
+openwrt_network_interfaceshost:
+  lan:
+    device: 'br-lan'
+    proto: 'dhcp'
+    # TODO: Fix ansible_openwrtnetwork role to support ipv6assign PD independent
+    # of using dhcpv6
+    ip6assign: '60'
+  wan:
+    device: 'wan'
+    proto: 'dhcp'
+  wan6:
+    device: 'wan'
+    proto: 'dhcpv6'
+
+  # In default interfaces config as /8 CIDR
+  # loopback:
+    # device: 'lo'
+    # proto: 'static'
+    # ipaddr: ['127.0.0.1']
+    # netmask: '255.0.0.0'

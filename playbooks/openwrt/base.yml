@@ -45,6 +45,12 @@
         - opkg_packages
         - packages
         - install_packages
+    - role: imp1sh.ansible_managemynetwork.ansible_openwrtnetwork
+      when: not (ansible_bootstrap | default(false))
+      tags:
+        - opkg_packages
+        - packages
+        - install_packages
   tasks:
     - name: Get original banner contents
       ansible.builtin.slurp:
