@@ -26,6 +26,7 @@ openwrt_wifi_devicesgroup:
       legacy_rates: 0
       channel: 100
       htmode: VHT80
+      cell_density: '2'
 
 openwrt_wifi_interfacesgroup:
   openwrt:
