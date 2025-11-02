@@ -31,3 +31,4 @@ packages_installgroup:
     - mdns-utils
     - mdnsd
     - mdnsresponder
+    - htop
