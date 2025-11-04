@@ -12,6 +12,7 @@ openwrt_wifi_interfacesgroup:
       encryption: psk2
       key: "{{ lyraphase_vault_wireless.radio1.key }}"
       dtim_period: 3
+      wmm: 1
     phy0_2g:
       device: radio0
       mode: ap

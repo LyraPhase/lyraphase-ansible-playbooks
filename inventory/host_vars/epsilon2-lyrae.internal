@@ -96,12 +96,6 @@ openwrt_network_interfaceshost:
     # ipaddr: ['127.0.0.1']
     # netmask: '255.0.0.0'
 
-openwrt_wifi_interfaceshost:
-epsilon2-lyrae.internal:
-  phy0_2g:
-    device: radio0
-    wmm: 1
-
 # AP-specific channel coverage cells & device paths
 openwrt_wifi_deviceshost:
   radio0:
