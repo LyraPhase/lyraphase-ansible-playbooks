@@ -126,6 +126,6 @@ openwrt_wifi_deviceshost:
     distance: 17
     txpower: 28
     legacy_rates: 0
-    channel: 124
+    channel: 128
     htmode: HE80
     cell_density: '2'
