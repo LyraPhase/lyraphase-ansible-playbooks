@@ -8,6 +8,11 @@ if [[ "${DOCKER_RUN_LOG}" == "DEBUG" ]]; then
   PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }' ## Debugging prompt (for bash -x || set -x)
   set -x
 fi
+# Convert to array if set
+if [ -n "$DOCKER_RUN_ARGS" ]; then
+  exec 3<> <(echo "$DOCKER_RUN_ARGS")
+  read -r -a DOCKER_RUN_ARGS -u 3
+fi
 
 CONTAINER_ID="${CONTAINER_ID-docker.io/lyraphase/ansible-playbooks-ee:latest}"
 
@@ -281,6 +286,7 @@ EOCMD
 # To use: export DOCKER_RUN_ARGS='-e DOCKER_RUN_LOG=DEBUG'
 DOCKER_RUN_LOG="\$(echo \$DOCKER_RUN_LOG | tr '[:lower:]' '[:upper:]')"
 if [[ "\${DOCKER_RUN_LOG}" == "DEBUG" ]]; then
+  export DOCKER_RUN_LOG
   PS4='+(\${BASH_SOURCE}:\${LINENO}): \${FUNCNAME[0]:+\${FUNCNAME[0]}(): }' ## Debugging prompt (for bash -x || set -x)
   set -x
 fi
