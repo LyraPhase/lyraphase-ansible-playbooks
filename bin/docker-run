@@ -418,6 +418,7 @@ EOF
 
 fi # End init check
 
+
 # shellcheck disable=SC2053
 [[ "${CMD[0]}" == $INIT_PATTERN ]] || chmod +x "${RUN_SCRIPT[0]}"
 # Check for previously spawned init container
