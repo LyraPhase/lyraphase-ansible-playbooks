@@ -400,7 +400,7 @@ cp ${REPO_BASE}/bin/setup-ansible-ee-docker-env.sh /etc/profile.d/
 [ -x "${RUN_SCRIPT[0]}.cmd.sh" ] || chmod +x "${RUN_SCRIPT[0]}.cmd.sh"
 
 
-sudo -E -u "${MY_USERNAME}" /bin/bash -c \
+sudo -E -u "${MY_USERNAME}" /bin/bash -l -c \
 '$EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK $EXPORT_DOCKER_PIP_USE_SUDO \
 cd ${REPO_BASE} && \
 source bin/setup-ansible-env.sh && [ -e /opt/ansible/ansible/hacking/env-setup ] && source /opt/ansible/ansible/hacking/env-setup ; \
