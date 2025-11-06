@@ -396,7 +396,6 @@ fi
 
 cp ${REPO_BASE}/bin/setup-ansible-ee-docker-env.sh /etc/profile.d/
 
-sed -i'' -e "1 a export PATH=\"$(printf '%q' "$PATH")\"" /etc/profile.d/setup-ansible-ee-docker-env.sh
 
 [ -x "${RUN_SCRIPT[0]}.cmd.sh" ] || chmod +x "${RUN_SCRIPT[0]}.cmd.sh"
 
