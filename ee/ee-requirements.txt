@@ -1,3 +1,4 @@
 ansible-core
 ansible-runner
 pytz
+ansible-pylibssh
