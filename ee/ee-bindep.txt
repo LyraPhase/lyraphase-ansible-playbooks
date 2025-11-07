@@ -32,6 +32,7 @@ openssl-libs [platform:redhat]
 crypto-policies-scripts [platform:redhat]
 ncurses [platform:redhat]
 bat [epel platform:redhat]
+fd-find [epel platform:redhat]
 fzf [epel platform:redhat]
 ripgrep [epel platform:redhat]
 bind-utils
