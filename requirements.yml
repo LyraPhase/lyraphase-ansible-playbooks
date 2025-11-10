@@ -8,4 +8,5 @@ collections:
   - name: https://github.com/trinitronx/ansible_managemynetwork.git
     type: git
     version: lede
+  - name: ansible.netcommon
 #  - name: imp1sh.ansible_managemynetwork
