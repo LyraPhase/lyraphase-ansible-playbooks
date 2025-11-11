@@ -9,6 +9,7 @@ OPNsense.internal ansible_python_interpreter=/usr/local/bin/python3
 
 [openwrt]
 vega.internal ansible_ssh_user=root
+epsilon2-lyrae.internal ansible_ssh_user=root
 
 [edisons]
 mu-lyrae.local

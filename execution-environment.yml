@@ -20,6 +20,8 @@ dependencies:
   system: ee/ee-bindep.txt
   galaxy: requirements.yml
 additional_build_files:
+  - src: ee/profile.d/00-container-path.sh
+    dest: profile.d
   - src: ee/profile.d/00-xdg-docker-config.sh
     dest: profile.d
   - src: ee/profile.d/p10k-centos.zsh
@@ -43,6 +45,7 @@ additional_build_steps:
         $PKGMGR clean all
     RUN gem install --no-document lastpass-ansible
     RUN update-crypto-policies --set LEGACY
+    COPY _build/profile.d/00-container-path.sh /etc/profile.d/00-container-path.sh
     COPY _build/profile.d/00-xdg-docker-config.sh /etc/profile.d/00-xdg-docker-config.sh
     RUN export _docker_xdg_cache_home=/var/run/user/docker-skel/cache && \
         echo "$_docker_xdg_cache_home" && \

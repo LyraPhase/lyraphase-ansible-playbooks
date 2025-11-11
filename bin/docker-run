@@ -3,44 +3,75 @@
 # ---------------------------------
 # Debug logging for this script
 # To use: export DOCKER_RUN_LOG=DEBUG
-DOCKER_RUN_LOG="$(echo "$DOCKER_RUN_LOG" | tr '[a-z]' '[A-Z]')"
+DOCKER_RUN_LOG="$(echo "$DOCKER_RUN_LOG" | tr '[:lower:]' '[:upper:]')"
 if [[ "${DOCKER_RUN_LOG}" == "DEBUG" ]]; then
   PS4='+(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]:+${FUNCNAME[0]}(): }' ## Debugging prompt (for bash -x || set -x)
   set -x
+fi
+# Convert to array if set
+if [ -n "$DOCKER_RUN_ARGS" ]; then
+  exec 3<> <(echo "$DOCKER_RUN_ARGS")
+  read -r -a DOCKER_RUN_ARGS -u 3
 fi
 
 CONTAINER_ID="${CONTAINER_ID-docker.io/lyraphase/ansible-playbooks-ee:latest}"
 
 REPO_BASE=$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )
-if [ $# -ge   1 ]; then
-   CMD=$@
+if [ $# -ge 1 ]; then
+  _i=0
+  _args=( "$@" )
+  CMD=()
+  for el in "${_args[@]}"; do
+    if [ "$_i" -eq 0 ]; then
+      CMD+=("$el")
+    else
+      if [[ "$el" =~ [[:space:]] ]]; then
+        CMD+=("$(builtin printf "%q" "$el")")
+      else
+        CMD+=("$el")
+      fi
+    fi
+    (( _i++ ))
+  done
 else
-   echo -n "Enter cmd: "
-   read CMD
+  echo -n "Enter cmd: "
+  read -r -a CMD
 fi
+
 MY_UID=$(id -u)
 MY_GID=$(id -g)
 # Because some OSX environments use MS AD style group name, we must fudge it
 # Reference: http://unix.stackexchange.com/questions/11477/what-are-the-allowed-group-names-for-groupadd
+# shellcheck disable=SC1003
 MY_GROUPNAME=$(id -gn | tr '\\' '-' | tr ' ' '_')
 MY_USERNAME=$(id -un)
 # name to give the running container. Should be unique.
 CONTAINER_NAME=ansible_run.${MY_USERNAME}.${RANDOM}
 MY_HOSTNAME=$(hostname)   # Only used for warning message clarity
 
-RUN_SCRIPT="$(mktemp "${REPO_BASE}"/dockerized_run.XXXXX)"
+RUN_SCRIPT=("$(mktemp "${REPO_BASE}"/dockerized_run.XXXXX)")
 
 # Cleanup on exit
+# shellcheck disable=SC2329
 __cleanup_bash_profile() {
-  sed -i -e "\|# Added by ${RUN_SCRIPT} to unload rvm$|d" ~/.bash_profile &>/dev/null
+  sed -i -e "\|# Added by ${RUN_SCRIPT[*]} to unload rvm$|d" ~/.bash_profile &>/dev/null
 }
-trap "bash -c 'rm ${RUN_SCRIPT} ' &>/dev/null; __cleanup_bash_profile" EXIT HUP INT QUIT KILL TERM
+INIT_PATTERN="*@(?(/)init|?(/)dumb-init|?(/)tini|?(/)supervisord|?(/)runit?(-init)|?(/)monit|?(/)s6-svscan)*([[:space:]])"
+
+# shellcheck disable=SC2053
+if [[ "${CMD[0]}" == $INIT_PATTERN ]]; then
+  CLEANUP_RUN_SCRIPTS=':' # no-op
+else
+  CLEANUP_RUN_SCRIPTS="rm ${RUN_SCRIPT[0]}; rm ${RUN_SCRIPT[0]}.cmd.sh; "
+fi
+# shellcheck disable=SC2064
+trap "bash -c '${CLEANUP_RUN_SCRIPTS}' &>/dev/null; __cleanup_bash_profile" EXIT HUP INT QUIT TERM
 
 # HACK: this is to allow 'docker-run' to work when DNS is unavailable.
 # For environments without DNS, we use /etc/hosts.
 # The container needs the /etc/hosts file to find
 # machines.
-if [ -n "$DOCKER_NO_DNS" -a "$DOCKER_NO_DNS" == '1'  ]; then
+if [ -n "$DOCKER_NO_DNS" ] && [ "$DOCKER_NO_DNS" == '1' ]; then
     DOCKER_RUN_ARGS+=(-v /etc/hosts:/etc/hosts)
 fi
 
@@ -146,18 +177,21 @@ if env | grep -q SSH_AUTH_SOCK && test -n "${DOCKER_MACHINE_NAME}"; then
 
   ssh_forwarding_pid=$!
   if test -z "${ssh_forwarding_pid}"; then
-    ssh_forwarding_pid=$(ps aux | grep "ssh.*docker@${DM_HOST}" | grep -v grep | head -n1 | awk '{print $2}')
+    ssh_forwarding_pid=$(pgrep -f "ssh.*docker@${DM_HOST}" | head -n1)
   fi
 
-  export DM_AGENT_SOCK="$(ssh -i "$HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa" -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -S "$SSH_SOCK" docker@"${DM_HOST}" echo \$SSH_AUTH_SOCK)"
+  DM_AGENT_SOCK="$(ssh -i "$HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa" -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -S "$SSH_SOCK" docker@"${DM_HOST}" echo \$SSH_AUTH_SOCK)"
+  export DM_AGENT_SOCK
   echo "INFO: Found $DM_AGENT_SOCK"
   echo "INFO: Running ssh forwarding pid: $ssh_forwarding_pid"
   # Try our best to kill the socket on exit
-  trap "bash -c 'ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -S $SSH_SOCK -O exit docker@${DM_HOST} ; rm ${RUN_SCRIPT}; sleep 1; kill $ssh_forwarding_pid ; ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -p ${SSH_PORT} -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10  docker@${DM_HOST} rm -f ${DM_AGENT_SOCK} ' &>/dev/null" EXIT HUP INT QUIT KILL TERM
+  # shellcheck disable=SC2064
+  trap "bash -c 'ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10 -S $SSH_SOCK -O exit docker@${DM_HOST} ; ${CLEANUP_RUN_SCRIPTS} sleep 1; kill $ssh_forwarding_pid ; ssh -i $HOME/.docker/machine/machines/${DOCKER_MACHINE_NAME}/id_rsa -p ${SSH_PORT} -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o LogLevel=quiet -o ConnectionAttempts=3 -o ConnectTimeout=10  docker@${DM_HOST} rm -f ${DM_AGENT_SOCK} ' &>/dev/null" EXIT HUP INT QUIT TERM
 
   # Check if DM_AGENT_SOCK exists in docker-machine VM
-  ssh -S "$SSH_SOCK" docker@"${DM_HOST}" "[ -e \"$DM_AGENT_SOCK\" ]"
-  [ $? -eq 0 ] || echo "ERROR: DM_AGENT_SOCK path: $DM_AGENT_SOCK does not exist... could not forward SSH_AUTH_SOCK into docker-machine!  Is your ssh-agent running?"
+  if ! ssh -S "$SSH_SOCK" docker@"${DM_HOST}" "[ -e \"$DM_AGENT_SOCK\" ]" ; then
+    echo "ERROR: DM_AGENT_SOCK path: $DM_AGENT_SOCK does not exist... could not forward SSH_AUTH_SOCK into docker-machine!  Is your ssh-agent running?"
+  fi
 fi
 
 
@@ -206,9 +240,15 @@ if env | grep -q GNUPGHOME || pgrep -U "${MY_UID}" gpg-agent 2>/dev/null 1>&2; t
 fi
 
 # If CMD passed is init, avoid using RUN_SCRIPT
-if [[ "$CMD" == *"/init" ]]; then
+# shellcheck disable=SC2053
+if [[ "${CMD[0]}" == $INIT_PATTERN ]]; then
+  # Early cleanup of unused mktemp file
+  rm -f "${RUN_SCRIPT[0]}" >/dev/null 2>&1
   # For first 'docker run', just run the init process as pid 1
-  RUN_SCRIPT="$CMD"
+  RUN_SCRIPT=("${CMD[@]}")
+  DOCKER_RUN_ARGS+=("--entrypoint=${RUN_SCRIPT[0]}")
+  unset "RUN_SCRIPT[0]"
+
   # Spawn the init process as a background container
   DOCKER_INTERACT_ARGS=('-d')
   echo "INFO: Detected that you are running an init container"
@@ -232,13 +272,21 @@ else
   # Generate temporary lastpass-cli home dir name
   TMP_LPASS_HOME=$(mktemp /tmp/lpass.XXXXX)
 
+  # Create CMD to run inside docker container as script to sidestep
+  # complications with quoting, escaping, and word splitting
+  cat << EOCMD > "${RUN_SCRIPT[0]}.cmd.sh"
+${CMD[@]}
+EOCMD
+  chmod +x "${RUN_SCRIPT[0]}.cmd.sh"
+
   # Create script to run inside docker container
-cat << EOF > "${RUN_SCRIPT}"
+  cat << EOF > "${RUN_SCRIPT[0]}"
 #!/usr/bin/env bash
-# Debug logging for ${RUN_SCRIPT}
+# Debug logging for ${RUN_SCRIPT[0]}
 # To use: export DOCKER_RUN_ARGS='-e DOCKER_RUN_LOG=DEBUG'
-DOCKER_RUN_LOG="\$(echo \$DOCKER_RUN_LOG | tr '[a-z]' '[A-Z]')"
+DOCKER_RUN_LOG="\$(echo \$DOCKER_RUN_LOG | tr '[:lower:]' '[:upper:]')"
 if [[ "\${DOCKER_RUN_LOG}" == "DEBUG" ]]; then
+  export DOCKER_RUN_LOG
   PS4='+(\${BASH_SOURCE}:\${LINENO}): \${FUNCNAME[0]:+\${FUNCNAME[0]}(): }' ## Debugging prompt (for bash -x || set -x)
   set -x
 fi
@@ -348,7 +396,11 @@ fi
 
 cp ${REPO_BASE}/bin/setup-ansible-ee-docker-env.sh /etc/profile.d/
 
-su - ${MY_USERNAME} -c \
+
+[ -x "${RUN_SCRIPT[0]}.cmd.sh" ] || chmod +x "${RUN_SCRIPT[0]}.cmd.sh"
+
+
+sudo -E -u "${MY_USERNAME}" /bin/bash -l -c \
 '$EXPORT_DOCKER_SSH_AGENT_AUTH_SOCK $EXPORT_DOCKER_PIP_USE_SUDO \
 cd ${REPO_BASE} && \
 source bin/setup-ansible-env.sh && [ -e /opt/ansible/ansible/hacking/env-setup ] && source /opt/ansible/ansible/hacking/env-setup ; \
@@ -357,34 +409,39 @@ export ENV="/etc/profile.d/setup-ansible-ee-docker-env.sh" ; \
 export BASH_ENV="\${ENV}" ; \
 export ANSIBLE_EE="1"; \
 printf "[[ \"\\\${ANSIBLE_EE}\" == 1 ]] && source \${ENV} ; \
-  __cleanup_bash_profile() { sed -i -e \"\\|# Added by ${RUN_SCRIPT} to unload rvm$|d\" ~/.bash_profile &>/dev/null ; } ; \
-  trap __cleanup_bash_profile EXIT HUP INT QUIT KILL TERM ; \
-  # Added by ${RUN_SCRIPT} to unload rvm" >> ~/.bash_profile ; \
-exec script -q -c "exec ${CMD}" /dev/null'
+  __cleanup_bash_profile() { sed -i -e \"\\|# Added by ${RUN_SCRIPT[*]} to unload rvm$|d\" ~/.bash_profile &>/dev/null ; } ; \
+  trap __cleanup_bash_profile EXIT HUP INT QUIT TERM ; \
+  # Added by ${RUN_SCRIPT[*]} to unload rvm" >> ~/.bash_profile ; \
+exec script -q -c "exec ${RUN_SCRIPT[0]}.cmd.sh" /dev/null'
 EOF
 
 fi # End init check
 
-[[ "$CMD" == *"/init" ]] || chmod +x "${RUN_SCRIPT}"
+
+# shellcheck disable=SC2053
+[[ "${CMD[0]}" == $INIT_PATTERN ]] || chmod +x "${RUN_SCRIPT[0]}"
 # Check for previously spawned init container
 # If init container is running, exec into that, otherwise run the RUN_SCRIPT as normal
 RUNNING_CONTAINERS="$(docker ps --filter status=running --format '{{.Names}}' | grep "ansible_run.$USER")"
 
 # Use first found init container
 for container_name in $RUNNING_CONTAINERS; do
-  if docker inspect --format '{{.Config.Cmd}}' "$container_name" | grep -Eq '.*/init' ; then
+  # shellcheck disable=SC2053
+  if [[ "$(docker inspect --format '{{.Config.Cmd}}' "$container_name")" == $INIT_PATTERN ]] || \
+     [[ "$(docker inspect --format '{{ range .Config.Entrypoint }}{{ printf "%s " .  }}{{ end }}' "$container_name")" == $INIT_PATTERN ]]; then
     EXEC_CONTAINER="$container_name"
     break
   fi
 done
 
 if [ -n "$EXEC_CONTAINER" ]; then
-  docker exec "${DOCKER_INTERACT_ARGS[@]:-}" --user=root "${EXEC_CONTAINER}" "${RUN_SCRIPT}"
+  DOCKER_INTERACT_ARGS=( '-ti' )
+  docker exec "${DOCKER_INTERACT_ARGS[@]:-}" --user=root "${EXEC_CONTAINER}" "${RUN_SCRIPT[@]}"
   RET=$?
 else
   docker images --format '{{.Repository}}:{{.Tag}}' | grep -q "${CONTAINER_ID##docker.io/}" || docker pull "${CONTAINER_ID}"
-  CACHE_VOLUME_NAME="xdg-cache-${MY_USERNAME}-$(docker inspect --format '{{range $index, $rt := .RepoDigests}}{{if eq $index 0}}{{$rt}}{{end}}{{end}}' "${CONTAINER_ID}" | tr '/@' '_' | tr ':' '.' | tr -d '[[:space:]]' )"
-  _container_arch="$(docker inspect --format '{{.Architecture}}' "${CONTAINER_ID}" | tr -d '[[:space:]]' )"
+  CACHE_VOLUME_NAME="xdg-cache-${MY_USERNAME}-$(docker inspect --format '{{range $index, $rt := .RepoDigests}}{{if eq $index 0}}{{$rt}}{{end}}{{end}}' "${CONTAINER_ID}" | tr '/@' '_' | tr ':' '.' | tr -d '[:space:]' )"
+  _container_arch="$(docker inspect --format '{{.Architecture}}' "${CONTAINER_ID}" | tr -d '[:space:]' )"
   if ! docker volume ls -q | grep -q "$CACHE_VOLUME_NAME"; then
     #docker volume create --name "$CACHE_VOLUME_NAME" --driver local --label "purpose=xdg-cache" --label "image_name=${CONTAINER_ID}" --label "user=${MY_USERNAME}" --label "group=${MY_GROUPNAME}" --label "uid=${MY_UID}" --label "gid=${MY_GID}" --opt type=tmpfs --opt device=tmpfs --opt "o=rw,nosuid,nodev,relatime,exec,uid=${MY_UID},gid=${MY_GID},size=64M"
     docker volume create --name "$CACHE_VOLUME_NAME" --driver local \
@@ -393,8 +450,9 @@ else
       --label "uid=${MY_UID}" --label "gid=${MY_GID}" \
       --label "arch=${_container_arch}"
   fi
-  docker run "${DOCKER_INTERACT_ARGS[@]:-}" --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}/cache" --name="${CONTAINER_NAME}" "${DOCKER_RUN_SSH_AGENT_ARGS[@]:-}" "${DOCKER_RUN_GPG_AGENT_ARGS[@]:-}" "${DOCKER_RUN_ARGS[@]}" "${CONTAINER_ID}" "${RUN_SCRIPT}"
+  docker run "${DOCKER_INTERACT_ARGS[@]:-}" --user=root -v "${REPO_BASE}:${REPO_BASE}" -v "${HOME}:${HOME}" -e TERM --mount "type=volume,volume-driver=local,src=${CACHE_VOLUME_NAME},dst=/var/run/user/${MY_UID}/cache" --name="${CONTAINER_NAME}" "${DOCKER_RUN_SSH_AGENT_ARGS[@]:-}" "${DOCKER_RUN_GPG_AGENT_ARGS[@]:-}" "${DOCKER_RUN_ARGS[@]}" "${CONTAINER_ID}" "${RUN_SCRIPT[@]}"
   RET=$?
-  rm "${RUN_SCRIPT}"
+  # shellcheck disable=SC2053
+  [[ "${CMD[0]}" == $INIT_PATTERN ]] || rm "${RUN_SCRIPT[0]}"
 fi
 exit $RET

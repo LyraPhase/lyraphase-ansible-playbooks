@@ -1,4 +1,4 @@
-openwrt_system_hostname: "vega"
+openwrt_system_hostname: "epsilon2-lyrae"
 openwrt_system_description: "wrt1900ac v1 AP"
 openwrt_system_notes: "upstairs office"
 openwrt_system_maintainer: "James Cuzella @trinitronx"
@@ -25,33 +25,33 @@ openwrt_system_ntp_server:
 openwrt_system_ntp_enabled: 1
 openwrt_system_ntp_enable_server: 1
 openwrt_system_ntp_use_dhcp: 0
-openwrt_system_led:
-  - itemname: "led_wan"
-    name: "WAN"
-    sysfs: "mamba:white:wan"
-    trigger: "netdev"
-    mode: "link tx rx"
-    dev: "wan"
-  - itemname: "led_usb1"
-    name: "USB 1"
-    sysfs: "mamba:white:usb2"
-    trigger: "usbport"
-    ports: ["usb1-port1"]
-  - itemname: "led_usb2"
-    name: "USB 2"
-    sysfs: "mamba:white:usb3_1"
-    trigger: "usbport"
-    ports:
-      - "usb2-port1"
-      - "usb3-port1"
-  - itemname: "led_usb2_ss"
-    name: "USB 2 SS"
-    sysfs: "mamba:white:usb3_2"
-    trigger: "usbport"
-    ports: ["usb3-port2"]
+#openwrt_system_led:
+#  - itemname: "led_wan"
+#    name: "WAN"
+#    sysfs: "mamba:white:wan"
+#    trigger: "netdev"
+#    mode: "link tx rx"
+#    dev: "wan"
+#  - itemname: "led_usb1"
+#    name: "USB 1"
+#    sysfs: "mamba:white:usb2"
+#    trigger: "usbport"
+#    ports: ["usb1-port1"]
+#  - itemname: "led_usb2"
+#    name: "USB 2"
+#    sysfs: "mamba:white:usb3_1"
+#    trigger: "usbport"
+#    ports:
+#      - "usb2-port1"
+#      - "usb3-port1"
+#  - itemname: "led_usb2_ss"
+#    name: "USB 2 SS"
+#    sysfs: "mamba:white:usb3_2"
+#    trigger: "usbport"
+#    ports: ["usb3-port2"]
 
 # Network globals
-openwrt_network_globals_ula: "fd30:b72c:2f28::/48"
+openwrt_network_globals_ula: "fd5a:7f4b:fa36::/48"
 openwrt_network_globals_packet_steering: 1
 
 openwrt_network_deviceshost:
@@ -59,21 +59,21 @@ openwrt_network_deviceshost:
     type: 'bridge'
     ports:
       - 'lan1'
-      - 'lan2'
-      - 'lan3'
-      - 'lan4'
+#      - 'lan2'
+#      - 'lan3'
+#      - 'lan4'
     igmp_snooping: '1'
     multicast_querier: '0'
   lan1:
-    macaddr: &eth0_mac "{{ vault_lyraphase_vega_deviceshost.eth0.macaddr }}"
-  lan2:
-    macaddr: *eth0_mac
-  lan3:
-    macaddr: *eth0_mac
-  lan4:
-    macaddr: *eth0_mac
-  wan:
-    macaddr: *eth0_mac
+    macaddr: &eth0_mac "{{ vault_lyraphase_epsilon2_lyrae_deviceshost.eth0.macaddr }}"
+#  lan2:
+#    macaddr: &eth1_mac "{{ vault_lyraphase_epsilon2_lyrae_deviceshost.eth1.macaddr }}"
+#  lan3:
+#    macaddr: *eth0_mac
+#  lan4:
+#    macaddr: *eth0_mac
+#  wan:
+#    macaddr: *eth0_mac
 
 openwrt_network_interfaceshost:
   lan:
@@ -82,12 +82,12 @@ openwrt_network_interfaceshost:
     # TODO: Fix ansible_openwrtnetwork role to support ipv6assign PD independent
     # of using dhcpv6
     ip6assign: '60'
-  wan:
-    device: 'wan'
-    proto: 'dhcp'
-  wan6:
-    device: 'wan'
-    proto: 'dhcpv6'
+#  wan:
+#    device: 'wan'
+#    proto: 'dhcp'
+#  wan6:
+#    device: 'wan'
+#    proto: 'dhcpv6'
 
   # In default interfaces config as /8 CIDR
   # loopback:
@@ -102,23 +102,24 @@ openwrt_wifi_deviceshost:
     type: mac80211
     hwmode: "{{ (not (openwrt_version_supports_band | bool)) | ternary('11g', omit) }}"
     band: "{{ (openwrt_version_supports_band | bool) | ternary('2g', omit) }}"
-    path: 'soc/{{ openwrt_soc_devicetree_pcie }}/pci0000:00/0000:00:02.0/0000:02:00.0'
-    country: US
-    distance: 17
-    txpower: 17
-    legacy_rates: 0
-    channel: 3
-    htmode: NOHT
-    ldpc: 0
-  radio1:
-    type: mac80211
-    hwmode: "{{ (not (openwrt_version_supports_band | bool)) | ternary('11a', omit) }}"
-    band: "{{ (openwrt_version_supports_band | bool) | ternary('5g', omit) }}"
-    path: 'soc/{{ openwrt_soc_devicetree_pcie }}/pci0000:00/0000:00:03.0/0000:03:00.0'
+    path: 'platform/soc/18000000.wifi'
     country: US
     distance: 17
     txpower: 23
     legacy_rates: 0
-    channel: 100
-    htmode: VHT80
+    channel: 3
+    htmode: NOHT
+    ldpc: 0
+    disabled: 1
+  radio1:
+    type: mac80211
+    hwmode: "{{ (not (openwrt_version_supports_band | bool)) | ternary('11a', omit) }}"
+    band: "{{ (openwrt_version_supports_band | bool) | ternary('5g', omit) }}"
+    path: 'platform/soc/18000000.wifi+1'
+    country: US
+    distance: 17
+    txpower: 28
+    legacy_rates: 0
+    channel: 128
+    htmode: HE80
     cell_density: '2'

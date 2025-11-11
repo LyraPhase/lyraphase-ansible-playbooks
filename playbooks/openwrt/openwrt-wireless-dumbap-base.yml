@@ -8,6 +8,7 @@
   gather_facts: true
   vars_files:
     - "vars/openwrt-wireless-dumbap.yml"
+    - "vars/openwrt-dhcp-dumbap.yml"
 
   roles:
     - role: imp1sh.ansible_managemynetwork.ansible_openwrtwireless
@@ -18,6 +19,13 @@
         - hostapd
         - wireless
         - wifi
+    - role: imp1sh.ansible_managemynetwork.ansible_openwrtdhcp
+      when: not (ansible_bootstrap | default(false))
+      tags:
+        - ansible_openwrtdhcp
+        - openwrt_dhcp
+        - dnsmasq
+        - dhcp
   tasks:
     - name: Are vars set?
       ansible.builtin.debug:

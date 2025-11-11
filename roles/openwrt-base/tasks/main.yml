@@ -8,12 +8,14 @@
     - bootstrap_ip
     - openwrt_bootstrap
     - ansible_bootstrap
+    - bootstrap
 - name: "Run tasks: python-openwrt"
   ansible.builtin.import_tasks: python-openwrt.yml
   tags:
     - python-openwrt
     - openwrt_bootstrap
     - ansible_bootstrap
+    - bootstrap
 - name: "Run tasks: setup-openwrt-release-facts"
   ansible.builtin.import_tasks: setup-openwrt-release-facts.yml
   tags:

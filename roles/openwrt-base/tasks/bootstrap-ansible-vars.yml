@@ -1,0 +1,60 @@
+---
+# opkg-edison: bootstrap-ansible-vars - Tasks entry point. Called by main.yml
+
+- name: "Gather /etc/os-release"
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw:
+    cat /etc/os-release
+  register: os_release
+  when: >
+        not (ansible_distribution_major_version is defined or
+             ansible_distribution_version is defined)
+  tags:
+    - openwrt_bootstrap
+    - openwrt-python
+    - openwrt-base-facts
+    - openwrt-base-setup-os-release-facts
+
+- name: Set openwrt_release facts - Decode and parse /etc/os-release content
+  ansible.builtin.set_fact:
+    os_release_data: "{{ os_release_data | default({}) | combine({ item.split('=')[0].lower(): item.split('=')[1].replace(\"'\", '').replace('\"', '') }) }}"
+  loop: "{{ os_release.stdout_lines }}"
+  when: >
+        os_release is defined and os_release.rc == 0 and
+        not (ansible_distribution_major_version is defined or
+             ansible_distribution_version is defined)
+  tags:
+    - openwrt_bootstrap
+    - openwrt-python
+    - openwrt-base-facts
+    - openwrt-base-setup-os-release-facts
+
+- name: DEBUG os_release facts
+  ansible.builtin.debug:
+    var: os_release_data
+  tags:
+    - openwrt_bootstrap
+    - openwrt-python
+    - openwrt-base-facts
+    - openwrt-base-setup-os-release-facts
+
+- name: Set OpenWrt distribution & version if facts NOT set
+  check_mode: false
+  changed_when: false
+  ansible.builtin.set_fact:
+    ansible_distribution: "{{ os_release_data.name }}"
+    ansible_os_family: "{{ os_release_data.id_like.split(' ') | last }}"
+    ansible_distribution_version: "{{ os_release_data.version }}"
+    ansible_distribution_major_version: "{{ 0 | extract(os_release_data.version.split('.')) | default('') | int }}"
+    openwrt_base_minor_version: "{{ 1 | extract(os_release_data.version.split('.')) | default('') | int }}"
+  failed_when: false
+  when: >
+        os_release_data is defined and
+        not (ansible_distribution_major_version is defined or
+             ansible_distribution_version is defined)
+  tags:
+    - openwrt_bootstrap
+    - openwrt-python
+    - openwrt-base-facts
+    - openwrt-base-setup-os-release-facts

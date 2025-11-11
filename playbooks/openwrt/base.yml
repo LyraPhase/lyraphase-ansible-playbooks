@@ -8,6 +8,22 @@
   vars_files:
     - "vars/openwrt-base.yml"
 
+  pre_tasks:
+    - name: Ansible setup
+      ansible.builtin.include_vars: "{{ item }}"
+      with_first_found:
+        - "./inventory/os_vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version | int }}.yml"
+        - "./inventory/os_vars/{{ ansible_distribution }}.yml"
+        - "./inventory/os_vars/{{ ansible_os_family }}.yml"
+        - "./inventory/os_vars/OpenWrt.yml"
+      when: not (ansible_bootstrap | default(false)) and
+            ansible_distribution is defined and
+            ansible_distribution_major_version is defined and
+            ansible_os_family is defined
+      tags:
+        - opkg_packages
+        - packages
+        - install_packages
   roles:
     - openwrt-base
 #    - openwrt-logrotate
@@ -24,6 +40,12 @@
         - ansible_openwrtdropbear
         - sshkeys
     - role: imp1sh.ansible_managemynetwork.ansible_packages
+      when: not (ansible_bootstrap | default(false))
+      tags:
+        - opkg_packages
+        - packages
+        - install_packages
+    - role: imp1sh.ansible_managemynetwork.ansible_openwrtnetwork
       when: not (ansible_bootstrap | default(false))
       tags:
         - opkg_packages

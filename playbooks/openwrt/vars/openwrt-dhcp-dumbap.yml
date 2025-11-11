@@ -1,0 +1,38 @@
+---
+openwrt_dhcp_poolshost:
+  - name: "wan"
+    ignore: "1"
+    interface: "wan"
+  - name: "lan"
+    ignore: "1"
+    interface: "lan"
+    start: "100"
+    limit: "150"
+    leasetime: "12h"
+    dhcpv4: "disabled"
+    dhcpv6: "disabled"
+    ra: "disabled"
+    ra_default: "0"
+    ra_flags:
+      - "managed-config"
+      - "other-config"
+    domain:
+      - "internal"
+# dnsmasq global options
+openwrt_dhcp_dnsmasq_authoritative: '0'
+openwrt_dhcp_dnsmasq_domainneeded: '1'
+openwrt_dhcp_dnsmasq_localise_queries: '1'
+openwrt_dhcp_dnsmasq_rebind_protection: '1'
+openwrt_dhcp_dnsmasq_rebind_localhost: '1'
+openwrt_dhcp_dnsmasq_local: '/internal/'
+openwrt_dhcp_dnsmasq_domain: 'internal'
+openwrt_dhcp_dnsmasq_leasefile: '/tmp/dhcp.leases'
+openwrt_dhcp_dnsmasq_resolvfile: '/tmp/resolv.conf.d/resolv.conf.auto'
+openwrt_dhcp_dnsmasq_localservice: '1'
+openwrt_dhcp_dnsmasq_cachesize: '1000'
+openwrt_dhcp_dnsmasq_ednspacket_max: '1232'
+# Undefine unused defaults from ansible_openwrtdhcp role
+openwrt_dhcp_dnsmasq_filterwin2k: "{{ undef() }}"
+openwrt_dhcp_dnsmasq_boguspriv: "{{ undef() }}"
+openwrt_dhcp_dnsmasq_nonwildcard: "{{ undef() }}"
+openwrt_dhcp_dnsmasq_nonegcache: "{{ undef() }}"

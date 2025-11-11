@@ -1,0 +1,35 @@
+packages_installgroup:
+  openwrt:
+    - arp-scan
+    - ethtool
+    - ip-full
+    - blkid
+    - ca-certificates
+    - ca-bundle
+    - curl
+    - bind-host
+    - bind-dig
+    - bind-libs
+    - ddns-scripts
+    - luci-app-ddns
+    - nftables-json
+    - libnetfilter-conntrack3
+    - logrotate
+    - lsblk
+    - luci-app-firewall
+    - luci-proto-ipv6
+    - openvpn-openssl
+    - libopenssl3
+    - libustream-openssl20201210
+    - libmbedtls12
+    # - kmod-tun
+    - luci-app-openvpn
+    - luci-proto-ppp
+    - luci-app-advanced-reboot
+    - ppp-mod-pppoe
+    - ppp
+    - mdns-utils
+    - mdnsd
+    - mdnsresponder
+    - iperf3
+    - htop
