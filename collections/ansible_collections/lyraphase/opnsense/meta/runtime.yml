@@ -1,1 +1,8 @@
+---
 requires_ansible: ">=2.15.0"
+plugin_routing:
+  modules:
+    command:
+      redirect: lyraphase.opnsense.shell_command
+    facts:
+      redirect: lyraphase.opnsense.opnsense_facts
