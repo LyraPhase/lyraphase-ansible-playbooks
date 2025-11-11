@@ -1,0 +1,86 @@
+---
+# lyraphase.opnsense.pkgs Ansible Role
+#
+# Copyright 2025 LyraPhase, LLC
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+argument_specs:
+  main:
+    short_description: Install OPNsense packages using `pkg` package manager
+    description:
+      - Install a list of OPNsense packages using the FreeBSD C(pkg) package manager.
+      - Uses the P(ansibleguy.opnsense.package) role to install packages.
+    author: James Cuzella (@trinitronx)
+    version_added: "1.0.0"
+    options:
+      opnsense_pkgs_list:
+        description:
+          - List of packages to install.
+        type: list
+        default: []
+      opnsense_pkgs_auth:
+        description:
+          - A `dict` object to pass an OPNsense API key & secret used to
+            authenticate, a CA file to verify against, or an
+            `api_credential_file` used to authenticate with the OPNsense
+            firewall's API.
+          - API key + secret Sub-options are set as ‘no_log’ parameters.
+          - "Required: `false`"
+        type: dict
+        required_together:
+          - ["api_key", "api_secret"]
+        options:
+          ssl_verify:
+            description:
+              - If the certificate of the target firewall should be validated.
+              - RECOMMENDED FOR PRODUCTION USAGE!
+            type: bool
+            default: true
+          ssl_ca_file:
+            description:
+              - If you use an internal certificate-authority to create the
+                certificate of the target firewall, provide the path to its
+                public key for validation
+            type: path
+            default: null
+          api_key:
+            description:
+              - API key used to authenticate, alternative to ‘api_credential_file’.
+              - Is set as ‘no_log’ parameter.
+              - "Required: `false`, `true` if ‘api_credential_file’ is not used"
+            type: str
+            default: null
+            no_log: true
+            required_if:
+              - ["api_credential_file", null, "api_secret"]
+          api_secret:
+            description:
+              - API secret used to authenticate, alternative to ‘api_credential_file’.
+              - Is set as ‘no_log’ parameter.
+            type: str
+            default: null
+            no_log: true
+            required_if:
+              - ["api_credential_file", null, "api_key"]
+          api_credential_file:
+            description:
+              - Path to the api-credential file as downloaded through the
+                web-interface.
+              - Alternative to ‘api_key’ and ‘api_secret’
+            type: path
+            default: null
+            required_if:
+              - ["api_secret", null]
+              - ["api_key", null]

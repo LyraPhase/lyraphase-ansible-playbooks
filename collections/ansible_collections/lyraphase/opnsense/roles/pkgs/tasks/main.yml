@@ -1,5 +1,5 @@
 ---
-# tasks file for lyraphase.opnsense.opnsense_pkgs
+# tasks file for lyraphase.opnsense.pkgs
 - name: Include package install tasks
   ansible.builtin.include_tasks: 'packages.yml'
   tags:
