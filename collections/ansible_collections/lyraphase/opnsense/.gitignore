@@ -112,4 +112,5 @@ venv.bak/
 .vscode/
 .DS_Store
 
+# antsibull-changelog
 changelogs/.plugin-cache.yaml

@@ -1,0 +1,4 @@
+---
+add plugin.shell:
+  - name: shell
+    description: Use `ansible.netcommon.network_cli` via `opnsense-shell` to run command on OPNsense platform

@@ -158,7 +158,7 @@ Please read and familiarize yourself with this document.
 
 <!--Add a link to a changelog.md file or an external docsite to cover this information. -->
 
-Release notes are available [here](https://github.com/LyraPhase/opnsense/blob/main/CHANGELOG.md).
+Release notes are available [here](https://github.com/LyraPhase/opnsense/blob/main/CHANGELOG.rst).
 
 <!-- ## Roadmap -->
 
