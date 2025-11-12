@@ -57,7 +57,8 @@ repos:
         exclude: |
           (?x)^(
               vendor/bundle/.*|
-              tmp/.*
+              tmp/.*|
+              dockerized_run\..*(\.sh)?
           )$
   - repo: local
     hooks:
