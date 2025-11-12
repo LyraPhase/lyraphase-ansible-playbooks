@@ -22,7 +22,6 @@
 #
 from __future__ import absolute_import, division, print_function
 
-
 __metaclass__ = type
 
 from ansible.module_utils.common.text.converters import to_text
@@ -30,7 +29,6 @@ from ansible.utils.display import Display
 from ansible_collections.ansible.netcommon.plugins.action.network import (
     ActionModule as ActionNetworkModule,
 )
-
 
 display = Display()
 
@@ -52,13 +50,20 @@ class ActionModule(ActionNetworkModule):
         persistent_connection = self._play_context.connection.split(".")[-1]
         warnings = []
 
-        display.vvvv("config module: %s" % to_text(self._config_module, errors="surrogate_then_replace"))
-        display.vvvv("persistent_connection: %s" % to_text(persistent_connection, errors="surrogate_then_replace"))
+        display.vvvv(
+            "config module: %s"
+            % to_text(self._config_module, errors="surrogate_then_replace")
+        )
+        display.vvvv(
+            "persistent_connection: %s"
+            % to_text(persistent_connection, errors="surrogate_then_replace")
+        )
 
         if persistent_connection not in ("network_cli"):
             return {
                 "failed": True,
-                "msg": "Connection type %s is not valid for this module" % self._play_context.connection,
+                "msg": "Connection type %s is not valid for this module"
+                % self._play_context.connection,
             }
 
         result = super(ActionModule, self).run(task_vars=task_vars)

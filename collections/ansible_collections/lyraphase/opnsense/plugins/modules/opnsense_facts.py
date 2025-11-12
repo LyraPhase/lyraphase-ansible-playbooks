@@ -22,7 +22,6 @@
 #
 from __future__ import absolute_import, division, print_function
 
-
 __metaclass__ = type
 
 
@@ -187,12 +186,15 @@ ansible_net_config:
 """
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.argspec.facts.facts import (
     FactsArgs,
 )
-from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.shell import shell_argument_spec
-from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.facts.facts import Facts
+from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.facts.facts import (
+    Facts,
+)
+from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.shell import (
+    shell_argument_spec,
+)
 
 
 def main():
