@@ -13,7 +13,6 @@ based on the configuration.
 
 from __future__ import absolute_import, division, print_function
 
-
 __metaclass__ = type
 
 
@@ -59,7 +58,9 @@ class Default(FactsBase):
         if data and (not isinstance(data, Exception)):
             product_data = json.loads(data)
             self.facts["opnsense_edition"] = (
-                "opnsense-business" if "business" in product_data["product_id"] else "opnsense-community"
+                "opnsense-business"
+                if "business" in product_data["product_id"]
+                else "opnsense-community"
             )
             self.facts["product"] = product_data
             # self.facts["asatype"] = self.parse_asatype(data)
@@ -67,7 +68,9 @@ class Default(FactsBase):
             # self.parse_stacks(data)
         else:
             if isinstance(data, Exception):
-                self.warnings.append("Unable to gather product information: %s" % to_text(data))
+                self.warnings.append(
+                    "Unable to gather product information: %s" % to_text(data)
+                )
 
     def parse_asatype(self, data):
         match = re.search(r"Hardware:(\s+)ASA", data)
@@ -123,10 +126,12 @@ class Default(FactsBase):
 
 
 class Hardware(FactsBase):
-    COMMANDS = ["df -t nodevfs -T -k",
-                "sysctl hw.realmem",
-                "sysctl vm.stats",
-                "vmstat -H"]
+    COMMANDS = [
+        "df -t nodevfs -T -k",
+        "sysctl hw.realmem",
+        "sysctl vm.stats",
+        "vmstat -H",
+    ]
 
     def populate(self):
         warnings = list()
@@ -139,27 +144,35 @@ class Hardware(FactsBase):
         data = self.responses[1]
         if data:
             if "sysctl: unknown oid" in data:
-                warnings.append("Unable to gather amount of hardware total memory (hw.realmem)")
+                warnings.append(
+                    "Unable to gather amount of hardware total memory (hw.realmem)"
+                )
             else:
                 if "hw.realmem:" in data:
                     (realmem_key, realmem_value) = data.split(":")
-                    self.facts["hardware_realmem_mb"] = int(realmem_value.rstrip().lstrip()) // 1024 // 1024
+                    self.facts["hardware_realmem_mb"] = (
+                        int(realmem_value.rstrip().lstrip()) // 1024 // 1024
+                    )
                 else:
-                    warnings.append("Unable to gather amount of hardware total memory (hw.realmem)")
+                    warnings.append(
+                        "Unable to gather amount of hardware total memory (hw.realmem)"
+                    )
 
         data = self.responses[2]
         if data:
             for line in data.splitlines():
                 (vm_stats_key, vm_stats_value) = line.split()
-                if 'vm.stats.vm.v_page_size' in line:
+                if "vm.stats.vm.v_page_size" in line:
                     pagesize = int(vm_stats_value)
-                if 'vm.stats.vm.v_page_count' in line:
+                if "vm.stats.vm.v_page_count" in line:
                     pagecount = int(vm_stats_value)
-                if 'vm.stats.vm.v_free_count' in line:
+                if "vm.stats.vm.v_free_count" in line:
                     freecount = int(vm_stats_value)
-            self.facts['memtotal_mb'] = pagesize * pagecount // 1024 // 1024
-            self.facts['memfree_mb'] = pagesize * freecount // 1024 // 1024
-            self.facts["memused_mb"] = int(self.facts['memtotal_mb'] - self.facts['memfree_mb'])
+            self.facts["memtotal_mb"] = pagesize * pagecount // 1024 // 1024
+            self.facts["memfree_mb"] = pagesize * freecount // 1024 // 1024
+            self.facts["memused_mb"] = int(
+                self.facts["memtotal_mb"] - self.facts["memfree_mb"]
+            )
 
         # Get free memory. vmstat output looks like:
         #  procs     memory       page                      disks faults       cpu
@@ -171,9 +184,13 @@ class Hardware(FactsBase):
                 warnings.append("Unable to gather amount of used memory (vmstat 'fre')")
             else:
                 if "fre" in data:
-                    self.facts["memfree_mb"] = int(data.splitlines()[-1].split()[4]) // 1024
+                    self.facts["memfree_mb"] = (
+                        int(data.splitlines()[-1].split()[4]) // 1024
+                    )
                 else:
-                    warnings.append("Unable to gather amount of physical memory (hw.physmem)")
+                    warnings.append(
+                        "Unable to gather amount of physical memory (hw.physmem)"
+                    )
 
     def parse_filesystems(self, data):
         return re.findall(r"^Directory of (\S+)/", data, re.M)
@@ -200,7 +217,9 @@ class Hardware(FactsBase):
 
 class Packages(FactsBase):
     # COMMANDS = ["configctl firmware local"] ## Includes kernel & userland metadata also
-    COMMANDS = ["pkg query '%n|||%v|||%c|||%sh|||%k|||%a|||%L|||%R|||%o'"]  # Just package metadata
+    COMMANDS = [
+        "pkg query '%n|||%v|||%c|||%sh|||%k|||%a|||%L|||%R|||%o'"
+    ]  # Just package metadata
     PKG_KEYS = [
         "name",
         "version",

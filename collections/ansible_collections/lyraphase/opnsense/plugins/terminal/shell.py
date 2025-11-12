@@ -22,7 +22,6 @@
 #
 from __future__ import absolute_import, division, print_function
 
-
 __metaclass__ = type
 
 DOCUMENTATION = """
@@ -43,11 +42,11 @@ import re
 
 from ansible.errors import AnsibleConnectionFailure
 
-
 try:
     from ansible.module_utils.common.text.converters import to_bytes, to_text
 except ImportError:
     from ansible.module_utils._text import to_bytes, to_text
+
 from ansible_collections.ansible.netcommon.plugins.plugin_utils.terminal_base import (
     TerminalBase,
 )
@@ -63,7 +62,7 @@ class TerminalModule(TerminalBase):
         re.compile(rb"error:", re.I),
         re.compile(rb"Permission denied, please try again\."),
         re.compile(
-            rb"Received disconnect from .*? port (?:\d+:?\d+)?: Too many authentication failures$"
+            rb"Received disconnect from .*? port (?:\d+:?\d+)?: Too many authentication failures$",
         ),
         re.compile(rb"\w+: Command not found\.$"),
         re.compile(rb"\w+: : Permission denied$"),
