@@ -72,6 +72,7 @@ initial menu screen shown by `/usr/local/sbin/opnsense-shell`.
 ### Roles
 
 <!-- markdownlint-disable no-inline-html -->
+
 | Name                                                                                                                        | Description                                                                                             |
 | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | [`lyraphase.opnsense.pkgs`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.pkgs_role.md)   | Install packages on OPNsense devices with `pkg` FreeBSD package manager                                 |
