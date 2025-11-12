@@ -11,7 +11,7 @@ Install packages on an OPNsense firewall for Ansible config managment.
 ## Role Variables
 
 - `opnsense_pkgs_list`: The list of packages to install
-   Default: `none`
+  Default: `none`
 
 ## Dependencies
 
@@ -29,13 +29,13 @@ To install this dependency:
 ## Example Playbook
 
 This example playbook installs the `lsblk` and `rsync` packages to `opnsense`
-hosts.  The playbook is run as `opnsense-user`.
+hosts. The playbook is run as `opnsense-user`.
 
     - name: Install OPNsense packages
       hosts: opnsense
       user: opnsense-user
       gather_facts: false
-    
+
       roles:
         - role: lyraphase.opnsense.opnsense_pkgs
           opnsense_pkgs_list: ['lsblk', 'rsync']
