@@ -1,5 +1,4 @@
-Role: opkg-edison
-=================
+# Role: opkg-edison
 
 **Description:**
 
@@ -7,8 +6,7 @@ This role will:
 
 - Make your favorite breakfast sandwich
 
-Requirements
-------------
+## Requirements
 
 **Supports:**
 
@@ -25,8 +23,7 @@ Install this with the `foo` role.
 - `opkg-edison_dependency_bar_baz` - Required by dependency
   `opkg-edison-dependency-bar` role.
 
-Role Variables
---------------
+## Role Variables
 
 The default role variables in `defaults/main.yml` are:
 
@@ -38,15 +35,13 @@ opkg-edison_foo: true
 
 - `opkg-edison_foo` - Allows foo-barring for opkg-edison.
 
-Dependencies
-------------
+## Dependencies
 
 This role depends on the following roles:
 
 - `opkg-edison-dependency-bar`
 
-Example Playbook
-----------------
+## Example Playbook
 
 ```YAML
 ---
@@ -58,15 +53,13 @@ Example Playbook
     - opkg-edison
 ```
 
-License
--------
+## License
 
 [AGPLv3][1]
 
-Author Information
-------------------
+## Author Information
 
-Copyright (C) © 🄯  2014-2024 LyraPhase.com / 37Om.com
-Copyright (C) © 🄯  2014-2024 James Cuzella <@trinitronx>
+Copyright (C) © 🄯 2014-2024 LyraPhase.com / 37Om.com
+Copyright (C) © 🄯 2014-2024 James Cuzella <@trinitronx>
 
 [1]: http://choosealicense.com/licenses/agpl-3.0/

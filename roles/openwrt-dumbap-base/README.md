@@ -1,5 +1,4 @@
-Role: openwrt-dumbap-base
-==================
+# Role: openwrt-dumbap-base
 
 **Description:**
 
@@ -13,8 +12,7 @@ This role will:
 - Disable DHCP on `br-lan`
 - Set static IP and network settings according to variables `openwrt_dumbap_static_lan`
 
-Requirements
-------------
+## Requirements
 
 **Supports:**
 
@@ -31,8 +29,7 @@ For `--check` mode to work properly, you must have already run the tasks in
 - `openwrt_dumbap_opkg_packages` - Required by `openwrt-dumbap-base` role.
 - `openwrt_dumbap_static_lan` - Required to setup static IP + network settings.
 
-Role Variables
---------------
+## Role Variables
 
 The default role variables in `vars/default.yml` are:
 
@@ -53,8 +50,7 @@ openwrt_dumbap_opkg_packages:
   - Default Packages:
     - `arp-scan`: ARP scan utility used by the crontab to resolve hostnames.
 
-Dependencies
-------------
+## Dependencies
 
 This role depends on the following OpenWRT base packages:
 
@@ -64,8 +60,7 @@ This role depends on the following OpenWRT base packages:
 - `libubox`
 - `uclient-fetch`
 
-Example Playbook
-----------------
+## Example Playbook
 
 ```YAML
 ---
@@ -79,15 +74,13 @@ Example Playbook
     - openwrt-dumbap-base
 ```
 
-License
--------
+## License
 
 [GPLv3][1]
 
-Author Information
-------------------
+## Author Information
 
-Copyright (C) © 🄯  2014-2024 LyraPhase.com / 37Om.com
-Copyright (C) © 🄯  2014-2024 James Cuzella <@trinitronx>
+Copyright (C) © 🄯 2014-2024 LyraPhase.com / 37Om.com
+Copyright (C) © 🄯 2014-2024 James Cuzella <@trinitronx>
 
 [1]: http://choosealicense.com/licenses/agpl-3.0/

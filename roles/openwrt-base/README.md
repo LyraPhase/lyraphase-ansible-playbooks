@@ -1,5 +1,4 @@
-Role: openwrt-base
-==================
+# Role: openwrt-base
 
 **Description:**
 
@@ -9,8 +8,7 @@ This role will:
 - Install any `opkg` repository feeds listed in `openwrt_opkg_repo_files`
 - Install any `opkg` packages listed in `openwrt_opkg_packages`
 
-Requirements
-------------
+## Requirements
 
 **Supports:**
 
@@ -28,8 +26,7 @@ For `--check` mode to work properly, you must have already run the tasks in
 - `opkg-edison_dependency_bar_baz` - Required by dependency
   `opkg-edison-dependency-bar` role.
 
-Role Variables
---------------
+## Role Variables
 
 The default role variables in `defaults/main.yml` are:
 
@@ -62,8 +59,7 @@ openwrt_opkg_packages:
     - `curl`: A client-side URL transfer utility
     - `uclient-fetch`: Tiny `wget` replacement using `libuclient`
 
-Dependencies
-------------
+## Dependencies
 
 This role depends on the following OpenWRT base packages:
 
@@ -73,8 +69,7 @@ This role depends on the following OpenWRT base packages:
 - `libubox`
 - `uclient-fetch`
 
-Example Playbook
-----------------
+## Example Playbook
 
 ```YAML
 ---
@@ -88,15 +83,13 @@ Example Playbook
     - openwrt-base
 ```
 
-License
--------
+## License
 
 [AGPLv3][1]
 
-Author Information
-------------------
+## Author Information
 
-Copyright (C) © 🄯  2014-2024 LyraPhase.com / 37Om.com
-Copyright (C) © 🄯  2014-2024 James Cuzella <@trinitronx>
+Copyright (C) © 🄯 2014-2024 LyraPhase.com / 37Om.com
+Copyright (C) © 🄯 2014-2024 James Cuzella <@trinitronx>
 
 [1]: http://choosealicense.com/licenses/agpl-3.0/
