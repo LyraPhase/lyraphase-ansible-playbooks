@@ -309,6 +309,7 @@
 
     - name: Wait for OPNSense host to reboot
       ansible.builtin.command: echo TODO
+      changed_when: false
       become: true
       become_method: ansible.builtin.sudo
       register: opnsense_be_create_result
@@ -338,7 +339,7 @@
         - bsd_be_create
         - debug
 
-    - name: List zpool checkpoints
+    - name: List zpool checkpoints (pre-upgrade)
       ansible.builtin.command: zpool list -H -o name,checkpoint
       changed_when: false
       check_mode: false
