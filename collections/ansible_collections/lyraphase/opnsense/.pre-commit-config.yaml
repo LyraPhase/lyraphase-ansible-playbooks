@@ -9,7 +9,8 @@ exclude: |
       \.kitchen/.*|
       screenlog\..*|
       .*\.retry|
-      \.mypy_cache/.*
+      \.mypy_cache/.*|
+      CHANGELOG\.rst
   )$
 repos:
   - repo: https://github.com/ansible-network/collection_prep
@@ -60,7 +61,8 @@ repos:
           (?x)^(
             .*\.patch|
             .*/LICENSE|
-            \.mypy_cache/.*
+            \.mypy_cache/.*|
+            CHANGELOG\.rst
           )$
 
   - repo: https://github.com/PyCQA/isort
