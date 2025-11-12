@@ -4,10 +4,14 @@ The LyraPhase Ansible OPNsense collection includes a variety of Ansible content 
 
 ## Support
 
-This Open Source project is not an official Red Hat Ansible [Certified Content](https://catalog.redhat.com/software/search?target_platforms=Red%20Hat%20Ansible%20Automation%20Platform), so this collection is **not** entitled to [support](https://access.redhat.com/support/) through [Ansible Automation Platform](https://www.redhat.com/en/technologies/management/ansible) (AAP).
-
+This Open Source project is not an official Red Hat Ansible [Certified
+Content](https://catalog.redhat.com/software/search?target_platforms=Red%20Hat%20Ansible%20Automation%20Platform),
+so this collection is **not** entitled to
+[support](https://access.redhat.com/support/) through [Ansible Automation
+Platform](https://www.redhat.com/en/technologies/management/ansible) (AAP).
 
 <!--start requires_ansible-->
+
 ## Ansible version compatibility
 
 This collection has been tested against following Ansible versions: **>=2.19.3**.
@@ -17,6 +21,7 @@ fully qualified collection name (for example, `lyraphase.opnsense.shell`).
 Plugins and modules within a collection may be tested with only specific Ansible versions.
 A collection may contain metadata that identifies these versions.
 PEP440 is the schema used to describe the versions of Ansible.
+
 <!--end requires_ansible-->
 
 ## Tested with Ansible
@@ -46,26 +51,30 @@ initial menu screen shown by `/usr/local/sbin/opnsense-shell`.
 ## Included content
 
 <!--start collection content-->
+
 ### Network terminal plugins
 
-| Name | Description |
-| --- | --- |
+| Name                                                                                                                   | Description                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | [`lyraphase.opnsense.shell`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.shell.md) | Use `ansible.netcommon.network_cli` via `opnsense-shell` to run commands on OPNsense platform |
 
 <!-- TODO -->
+
 ### Modules
 
-| Name | Description |
-| --- | --- |
-| [`lyraphase.opnsense.shell_command`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.shell_command_module.md) | Run arbitrary commands on OPNsense devices |
-| [`lyraphase.opnsense.facts`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.facts_module.md) | Collect facts from remote devices running OPNsense |
+| Name                                                                                                                                          | Description                                        |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| [`lyraphase.opnsense.shell_command`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.shell_command_module.md) | Run arbitrary commands on OPNsense devices         |
+| [`lyraphase.opnsense.facts`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.facts_module.md)                 | Collect facts from remote devices running OPNsense |
+
 <!-- END TODO -->
 
 ### Roles
 
-| Name | Description |
-| --- | --- |
-| [`lyraphase.opnsense.pkgs`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.pkgs_role.md) | Install packages on OPNsense devices with `pkg` FreeBSD package manager |
+<!-- markdownlint-disable no-inline-html -->
+| Name                                                                                                                        | Description                                                                                             |
+| --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [`lyraphase.opnsense.pkgs`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.pkgs_role.md)   | Install packages on OPNsense devices with `pkg` FreeBSD package manager                                 |
 | [`lyraphase.opnsense.users`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.users_role.md) | Add or modify users on remote devices running OPNsense <br/>(depends on: `ansibleguy.opnsense.package`) |
 
 <!--end collection content-->
@@ -94,7 +103,7 @@ An example for using this collection to run a raw shell command is as follows:
 
 `inventory.ini` (Note the password should be managed by a [Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for a production environment.
 
-```
+```ini
 [opnsense]
 opnsense.internal
 
@@ -127,7 +136,7 @@ You can either call modules by their Fully Qualified Collection Name (FQCN), lik
     - name: Get OPNsense version
       register: version_result
       shell_command: &id001
-        commands: 
+        commands:
           - opnsense-version -v
 ```
 
