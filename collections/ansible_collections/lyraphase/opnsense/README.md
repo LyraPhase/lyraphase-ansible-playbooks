@@ -54,18 +54,18 @@ initial menu screen shown by `/usr/local/sbin/opnsense-shell`.
 
 ### Network terminal plugins
 
-| Name                                                                                                                   | Description                                                                                   |
-| ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| [`lyraphase.opnsense.shell`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.shell.md) | Use `ansible.netcommon.network_cli` via `opnsense-shell` to run commands on OPNsense platform |
+| Name                                         | Description                                                                                   |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| [`lyraphase.opnsense.shell`][opnsense.shell] | Use `ansible.netcommon.network_cli` via `opnsense-shell` to run commands on OPNsense platform |
 
 <!-- TODO -->
 
 ### Modules
 
-| Name                                                                                                                                          | Description                                        |
-| --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| [`lyraphase.opnsense.shell_command`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.shell_command_module.md) | Run arbitrary commands on OPNsense devices         |
-| [`lyraphase.opnsense.facts`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.facts_module.md)                 | Collect facts from remote devices running OPNsense |
+| Name                                                         | Description                                        |
+| ------------------------------------------------------------ | -------------------------------------------------- |
+| [`lyraphase.opnsense.shell_command`][opnsense.shell_command] | Run arbitrary commands on OPNsense devices         |
+| [`lyraphase.opnsense.facts`][opnsense.facts]                 | Collect facts from remote devices running OPNsense |
 
 <!-- END TODO -->
 
@@ -185,3 +185,7 @@ Release notes are available [here](https://github.com/LyraPhase/opnsense/blob/ma
 GNU Affero General Public License v3.0 or later.
 
 See [LICENSE](https://www.gnu.org/licenses/agpl-3.0.txt) to see the full text.
+
+[opnsense.shell]: https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.shell.md
+[opnsense.shell_command]: https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.shell_command_module.md
+[opnsense.facts]: https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.facts_module.md
