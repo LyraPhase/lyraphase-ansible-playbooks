@@ -63,8 +63,10 @@ argument_specs:
             type: str
             default: null
             no_log: true
-            required_if:
-              - ["api_credential_file", null, "api_secret"]
+            required_together:
+              - ["api_key", "api_secret"]
+            mutually_exclusive:
+              - ["api_key", "api_credential_file"]
           api_secret:
             description:
               - API secret used to authenticate, alternative to ‘api_credential_file’.
@@ -72,8 +74,10 @@ argument_specs:
             type: str
             default: null
             no_log: true
-            required_if:
-              - ["api_credential_file", null, "api_key"]
+            required_together:
+              - ["api_secret", "api_key"]
+            mutually_exclusive:
+              - ["api_secret", "api_credential_file"]
           api_credential_file:
             description:
               - Path to the api-credential file as downloaded through the
@@ -81,6 +85,6 @@ argument_specs:
               - Alternative to ‘api_key’ and ‘api_secret’
             type: path
             default: null
-            required_if:
-              - ["api_secret", null]
-              - ["api_key", null]
+            mutually_exclusive:
+              - ["api_credential_file", "api_secret"]
+              - ["api_credential_file", "api_key"]
