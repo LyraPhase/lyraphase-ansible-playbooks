@@ -11,20 +11,15 @@ description: LyraPhase OPNsense Ansible collection allows automation, and
 
 license_file: LICENSE
 
-tags:
-  [
-    "opnsense",
-    "infrastructure",
-    "automation",
-    "devops",
-  ]
+tags: ["opnsense", "infrastructure", "automation", "devops"]
 
-dependencies: {
-  "community.general": ">=10.6.0",
-  "ansibleguy.opnsense": ">=1.2.13",
-  "ansible.netcommon": ">=8.1.0",
-  "ansible.utils": ">=6.0.0"
-}
+dependencies:
+  {
+    "community.general": ">=10.6.0",
+    "ansibleguy.opnsense": ">=1.2.13",
+    "ansible.netcommon": ">=8.1.0",
+    "ansible.utils": ">=6.0.0",
+  }
 
 repository: https://github.com/LyraPhase/ansible_opnsense
 
