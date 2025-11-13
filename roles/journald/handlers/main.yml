@@ -1,7 +1,7 @@
 ---
 # journald: entry point for handlers
 
-- name: restart systemd-journald
-  ansible.builtin.service: >
-    name=systemd-journald
-    state=restarted
+- name: Restart systemd-journald
+  ansible.builtin.service:
+    name: systemd-journald
+    state: restarted
