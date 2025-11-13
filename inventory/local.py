@@ -27,6 +27,7 @@ ANSIBLE_INV = {
 }
 """
 
+
 def output_list_inventory(json_output):
     """
     Output the --list data structure as JSON
