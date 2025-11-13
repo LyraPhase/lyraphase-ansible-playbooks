@@ -147,8 +147,8 @@ The buttons from left to right are: RM, FW, PWR, SHLD.](https://web.archive.org/
 
 #### Step 3 – Configure Edison
 
-1. Open a web browser and go to <http://edison.local>. \***note - if you have already changed the name and password of you Edison,
-   then replace "`edison`" in the URL with the name you have chosen.**
+1. Open a web browser and go to <http://edison.local>. \***note - if you have already changed the name and password of
+   your Edison, then replace "`edison`" in the URL with the name you have chosen.**
 
    ![Image of Google Chrome Web Browser: Page opened is "edison.local".
 Edison One-time Setup page is shown.](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238750/1560-900/Screen+Shot+2014-09-06+at+8.18.45+PM.png)
@@ -205,13 +205,13 @@ how to get connected, and setting up the Edison in various Wi-Fi modes.
 In our setup, we will be using the "Access Point Setup", which is detailed in
 Section 5 of that PDF Guide.
 
-1.  Either SSH or connect a serial console to the Edison over the micro USB port.
-2.  Open the `/etc/hostapd/hostapd.conf` file with an editor.
-    The basic and ubiquitous `vi` is already installed,
-    so that is recommended if you know how to use it.
-3.  Ensure that your configuration has _at least_ lines like the following
-    (Full [example configuration may be found here][4]
-    or an example is also attached below):
+1. Either SSH or connect a serial console to the Edison over the micro USB port.
+2. Open the `/etc/hostapd/hostapd.conf` file with an editor.
+   The basic and ubiquitous `vi` is already installed,
+   so that is recommended if you know how to use it.
+3. Ensure that your configuration has _at least_ lines like the following
+   (Full [example configuration may be found here][4]
+   or an example is also attached below):
 
         interface=wlan0
         driver=nl80211
@@ -224,13 +224,13 @@ Section 5 of that PDF Guide.
         wpa_pairwise=TKIP CCMP
         rsn_pairwise=CCMP
 
-4.  Replace the tokens "`<YOUR_EDISON_SSID_NAME_HERE>`",
-    and "`<YOUR_EDISON_WIFI_WPA_PASSPHRASE_HERE>`" with your SSID
-    and WPA2 Passphrase of your choice.
-    <br/>
-    (Defaults: `SSID` = hostname of Edison, `wpa_passphrase` = S/N of Edison)
-5.  Stop `wpa_supplicant` first: `systemctl stop wpa_supplicant`
-6.  Start `hostapd`: `systemctl restart hostapd`
+4. Replace the tokens "`<YOUR_EDISON_SSID_NAME_HERE>`",
+   and "`<YOUR_EDISON_WIFI_WPA_PASSPHRASE_HERE>`" with your SSID
+   and WPA2 Passphrase of your choice.
+   <br/>
+   (Defaults: `SSID` = hostname of Edison, `wpa_passphrase` = S/N of Edison)
+5. Stop `wpa_supplicant` first: `systemctl stop wpa_supplicant`
+6. Start `hostapd`: `systemctl restart hostapd`
 
 You should now see that `hostapd` is running with `systemctl status hostapd`.
 
@@ -324,73 +324,73 @@ First step is to enable packet forwarding. There are guides for both
 [OSX Yosemite pf & NAT Setup][5], and [Linux pf & NAT Setup][6] online.
 We will however only be doing NAT on the Macbook, **NOT** the Edison.
 
-1.  Set up packet forwarding **on Macbook** (OSX Yosemite):<br/><br/>
+1. Set up packet forwarding **on Macbook** (OSX Yosemite):<br/><br/>
 
     sudo sysctl -w net.inet.ip.forwarding=1
     sudo sysctl -w net.inet.ip.fw.enable=1
 
-2.  Set up NAT rules **on Macbook**:
-    - Here is where you need the interface names for the Macbook's `Wi-Fi` and
-      `iPhone USB` network adapters.
-    - Syntax is: `nat on $ext_if from $localnet to any -> ($ext_if)`
-    - Where:
-      - `$ext_if = <iPhone USB interface>`
-      - `$localnet = <WiFi interface>:network`
-    - **For Example:** Given `iPhone USB = en6`, `WiFi = en0`
-      <br/>
-      Write the following to a file named `nat-rules`
-      <br/><br/>
+2. Set up NAT rules **on Macbook**:
+   - Here is where you need the interface names for the Macbook's `Wi-Fi` and
+     `iPhone USB` network adapters.
+   - Syntax is: `nat on $ext_if from $localnet to any -> ($ext_if)`
+   - Where:
+     - `$ext_if = <iPhone USB interface>`
+     - `$localnet = <WiFi interface>:network`
+   - **For Example:** Given `iPhone USB = en6`, `WiFi = en0`
+     <br/>
+     Write the following to a file named `nat-rules`
+     <br/><br/>
 
           nat on en6 from en0:network to any -> (en6)
 
-3.  Turn on NAT **on Macbook** (OSX Yosemite) via `pfctl`:<br/><br/>
+3. Turn on NAT **on Macbook** (OSX Yosemite) via `pfctl`:<br/><br/>
 
-    sudo pfctl -d #disables pfctl
-    sudo pfctl -F all #flushes all pfctl rule
+        sudo pfctl -d #disables pfctl
+        sudo pfctl -F all #flushes all pfctl rule
 
-    # start pfctl & load rules from nat-rules file
+        # start pfctl & load rules from nat-rules file
 
-    sudo pfctl -f /Path/to/file/nat-rules -E
+        sudo pfctl -f /Path/to/file/nat-rules -E
 
-4.  Set up default route **on Edison AP**:
-    - This will route from Intel Edison AP (to) -> Macbook's Wi-Fi interface.
-    - Find the Macbook Wi-Fi IP using `ifconfig`.
-      (e.g.: listed as "`inet 192.168.xx.xx`" under `en0`)
+4. Set up default route **on Edison AP**:
+   - This will route from Intel Edison AP (to) -> Macbook's Wi-Fi interface.
+   - Find the Macbook Wi-Fi IP using `ifconfig`.
+     (e.g.: listed as "`inet 192.168.xx.xx`" under `en0`)
 
           ip route add default via <YOUR_MACBOOK_WIFI_IP_HERE>
 
-5.  Set up packet forwarding **on Edison AP**:
+5. Set up packet forwarding **on Edison AP**:
 
     sysctl -w net.ipv4.ip_forward=1
 
-6.  Set up DNS in `/etc/resolv.conf` **on Intel Edison AP**:
-    - Edit your `/etc/resolv.conf` and change `nameserver` lines to:
+6. Set up DNS in `/etc/resolv.conf` **on Intel Edison AP**:
+   - Edit your `/etc/resolv.conf` and change `nameserver` lines to:
 
           nameserver 8.8.8.8
           nameserver 4.2.2.2
 
-7.  Set up DNS via DHCP **on Intel Edison AP**:
-    - Edit the `/etc/hostapd/udhcpd-for-hostapd.conf` file
-    - Change the line `#opt dns` to contain DNS servers of your choosing.
-    - For Example:
+7. Set up DNS via DHCP **on Intel Edison AP**:
+   - Edit the `/etc/hostapd/udhcpd-for-hostapd.conf` file
+   - Change the line `#opt dns` to contain DNS servers of your choosing.
+   - For Example:
 
           opt dns 8.8.8.8 4.2.2.2  # Google DNS servers.
 
-    - Alternatives:
-      - Level3 (209.244.0.3 209.244.0.4),
-      - OpenDNS (208.67.222.222 208.67.220.220),
-      - Verisign (64.6.64.6 64.6.65.6)
-      - [Full list here](http://pcsupport.about.com/od/tipstricks/a/free-public-dns-servers.htm)
-      - If you can't remember this, or are too remote to have this guide handy,
-        tweet @OpenDNS or goto [http://208.69.38.205](http://208.69.38.205)
-        for help setting up.
+   - Alternatives:
+     - Level3 (209.244.0.3 209.244.0.4),
+     - OpenDNS (208.67.222.222 208.67.220.220),
+     - Verisign (64.6.64.6 64.6.65.6)
+     - [Full list here](http://pcsupport.about.com/od/tipstricks/a/free-public-dns-servers.htm)
+     - If you can't remember this, or are too remote to have this guide handy,
+       tweet @OpenDNS or goto [http://208.69.38.205](http://208.69.38.205)
+       for help setting up.
 
-8.  Restart `udhcpd` **on Intel Edison AP**:
+8. Restart `udhcpd` **on Intel Edison AP**:
 
     systemctl restart udhcpd-for-hostapd.service hostapd.service
 
-9.  Your Wi-Fi Clients should now have the DNS servers you set automatically
-    added to their network configuration.
+9. Your Wi-Fi Clients should now have the DNS servers you set automatically
+   added to their network configuration.
 10. **On any other** Intel Edison boards that you wish to set up as Wi-Fi
     Clients:
     - Run `configure_edison --wifi`
