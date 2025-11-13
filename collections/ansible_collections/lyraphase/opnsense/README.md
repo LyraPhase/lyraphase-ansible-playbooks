@@ -5,10 +5,8 @@ The LyraPhase Ansible OPNsense collection includes a variety of Ansible content 
 ## Support
 
 This Open Source project is not an official Red Hat Ansible [Certified
-Content](https://catalog.redhat.com/software/search?target_platforms=Red%20Hat%20Ansible%20Automation%20Platform),
-so this collection is **not** entitled to
-[support](https://access.redhat.com/support/) through [Ansible Automation
-Platform](https://www.redhat.com/en/technologies/management/ansible) (AAP).
+Content][rh-certified-content], so this collection is **not** entitled to
+[support][rh-support] through [Ansible Automation Platform][rh-aap] (AAP).
 
 <!--start requires_ansible-->
 
@@ -73,10 +71,10 @@ initial menu screen shown by `/usr/local/sbin/opnsense-shell`.
 
 <!-- markdownlint-disable no-inline-html -->
 
-| Name                                                                                                                        | Description                                                                                             |
-| --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| [`lyraphase.opnsense.pkgs`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.pkgs_role.md)   | Install packages on OPNsense devices with `pkg` FreeBSD package manager                                 |
-| [`lyraphase.opnsense.users`](https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.users_role.md) | Add or modify users on remote devices running OPNsense <br/>(depends on: `ansibleguy.opnsense.package`) |
+| Name                                         | Description                                                                                             |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [`lyraphase.opnsense.pkgs`][opnsense.pkgs]   | Install packages on OPNsense devices with `pkg` FreeBSD package manager                                 |
+| [`lyraphase.opnsense.users`][opnsense.users] | Add or modify users on remote devices running OPNsense <br/>(depends on: `ansibleguy.opnsense.package`) |
 
 <!--end collection content-->
 
@@ -88,21 +86,29 @@ You can install the LyraPhase OPNsense collection with the Ansible Galaxy CLI:
 
 You can also include it in a `requirements.yml` file and install it with `ansible-galaxy collection install -r requirements.yml`, using the format:
 
+<!-- markdownlint-disable code-block-style -->
+
 ```yaml
 ---
 collections:
   - name: lyraphase.opnsense
 ```
 
+<!-- markdownlint-enable code-block-style -->
+
 ## Using this collection
 
-This collection includes [security resource modules](https://docs.ansible.com/ansible/latest/network/user_guide/network_resource_modules.html). Similar to Network resource modules introduced in Ansible `2.9`
+This collection includes [security resource modules][security-resource-modules].
+Similar to [Network resource modules][network-resource-modules] introduced in
+Ansible `2.9`
 
 ### Using LyraPhase OPNsense Ansible Collection
 
 An example for using this collection to run a raw shell command is as follows:
 
 `inventory.ini` (Note the password should be managed by a [Vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html) for a production environment.
+
+<!-- markdownlint-disable code-block-style -->
 
 ```ini
 [opnsense]
@@ -120,9 +126,16 @@ ansible_network_os=lyraphase.opnsense.shell
 ansible_python_interpreter=python3.11
 ```
 
+<!-- markdownlint-enable code-block-style -->
+
 #### Using the modules with Fully Qualified Collection Name (FQCN)
 
-You can either call modules by their Fully Qualified Collection Name (FQCN), like `lyraphase.opnsense.shell_command`, or you can call modules by their short name if you list the `lyraphase.opnsense` collection in the playbook's `collections`, as follows:
+You can either call modules by their Fully Qualified Collection Name (FQCN),
+like `lyraphase.opnsense.shell_command`, or you can call modules by their short
+name if you list the `lyraphase.opnsense` collection in the playbook's
+`collections`, as follows:
+
+<!-- markdownlint-disable code-block-style -->
 
 ```yaml
 ---
@@ -152,11 +165,17 @@ The following example task gathers facts from an OPNsense firewall device, using
       - all
 ```
 
+<!-- markdownlint-enable code-block-style -->
+
 ## Contributing to this collection
 
-We welcome community contributions to this collection. If you find problems, please open an issue or create a PR against the [LyraPhase OPNsense collection repository](https://github.com/LyraPhase/ansible_opnsense). See the [Ansible Collections Contributor Guide](https://docs.ansible.com/ansible/devel/community/contributions_collections.html) for complete details.
+We welcome community contributions to this collection. If you find problems,
+please open an issue or create a PR against the [LyraPhase OPNsense collection
+repository][lyraphase.opnsense]. See the [Ansible Collections Contributor
+Guide][ansible-collections-contrib-guide] for complete details.
 
-See the [Ansible Community Guide](https://docs.ansible.com/ansible/latest/community/index.html) for details on contributing to Ansible.
+See the [Ansible Community Guide][ansible-community-guide] for details on
+contributing to Ansible.
 
 ### Code of Conduct
 
@@ -168,7 +187,7 @@ Please read and familiarize yourself with this document.
 
 <!--Add a link to a changelog.md file or an external docsite to cover this information. -->
 
-Release notes are available [here](https://github.com/LyraPhase/opnsense/blob/main/CHANGELOG.rst).
+Release notes are [available here][changelog].
 
 <!-- ## Roadmap -->
 
@@ -187,6 +206,17 @@ GNU Affero General Public License v3.0 or later.
 
 See [LICENSE](https://www.gnu.org/licenses/agpl-3.0.txt) to see the full text.
 
+[rh-certified-content]: https://catalog.redhat.com/software/search?target_platforms=Red%20Hat%20Ansible%20Automation%20Platform
+[rh-support]: https://access.redhat.com/support/
+[rh-aap]: https://www.redhat.com/en/technologies/management/ansible
+[ansible-collections-contrib-guide]: https://docs.ansible.com/ansible/devel/community/contributions_collections.html
+[ansible-community-guide]: https://docs.ansible.com/ansible/latest/community/index.html
 [opnsense.shell]: https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.shell.md
 [opnsense.shell_command]: https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.shell_command_module.md
 [opnsense.facts]: https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.facts_module.md
+[opnsense.pkgs]: https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.pkgs_role.md
+[opnsense.users]: https://github.com/LyraPhase/ansible_opnsense/blob/main/docs/lyraphase.opnsense.users_role.md
+[changelog]: https://github.com/LyraPhase/opnsense/blob/main/CHANGELOG.rst
+[security-resource-modules]: https://docs.ansible.com/projects/ansible/latest/network/dev_guide/developing_resource_modules_network.html#understanding-network-and-security-resource-modules
+[network-resource-modules]: https://docs.ansible.com/ansible/latest/network/user_guide/network_resource_modules.html
+[lyraphase.opnsense]: https://github.com/LyraPhase/ansible_opnsense
