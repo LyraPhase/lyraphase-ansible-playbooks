@@ -21,4 +21,4 @@
     mode: "0644"
   register: openwrt_wireless
   notify:
-    - reload wifi
+    - Reload wifi

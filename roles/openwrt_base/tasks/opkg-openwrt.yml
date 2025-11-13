@@ -24,9 +24,9 @@
     (not pkg_manager is defined and
      ansible_pkg_mgr is defined and ansible_pkg_mgr == "opkg")
   notify:
-    - destroy opkg cache
-    - create opkg cache dir
-    - opkg update
+    - Destroy opkg cache
+    - Create opkg cache dir
+    - OPKG update
 
 # Run yum makecache handlers immediately
 # (Should fix Ansible runs on hosts with pre-existing opkg repo problems)

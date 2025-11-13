@@ -2,20 +2,20 @@
 # openwrt_base: entry point for handlers
 # This should fix any weird opkg cache bugs
 # Use this if you're seeing 0 packages for a repo,
-- name: destroy opkg cache
+- name: Destroy opkg cache
   ansible.builtin.file:
     path: /var/opkg-lists
     force: true
     state: absent
 
-- name: create opkg cache dir
+- name: Create opkg cache dir
   ansible.builtin.file:
     path: /var/opkg-lists
     force: true
     state: directory
     mode: "0755"
 
-- name: opkg update
+- name: OPKG update
   ansible.builtin.command: opkg update
   check_mode: false
   register: opkg_update_result
@@ -24,20 +24,20 @@
   delay: 1
   changed_when: opkg_update_result.rc == 0
 
-- name: destroy apk cache
+- name: Destroy apk cache
   ansible.builtin.file:
     path: /var/cache/apk
     force: true
     state: absent
 
-- name: create apk cache dir
+- name: Create apk cache dir
   ansible.builtin.file:
     path: /var/cache/apk
     force: true
     state: directory
     mode: "0755"
 
-- name: apk update
+- name: APK update
   ansible.builtin.command: apk update
   check_mode: false
   register: apk_update_result
@@ -89,7 +89,7 @@
   until: reboot_result is defined and reboot_result.rc == 0
   changed_when: reboot_result.rc == 0
 
-- name: reload wifi
+- name: Reload wifi
   ansible.builtin.raw: wifi
   register: openwrt_wifi_result
   changed_when: openwrt_wifi_result.rc == 0
