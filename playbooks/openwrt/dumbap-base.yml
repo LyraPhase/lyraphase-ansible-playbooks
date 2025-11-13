@@ -10,7 +10,6 @@
 
   roles:
     - openwrt-dumbap-base
-
 #  tasks:
 #    - name: Install Extra packages
 #      opkg: >

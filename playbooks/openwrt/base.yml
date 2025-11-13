@@ -17,16 +17,16 @@
         - "./inventory/os_vars/{{ ansible_os_family }}.yml"
         - "./inventory/os_vars/OpenWrt.yml"
       when: not (ansible_bootstrap | default(false)) and
-            ansible_distribution is defined and
-            ansible_distribution_major_version is defined and
-            ansible_os_family is defined
+        ansible_distribution is defined and
+        ansible_distribution_major_version is defined and
+        ansible_os_family is defined
       tags:
         - opkg_packages
         - packages
         - install_packages
   roles:
     - lyraphase.openwrt_base
-#    - openwrt-logrotate
+    #    - openwrt-logrotate
     - role: imp1sh.ansible_managemynetwork.ansible_users
       tags:
         - ansible_users
