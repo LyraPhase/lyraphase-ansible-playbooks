@@ -9,7 +9,7 @@ galaxy_info:
   min_ansible_version: 1.2
   platforms:
   # Platforms tested are uncommented, but it probably works on most CentOS/RHEL
-  #- name: EL
+  # - name: EL
   #  versions:
   #     - all
   #     - 5
@@ -106,4 +106,4 @@ galaxy_info:
   # Specify role dependencies here
   # For foo
   #  - foo
-#version: 0.0.1 ## Ansible 2.0 broke this. Uncomment if / when they ever fix ansible/ansible#13496
+# version: 0.0.1 ## Ansible 2.0 broke this. Uncomment if / when they ever fix ansible/ansible#13496
