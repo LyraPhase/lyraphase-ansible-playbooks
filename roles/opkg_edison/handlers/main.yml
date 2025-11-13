@@ -3,20 +3,20 @@
 # This should fix any weird opkg cache bugs
 # Use this if you're seeing 0 packages for a repo,
 - name: destroy opkg cache
-  file: >
-    path=/var/lib/opkg
-    force=yes
-    state=absent
+  file:
+    path: /var/lib/opkg
+    force: true
+    state: absent
 
 - name: create opkg cache dir
-  file: >
-    path=/var/lib/opkg
-    force=yes
-    state=directory
+  file:
+    path: /var/lib/opkg
+    force: true
+    state: directory
 
 - name: opkg update
-  shell: opkg update
-  always_run: true
+  ansible.builtin.command: opkg update
+  check_mode: false
   register: opkg_makecache_result
   until: opkg_makecache_result is defined and opkg_makecache_result.rc == 0
   retries: 3
