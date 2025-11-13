@@ -2,7 +2,8 @@
 # opkg_edison: Tasks entry point. Called by main.yml
 
 # Load a variable file based on the OS type, or a default if not found.
-- ansible.builtin.include_vars: "{{ item }}"
+- name: Include distro specific vars
+  ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
     - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version | int}}.yml"
     - "../vars/{{ ansible_distribution }}.yml"
@@ -25,4 +26,5 @@
 
 # Run yum makecache handlers immediately
 # (Should fix Ansible runs on hosts with pre-existing opkg repo problems)
-- meta: flush_handlers
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
