@@ -6,11 +6,10 @@
 version: 3
 
 images:
- base_image:
-  name: quay.io/centos/centos:stream8
+  base_image:
+    name: quay.io/centos/centos:stream8
 options:
   package_manager_path: /usr/bin/dnf
-
 
 dependencies:
   python_interpreter:
@@ -47,10 +46,10 @@ additional_build_steps:
   append_base:
     - RUN $PKGMGR install -y --nodocs --setopt install_weak_deps=0
           git-core git-lfs && $PKGMGR clean all
-#    - RUN $PYCMD -m pip install --no-cache-dir --python-version 2.7 -U pip==20.3.4 setuptools==44.1.1 wheel &&
-#          $PYCMD -m pip cache purge
-#    - RUN $PYCMD -m pip install --no-cache-dir -U pip &&
-#          $PYCMD -m pip cache purge
+  #    - RUN $PYCMD -m pip install --no-cache-dir --python-version 2.7 -U pip==20.3.4 setuptools==44.1.1 wheel &&
+  #          $PYCMD -m pip cache purge
+  #    - RUN $PYCMD -m pip install --no-cache-dir -U pip &&
+  #          $PYCMD -m pip cache purge
   prepend_builder:
     # - ENV PYCMD=python3.9
     - RUN python3.9 -m pip install --no-cache-dir bindep pyyaml packaging &&
@@ -63,8 +62,8 @@ additional_build_steps:
           $PYCMD -m  ensurepip --upgrade
     - RUN sed -i''  -e '/\$PYCMD -m venv \/tmp\/venv/d' /output/scripts/assemble
     # - RUN $PYCMD -m venv /tmp/venv --system-site-packages --without-pip &&
-          # source /tmp/venv/bin/activate &&
-          # /usr/bin/python3 -m  ensurepip --upgrade
+    #       source /tmp/venv/bin/activate &&
+    #       /usr/bin/python3 -m  ensurepip --upgrade
     - RUN mv /output/scripts/introspect.py /output/scripts/introspect.py3.py &&
           sed -i'' -e "/^EXCLUDE_REQUIREMENTS = /a \ \ \ \ 'httpx', 'ansible-runner'," /output/scripts/introspect.py3.py
     - COPY _build/output/py2-introspect-shim.py /output/scripts/introspect.py
@@ -135,6 +134,7 @@ additional_build_steps:
         yum_cachedir="$(/usr/libexec/platform-python -c 'import dnf, json; db = dnf.dnf.Base();db.conf.substitutions.update_from_etc("/");print(db.conf.system_cachedir)')" && \
         find "${yum_cachedir}"/nodesource-nodejs-*/packages/ -iname "nodejs-*.$(uname -m).rpm" -print0 | xargs -0 sudo rpm -i --nodeps && \
         $PKGMGR clean all
+
 # RUN dnf localinstall -y --nodocs --setopt install_weak_deps=0 https://yum.jc21.com/jc21.rpm
 # https://yum.jc21.com/el/base/el/8/x86_64/git-delta-0.18.2-1.el8.x86_64.rpm
 # https://yum.jc21.com/el/base/el/9/x86_64/git-delta-0.18.2-1.el9.x86_64.rpm
