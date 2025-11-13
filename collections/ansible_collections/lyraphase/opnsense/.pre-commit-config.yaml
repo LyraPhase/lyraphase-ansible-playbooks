@@ -62,7 +62,8 @@ repos:
             .*\.patch|
             .*/LICENSE|
             \.mypy_cache/.*|
-            CHANGELOG\.rst
+            CHANGELOG\.rst|
+            \.kitchen\.?.*\.yml
           )$
 
   - repo: https://github.com/PyCQA/isort
