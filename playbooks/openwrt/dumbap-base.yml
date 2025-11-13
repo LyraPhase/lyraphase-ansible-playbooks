@@ -6,10 +6,10 @@
   user: root
   gather_facts: false
   vars_files:
-    - "vars/openwrt-dumbap-base.yml"
+    - "vars/openwrt_dumbap_base.yml"
 
   roles:
-    - openwrt-dumbap-base
+    - lyraphase.openwrt_dumbap_base
 #  tasks:
 #    - name: Install Extra packages
 #      opkg: >
