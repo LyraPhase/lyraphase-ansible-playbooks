@@ -87,21 +87,12 @@ galaxy_info:
   # - name: Darwin
   #   versions:
   #     - all
-  categories:
-  #   - web
-  #   - system
-  #   - packaging
-  #   - networking
-  #   - monitoring
-  #   - development
-  #   - database:sql
-  #   - database:nosql
-  #   - database
-  #   - clustering
-  #   - cloud:rax
-  #   - cloud:gce
-  #   - cloud:ec2
-  #   - cloud
+  # categories:
+  galaxy_tags:
+    - system
+    - monitoring
+    - logging
+    - logs
   # dependencies:
   # Specify role dependencies here
   # For foo
