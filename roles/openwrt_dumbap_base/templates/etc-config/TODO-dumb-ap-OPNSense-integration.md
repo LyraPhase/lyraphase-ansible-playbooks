@@ -59,4 +59,4 @@
     - Effectively `uci set dhcp.@dnsmasq[0].boguspriv='0'`
     - Removes config line from `dnsmasq.conf.cfg*`:
 
-        bogus-priv
+          bogus-priv
