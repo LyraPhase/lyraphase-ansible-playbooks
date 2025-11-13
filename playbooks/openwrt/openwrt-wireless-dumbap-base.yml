@@ -7,7 +7,7 @@
   user: root
   gather_facts: true
   vars_files:
-    - "vars/openwrt-wireless-dumbap.yml"
+    - "vars/openwrt_wireless_dumbap.yml"
     - "vars/openwrt-dhcp-dumbap.yml"
 
   roles:
@@ -36,7 +36,6 @@
       tags:
         - openwrt_wireless
         - debug
-
 #  tasks:
 #    - name: Install Extra packages
 #      opkg: >

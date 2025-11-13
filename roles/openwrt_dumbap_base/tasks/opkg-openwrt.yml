@@ -1,5 +1,5 @@
 ---
-# openwrt-dumbap-base: Tasks entry point. Called by main.yml
+# openwrt_dumbap_base: Tasks entry point. Called by main.yml
 
 # Load a variable file based on the OS type, or a default if not found.
 - name: Include OS-specific vars

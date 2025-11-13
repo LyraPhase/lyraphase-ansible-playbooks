@@ -1,4 +1,4 @@
-# openwrt-dumbap-base: entry point for defaults
+# openwrt_dumbap_base: entry point for defaults
 # default.yml - default vars for unsupported / unknown OS
 # (Assumes this is OpenWRT LEDE Image)
 ---

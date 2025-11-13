@@ -1,5 +1,5 @@
 ---
-# openwrt-dumbap-base: entry point for handlers
+# openwrt_dumbap_base: entry point for handlers
 # This should fix any weird opkg cache bugs
 # Use this if you're seeing 0 packages for a repo,
 - name: Destroy opkg cache
@@ -26,14 +26,12 @@
 
 # RAW command handlers for bootstrap steps
 - name: RAW destroy opkg cache
-  ansible.builtin.raw:
-    rm -rf /var/opkg-lists
+  ansible.builtin.raw: rm -rf /var/opkg-lists
   register: opkg_destroy_cache_result
   changed_when: opkg_destroy_cache_result.rc == 0
 
 - name: RAW create opkg cache dir
-  ansible.builtin.raw:
-    mkdir -p /var/opkg-lists
+  ansible.builtin.raw: mkdir -p /var/opkg-lists
   register: opkg_mkdir_cache_result
   changed_when: opkg_mkdir_cache_result.rc == 0
 
