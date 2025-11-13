@@ -14,7 +14,7 @@
     "style": "consistent"
   },
   "heading-style": {
-    "style": "setext_with_atx"
+    "style": "atx"
   },
   "no-inline-html": {
     "allowed_elements": ["br"]
