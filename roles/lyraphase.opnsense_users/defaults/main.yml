@@ -1,6 +1,6 @@
 ---
 # defaults file for lyraphase.opnsense-users
-lyraphase_opnsense_users_sudoers_path: '/usr/local/etc/sudoers.d'
+lyraphase_opnsense_users_sudoers_path: "/usr/local/etc/sudoers.d"
 # Group ID for Ansible group
 # Picked free(BSD) ID: https://cgit.freebsd.org/ports/tree/GIDs#n675
 lyraphase_opnsense_users_ansible_gid: 731
