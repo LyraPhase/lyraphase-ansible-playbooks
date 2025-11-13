@@ -13,7 +13,9 @@
 
 - name: Set openwrt_release facts - Decode and parse /etc/openwrt_release content
   ansible.builtin.set_fact:
-    openwrt_release_data: '{{ openwrt_release_data | default({}) | combine({ item.split(''='')[0].lower(): item.split(''='')[1].replace("''", '''').replace(''"'', '''') }) }}'
+    openwrt_release_data: >
+      {{ openwrt_release_data | default({}) |
+      combine({item.split('=')[0].lower(): item.split('=')[1].replace("'", '').replace('"', '')}) }}
   loop: "{{ (openwrt_release.content | b64decode | trim ).split('\n') }}"
   tags:
     - opkg-openwrt

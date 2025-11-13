@@ -267,7 +267,10 @@
   changed_when: opkg_install_python_openssl.rc == 0
 
 - name: Install python-distutils
-  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-distutils'] | default('python-distutils') }}"
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }}
+    {{ pkg_manager_install_cmd }}
+    {{ pkg_manager_pkgs['python-distutils'] | default('python-distutils') }}
   when: >
     (pkg_manager == 'opkg' and
      not python_distutils_installed.stdout is search("Status: install (ok|user) installed")) or
@@ -287,7 +290,10 @@
   changed_when: opkg_install_python_codecs.rc == 0
 
 - name: Install python-multiprocessing
-  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-multiprocessing'] | default('python-multiprocessing') }}"
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }}
+    {{ pkg_manager_install_cmd }}
+    {{ pkg_manager_pkgs['python-multiprocessing'] | default('python-multiprocessing') }}
   when: >
     (pkg_manager == 'opkg' and
      not python_multiprocessing_installed.stdout is search("Status: install (ok|user) installed")) or
@@ -307,7 +313,10 @@
   changed_when: opkg_install_python_ctypes.rc == 0
 
 - name: Install openssh-sftp-server
-  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['openssh-sftp-server'] | default('openssh-sftp-server') }}"
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }}
+    {{ pkg_manager_install_cmd }}
+    {{ pkg_manager_pkgs['openssh-sftp-server'] | default('openssh-sftp-server') }}
   when: >
     (pkg_manager == 'opkg' and
      not openssh_server_installed.stdout is search("Status: install (ok|user) installed")) or

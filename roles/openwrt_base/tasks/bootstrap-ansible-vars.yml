@@ -17,7 +17,9 @@
 
 - name: Set openwrt_release facts - Decode and parse /etc/os-release content
   ansible.builtin.set_fact:
-    os_release_data: '{{ os_release_data | default({}) | combine({ item.split(''='')[0].lower(): item.split(''='')[1].replace("''", '''').replace(''"'', '''') }) }}'
+    os_release_data: >
+      {{ os_release_data | default({}) |
+      combine({item.split('=')[0].lower(): item.split('=')[1].replace("'", '').replace('"', '')}) }}
   loop: "{{ os_release.stdout_lines }}"
   when: >
     os_release is defined and os_release.rc == 0 and
