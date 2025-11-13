@@ -6,7 +6,7 @@ galaxy_info:
   description: Installs journald
   company: LyraPhase
   license: AGPL-3.0-or-later
-  min_ansible_version: 1.2
+  min_ansible_version: "1.2"
   platforms:
   # Platforms tested are uncommented, but it probably works on most CentOS/RHEL
   # - name: EL
