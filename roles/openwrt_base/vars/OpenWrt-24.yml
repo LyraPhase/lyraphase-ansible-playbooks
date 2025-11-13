@@ -22,14 +22,14 @@ openwrt_apk_repo_files:
   - distfeeds.list
   - customfeeds.list
 
-#openwrt_apk_packages:
-#  - ca-certificates
-#  - ca-bundle
-#  - zlib
-#  - libopenssl
-#  - curl
-#  - uclient-fetch
-#  - arp-scan
+# openwrt_apk_packages:
+#   - ca-certificates
+#   - ca-bundle
+#   - zlib
+#   - libopenssl
+#   - curl
+#   - uclient-fetch
+#   - arp-scan
 
 openwrt_opkg_bootstrap_packages:
   python: python3
