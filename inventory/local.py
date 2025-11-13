@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-'''
+"""
 Ansible dynamic inventory experimentation
 
 Output dynamic inventory as JSON from statically defined data structures
-'''
+"""
 
-'''
+"""
 ANSIBLE_INV = {
     "rpi": {
         "hosts": ["rpi1", "rpi2", "rpi3", "rpi4"],
@@ -15,26 +15,28 @@ ANSIBLE_INV = {
         }
     }
 }
-'''
+"""
 
 import argparse
 import json
 import sys
 from os import path
-sys.path.append(path.join(path.dirname(__file__), 'lib/python/site-packages/'))
+
+sys.path.append(path.join(path.dirname(__file__), "lib/python/site-packages/"))
 import rpi
 
+
 def output_list_inventory(json_output):
-    '''
+    """
     Output the --list data structure as JSON
-    '''
+    """
     print(json.dumps(json_output))
 
 
 def find_host(search_host, inventory):
-    '''
+    """
     Find the given variables for the given host and output them as JSON
-    '''
+    """
     host_attribs = inventory.get(search_host, {})
     print(json.dumps(host_attribs))
 
@@ -42,20 +44,28 @@ def find_host(search_host, inventory):
 def main():
     # Argument parsing
     parser = argparse.ArgumentParser(description="Ansible dynamic inventory")
-    parser.add_argument("--list", help="Ansible inventory of all of the groups",
-                        action="store_true", dest="list_inventory")
-    parser.add_argument("--host", help="Ansible inventory of a particular host", action="store",
-                        dest="ansible_host", type=str)
+    parser.add_argument(
+        "--list",
+        help="Ansible inventory of all of the groups",
+        action="store_true",
+        dest="list_inventory",
+    )
+    parser.add_argument(
+        "--host",
+        help="Ansible inventory of a particular host",
+        action="store",
+        dest="ansible_host",
+        type=str,
+    )
 
     cli_args = parser.parse_args()
     list_inventory = cli_args.list_inventory
     ansible_host = cli_args.ansible_host
 
-# Finding RPi
+    # Finding RPi
     rpi.rpi_detector.run()
-    ANSIBLE_INV= rpi.rpi_detector.var_gen_inv()
+    ANSIBLE_INV = rpi.rpi_detector.var_gen_inv()
     HOST_VARS = rpi.rpi_detector.var_gen_host()
-
 
     if list_inventory:
         output_list_inventory(ANSIBLE_INV)
