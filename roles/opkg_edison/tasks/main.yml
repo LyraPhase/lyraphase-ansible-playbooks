@@ -2,5 +2,6 @@
 # opkg_edison: entry point for tasks
 #                 Generally only include other file(s) and add tags here.
 
-- include: opkg-edison.yml
+- name: Include opkg-edison tasks
+  ansible.builtin.include_tasks: opkg-edison.yml
   tags: opkg_edison
