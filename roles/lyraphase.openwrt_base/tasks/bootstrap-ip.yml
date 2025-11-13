@@ -1,0 +1,197 @@
+---
+# openwrt_base: bootstrap-ip Tasks entry point. Called by main.yml
+
+- name: Check for current OpenWRT IP
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: uci get network.lan.ipaddr | cut -f1
+  register: openwrt_ipaddr
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
+  tags: openwrt_ip_check
+
+- name: Check for current OpenWRT netmask
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: uci get network.lan.netmask | cut -f1
+  register: openwrt_netmask
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
+  tags: openwrt_netmask_check
+
+- name: Check for current OpenWRT DHCP proto
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: uci get network.lan.proto | cut -f1
+  register: openwrt_dhcp_proto
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
+  tags: openwrt_dhcp_check
+
+- name: Check for current OpenWRT DHCP LAN ignore setting
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: uci get dhcp.lan.ignore | cut -f1
+  register: openwrt_dhcp_ignore
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy
+  tags: openwrt_dhcp_check
+
+- name: UCI - Set bootstrap DHCP proto
+  ansible.builtin.raw: "uci set network.lan.proto={{ openwrt_base_bootstrap_dhcp_proto }}"
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy and
+    (openwrt_base_bootstrap_dhcp_proto is defined and
+     openwrt_dhcp_proto.stdout_lines[0] != openwrt_base_bootstrap_dhcp_proto)
+  register: uci_set_dhcp_proto
+  changed_when: uci_set_dhcp_proto.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW reboot
+
+- name: UCI - Set bootstrap IP
+  ansible.builtin.raw: "uci set network.lan.ipaddr={{ openwrt_base_bootstrap_ip }}"
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy and
+    (openwrt_base_bootstrap_ip is defined and
+     (openwrt_ipaddr.stdout_lines[0] | trim) != openwrt_base_bootstrap_ip) and
+    openwrt_base_bootstrap_dhcp_proto is defined and
+    openwrt_base_bootstrap_dhcp_proto == 'static'
+  register: uci_set_ipaddr
+  changed_when: uci_set_ipaddr.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW reboot
+
+- name: UCI - Set bootstrap netmask
+  ansible.builtin.raw: "uci set network.lan.netmask={{ openwrt_base_bootstrap_netmask }}"
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy and
+    (openwrt_base_bootstrap_netmask is defined and
+     openwrt_netmask.stdout_lines[0] != openwrt_base_bootstrap_netmask) and
+    openwrt_base_bootstrap_dhcp_proto is defined and
+    openwrt_base_bootstrap_dhcp_proto == 'static'
+  register: uci_set_netmask
+  changed_when: uci_set_netmask.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW reboot
+
+- name: UCI - Delete bootstrap IP
+  ansible.builtin.raw: "uci del network.lan.ipaddr"
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy and
+    (openwrt_ipaddr.rc != 1 and
+     not (openwrt_ipaddr.stdout_lines[0] | regex_search('.*Entry not found'))
+    ) and
+    (openwrt_base_bootstrap_ip is not defined or
+    openwrt_base_bootstrap_dhcp_proto is defined and
+    openwrt_base_bootstrap_dhcp_proto == "dhcp")
+  register: uci_del_ipaddr
+  changed_when: uci_del_ipaddr.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW reboot
+
+- name: UCI - Delete bootstrap netmask
+  ansible.builtin.raw: "uci del network.lan.netmask"
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy and
+    (openwrt_netmask.rc != 1 and
+     not (openwrt_netmask.stdout_lines[0] | regex_search('.*Entry not found'))
+    ) and
+    (openwrt_base_bootstrap_netmask is not defined and
+    openwrt_base_bootstrap_dhcp_proto is defined and
+    openwrt_base_bootstrap_dhcp_proto == "dhcp")
+  register: uci_del_netmask
+  changed_when: uci_del_netmask.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW reboot
+
+- name: UCI - Set DHCPv6 hybrid
+  ansible.builtin.raw: "uci set dhcp.lan.dhcpv6='hybrid'"
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy and
+    (openwrt_base_bootstrap_ip is defined and
+     (openwrt_ipaddr.stdout_lines[0] | trim) != openwrt_base_bootstrap_ip) and
+    openwrt_base_bootstrap_dhcp_proto is defined and
+    openwrt_base_bootstrap_dhcp_proto == "dhcp"
+  register: uci_set_ipaddr
+  changed_when: uci_set_ipaddr.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW reboot
+
+- name: UCI - Set IPv6 RA hybrid
+  ansible.builtin.raw: "uci set dhcp.lan.ra='hybrid'"
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy and
+    (openwrt_base_bootstrap_netmask is defined and
+     openwrt_netmask.stdout_lines[0] != openwrt_base_bootstrap_netmask) and
+    openwrt_base_bootstrap_dhcp_proto is defined and
+    openwrt_base_bootstrap_dhcp_proto == "dhcp"
+  register: uci_set_netmask
+  changed_when: uci_set_netmask.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW reboot
+
+- name: UCI - Set bootstrap DHCP LAN ignore
+  ansible.builtin.raw: "uci set dhcp.lan.ignore=1"
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy and
+    (openwrt_dhcp_ignore.stdout_lines[0] != "1" or
+     (openwrt_dhcp_ignore.rc == 1 and openwrt_dhcp_ignore.stdout_lines[0] | regex_search('.*Entry not found'))
+    )
+  register: uci_set_dhcp_ignore
+  changed_when: uci_set_dhcp_ignore.rc == 0
+  notify:
+    - RAW uci commit
+    - RAW reboot
+
+# Run uci commit handlers immediately
+# (Should fix initial Ansible run on factory OpenWrt image)
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+  check_mode: false
+
+- name: Wait for host to come up on new IP + netmask
+  ansible.builtin.wait_for:
+    host: "{{ openwrt_base_bootstrap_ip | default(ansible_host) }}"
+    port: 22
+    timeout: 300
+  delegate_to: localhost
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy and
+    ((openwrt_base_bootstrap_ip is defined and
+      ansible_host != openwrt_base_bootstrap_ip) or
+    uci_set_ipaddr.changed or
+    uci_set_netmask.changed or
+    uci_set_dhcp_proto.changed or
+    uci_del_ipaddr.changed or
+    uci_del_netmask.changed)
+
+- name: Set ansible_host for new IP
+  ansible.builtin.set_fact:
+    ansible_host: "{{ openwrt_base_bootstrap_ip | default(ansible_host) }}"
+  when: >
+    ansible_bootstrap is defined and
+    ansible_bootstrap is truthy and
+    uci_set_ipaddr.changed
+
+- name: Reset connection for subsequent tasks
+  ansible.builtin.meta: reset_connection

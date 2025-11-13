@@ -1,0 +1,326 @@
+---
+# opkg-edison: Tasks entry point. Called by main.yml
+
+- name: "Run tasks: bootstrap-ansible-vars"
+  ansible.builtin.include_tasks: bootstrap-ansible-vars.yml
+  when: >
+    not (ansible_distribution is defined or
+         ansible_distribution_major_version is defined or
+         ansible_os_family is defined)
+  tags:
+    - openwrt_bootstrap
+    - openwrt-python
+    - openwrt_base-facts
+    - openwrt_base-setup-os-release-facts
+
+# Load a variable file based on the OS type, or a default if not found.
+- name: Include OS-specific vars
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - "../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version | int }}.yml"
+    - "../vars/{{ ansible_distribution }}.yml"
+    - "../vars/{{ ansible_os_family }}.yml"
+    - "../vars/default.yml"
+  when: >
+    openwrt_opkg_bootstrap_packages is not defined or
+    openwrt_apk_bootstrap_packages is not defined
+
+- name: Check for OpenWRT version
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: grep VERSION_ID /etc/os-release | cut -f2 -d= | tr -d '"'
+  register: openwrt_version
+  tags: openwrt_version_check
+
+- name: Check for opkg
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: which opkg
+  register: openwrt_opkg
+  failed_when: false
+  tags: openwrt_version_check
+
+- name: Check for apk
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: which apk
+  register: openwrt_apk
+  failed_when: false
+  tags: openwrt_version_check
+
+- name: Use opkg on appropriate OpenWRT version
+  check_mode: false
+  changed_when: false
+  ansible.builtin.set_fact:
+    pkg_manager: opkg
+    pkg_manager_check_cmd: status
+    pkg_manager_install_cmd: install
+    pkg_manager_pkgs: "{{ openwrt_opkg_bootstrap_packages }}"
+  when: >
+    (openwrt_version.stdout_lines[0] != "snapshot" and ((openwrt_version.stdout_lines[0].split('.')[0] | int) < 24))
+    or ((openwrt_version.stdout_lines[0] != "snapshot"
+          or (openwrt_version.stdout_lines[0].split('.')[0] | int) >= 24)
+        and openwrt_apk.rc != 0)
+  tags: openwrt_version_check
+
+- name: Use apk on appropriate OpenWRT version
+  check_mode: false
+  changed_when: false
+  ansible.builtin.set_fact:
+    pkg_manager: apk
+    pkg_manager_check_cmd: "info --installed"
+    pkg_manager_install_cmd: add
+    pkg_manager_pkgs: "{{ openwrt_apk_bootstrap_packages }}"
+  when: >
+    (openwrt_version.stdout_lines[0] == "snapshot"
+      or ((openwrt_version.stdout_lines[0].split('.')[0] | int) >= 24
+      and (openwrt_version.stdout_lines[0].split('.')[1] | int) >= 10))
+    and openwrt_apk.rc == 0
+    and (openwrt_apk.stdout_lines[0] | regex_search('.*/apk$')) is truthy
+  tags: openwrt_version_check
+
+# Note: pkg cache must exist to perform installed checks
+- name: Check opkg pkg cache lists exist
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: >
+    ls -1 /var/opkg-lists/openwrt_* 2>/dev/null | wc -l
+  register: opkg_cache_files
+  when: pkg_manager == "opkg"
+
+- name: Bootstrap - RAW update opkg cache
+  ansible.builtin.raw: opkg update
+  when: >
+    pkg_manager is defined and
+    pkg_manager == 'opkg' and
+    (opkg_cache_files.stdout | trim | int) == 0 and
+    ansible_bootstrap is defined and ansible_bootstrap is truthy
+  changed_when: false
+  check_mode: false
+
+- name: Raw update opkg cache
+  ansible.builtin.raw: echo 'Triggering RAW opkg update'
+  when: >
+    pkg_manager is defined and
+    pkg_manager == 'opkg' and
+    (opkg_cache_files.stdout | trim | int) == 0 and
+    not (ansible_bootstrap | default(false))
+  changed_when: false
+  notify:
+    - RAW destroy opkg cache
+    - RAW create opkg cache dir
+    - RAW opkg update
+
+- name: Check apk pkg cache indices exist
+  check_mode: false
+  changed_when: false
+  ansible.builtin.raw: >
+    ls -1 /var/cache/apk/APKINDEX.*.tar.gz 2>/dev/null | wc -l
+  register: apk_cache_files
+  when: pkg_manager == "apk"
+
+- name: Bootstrap - RAW update apk cache
+  ansible.builtin.raw: apk update
+  when: >
+    pkg_manager is defined and
+    pkg_manager == 'apk' and
+    (apk_cache_files.stdout | trim | int) == 0 and
+    ansible_bootstrap is defined and ansible_bootstrap is truthy
+  changed_when: false
+  check_mode: false
+
+- name: Raw update apk cache
+  ansible.builtin.raw: echo 'Triggering RAW apk update'
+  when: >
+    pkg_manager is defined and
+    pkg_manager == 'apk' and
+    (apk_cache_files.stdout | trim | int) == 0 and
+    not (ansible_bootstrap | default(false))
+  changed_when: false
+  notify:
+    - RAW destroy apk cache
+    - RAW create apk cache dir
+    - RAW apk update
+
+# Run apk makecache handlers immediately
+# (Should fix Ansible runs on hosts with pre-existing apk repo problems or missing apk pkg cache)
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+  check_mode: false
+
+- name: Check for python interpreter
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs.python | default('python-light') }}
+  register: python_light_installed
+
+- name: Check for python-logging
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-logging'] | default('python-logging') }}
+  register: python_logging_installed
+
+- name: Check for python-openssl
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-openssl'] | default('python-openssl') }}
+  register: python_openssl_installed
+
+- name: Check for python-distutils
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-distutils'] | default('python-distutils') }}
+  register: python_distutils_installed
+
+- name: Check for python-codecs
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-codecs'] | default('python-codecs') }}
+  register: python_codecs_installed
+
+- name: Check for python-multiprocessing
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-multiprocessing'] | default('python-multiprocessing') }}
+  register: python_multiprocessing_installed
+
+- name: Check for python-ctypes
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['python-ctypes'] | default('python-ctypes') }}
+  register: python_ctypes_installed
+
+- name: Check for openssh-sftp-server
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }} {{ pkg_manager_check_cmd }} {{ pkg_manager_pkgs['openssh-sftp-server'] | default('openssh-sftp-server') }}
+  register: openssh_server_installed
+
+# Bootstrap python interpreter for Ansible
+- name: Raw update opkg cache
+  ansible.builtin.raw: echo 'Triggering RAW opkg update'
+  when: >
+    pkg_manager == 'opkg' and
+    not python_light_installed.stdout is search("Status: install (ok|user) installed")
+    or not python_logging_installed.stdout is search("Status: install (ok|user) installed")
+    or not python_openssl_installed.stdout is search("Status: install (ok|user) installed")
+    or not python_codecs_installed.stdout is search("Status: install (ok|user) installed")
+    or not python_multiprocessing_installed.stdout is search("Status: install (ok|user) installed")
+    or not python_ctypes_installed.stdout is search("Status: install (ok|user) installed")
+    or not openssh_server_installed.stdout is search("Status: install (ok|user) installed")
+  changed_when: false
+  notify:
+    - RAW destroy opkg cache
+    - RAW create opkg cache dir
+    - RAW opkg update
+
+# Run yum makecache handlers immediately
+# (Should fix Ansible runs on hosts with pre-existing opkg repo problems)
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+  check_mode: false
+
+- name: Install python interpreter
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs.python | default('python-light') }}"
+  when: >
+    (pkg_manager == 'opkg' and
+     not python_light_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     python_light_installed.rc == 1)
+  register: opkg_install_python_light
+  changed_when: opkg_install_python_light.rc == 0
+
+- name: Install python-logging
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-logging'] | default('python-logging') }}"
+  when: >
+    (pkg_manager == 'opkg' and
+     not python_logging_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     python_logging_installed.rc == 1)
+  register: opkg_install_python_logging
+  changed_when: opkg_install_python_logging.rc == 0
+
+- name: Install python-openssl
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-openssl'] | default('python-openssl') }}"
+  when: >
+    (pkg_manager == 'opkg' and
+     not python_openssl_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     python_openssl_installed.rc == 1)
+  register: opkg_install_python_openssl
+  changed_when: opkg_install_python_openssl.rc == 0
+
+- name: Install python-distutils
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }}
+    {{ pkg_manager_install_cmd }}
+    {{ pkg_manager_pkgs['python-distutils'] | default('python-distutils') }}
+  when: >
+    (pkg_manager == 'opkg' and
+     not python_distutils_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     python_distutils_installed.rc == 1)
+  register: opkg_install_python_distutils
+  changed_when: opkg_install_python_distutils.rc == 0
+
+- name: Install python-codecs
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-codecs'] | default('python-codecs') }}"
+  when: >
+    (pkg_manager == 'opkg' and
+     not python_codecs_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     python_codecs_installed.rc == 1)
+  register: opkg_install_python_codecs
+  changed_when: opkg_install_python_codecs.rc == 0
+
+- name: Install python-multiprocessing
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }}
+    {{ pkg_manager_install_cmd }}
+    {{ pkg_manager_pkgs['python-multiprocessing'] | default('python-multiprocessing') }}
+  when: >
+    (pkg_manager == 'opkg' and
+     not python_multiprocessing_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     python_multiprocessing_installed.rc == 1)
+  register: opkg_install_python_multiprocessing
+  changed_when: opkg_install_python_multiprocessing.rc == 0
+
+- name: Install python-ctypes
+  ansible.builtin.raw: "{{ pkg_manager | default('opkg') }} {{ pkg_manager_install_cmd }} {{ pkg_manager_pkgs['python-ctypes'] | default('python-ctypes') }}"
+  when: >
+    (pkg_manager == 'opkg' and
+     not python_ctypes_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     python_ctypes_installed.rc == 1)
+  register: opkg_install_python_ctypes
+  changed_when: opkg_install_python_ctypes.rc == 0
+
+- name: Install openssh-sftp-server
+  ansible.builtin.raw: >
+    {{ pkg_manager | default('opkg') }}
+    {{ pkg_manager_install_cmd }}
+    {{ pkg_manager_pkgs['openssh-sftp-server'] | default('openssh-sftp-server') }}
+  when: >
+    (pkg_manager == 'opkg' and
+     not openssh_server_installed.stdout is search("Status: install (ok|user) installed")) or
+    (pkg_manager == 'apk' and
+     openssh_server_installed.rc == 1)
+  register: opkg_install_openssh_sftp_server
+  changed_when: opkg_install_openssh_sftp_server.rc == 0

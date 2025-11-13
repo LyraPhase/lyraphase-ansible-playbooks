@@ -1,0 +1,55 @@
+# openwrt_base: entry point for defaults
+# default.yml - default vars for unsupported / unknown OS
+# - Assumes this is OpenWrt LEDE Image for opkg
+# - Assumes OpenWRt for apk
+# - ansible_distribution* vars are unset during bootstrap,
+#   so these defaults apply when ansible_bootstrap is true
+---
+openwrt_opkg_repo_files:
+  - distfeeds.conf
+  - customfeeds.conf
+
+openwrt_opkg_packages:
+  - ca-certificates
+  - ca-bundle
+  - zlib
+  - libopenssl
+  - curl
+  - uclient-fetch
+  - arp-scan
+
+openwrt_apk_repo_files:
+  - distfeeds.list
+  - customfeeds.list
+
+# openwrt_apk_packages:
+#   - ca-certificates
+#   - ca-bundle
+#   - zlib
+#   - libopenssl
+#   - curl
+#   - uclient-fetch
+#   - arp-scan
+
+openwrt_opkg_bootstrap_packages:
+  python: python-light
+  python-logging: python-logging
+  python-openssl: python-openssl
+  python-distutils: python-distutils
+  python-codecs: python-codecs
+  python-multiprocessing: python-multiprocessing
+  python-ctypes: python-ctypes
+  openssh-sftp-server: openssh-sftp-server
+
+openwrt_apk_bootstrap_packages:
+  python: python3
+  python-logging: python3-logging
+  python-openssl: python3-openssl
+  python-distutils: python3-distutils
+  python-codecs: python3-codecs
+  python-multiprocessing: python3-multiprocessing
+  python-ctypes: python3-ctypes
+  openssh-sftp-server: openssh-sftp-server
+
+openwrt_base_crontab_files:
+  - root

@@ -1,0 +1,45 @@
+---
+# opkg_edison: entry point for meta
+galaxy_info:
+  namespace: lyraphase
+  author: James Cuzella
+  description: Installs opkg_edison
+  company: LyraPhase
+  license: AGPL-3.0-or-later
+  min_ansible_version: "1.2"
+  platforms:
+    # Platforms tested are OpenWrt & Yocto Linux (Intel Edison), but it probably
+    # works on any OS with opkg
+    - name: GenericUNIX
+      versions:
+        - all
+    - name: GenericLinux
+      versions:
+        - all
+    - name: OpenWrt
+      versions:
+        - "17.01"
+        - "18.06"
+        - "19.07"
+        - "21.02"
+        - "22.03"
+        - "23.05"
+        - "24.10"
+    # Officially supported by this role, but sadly ansible-galaxy and
+    # ansible-lint do not support this distro in the metadata YAML schema
+    # All Yocto versions based on opkg are supported
+    # - name: YoctoLinux
+    #   versions:
+    #     - all
+  galaxy_tags:
+    - system
+    - packaging
+    - opkg
+    - edison
+    - yocto
+    - yoctolinux
+  # dependencies:
+  # Specify role dependencies here
+  # For foo
+  #  - foo
+# version: 0.0.1 ## Ansible 2.0 broke this. Uncomment if / when they ever fix ansible/ansible#13496

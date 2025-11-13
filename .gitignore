@@ -76,3 +76,4 @@ env/
 # Ansible Partials
 # ################
 *.retry
+.ansible

@@ -14,8 +14,7 @@
 
   tasks:
     - name: Check boot environment support
-      ansible.builtin.command:
-        bectl check
+      ansible.builtin.command: bectl check
       changed_when: false
       register: bectl_sanity_check
       check_mode: false
@@ -48,8 +47,7 @@
         - upgrade
 
     - name: Check if OPNSense update is available
-      ansible.builtin.command:
-        opnsense-update -v -c -up
+      ansible.builtin.command: opnsense-update -v -c -up
       become: true
       become_method: ansible.builtin.sudo
       ignore_errors: true
@@ -156,8 +154,7 @@
         - debug
 
     - name: List zpool checkpoints
-      ansible.builtin.command:
-        zpool list -H -o name,checkpoint
+      ansible.builtin.command: zpool list -H -o name,checkpoint
       changed_when: false
       check_mode: false
       register: zpool_checkpoints_result
@@ -186,8 +183,7 @@
         - debug
 
     - name: Check for any old checkpoints
-      ansible.builtin.shell:
-        zpool status zroot | grep checkpoint
+      ansible.builtin.shell: zpool status zroot | grep checkpoint
       register: zpool_status_has_checkpoint
       ignore_errors: true
       failed_when: false
@@ -247,8 +243,7 @@
         - destructive
 
     - name: Delete OLD zpool checkpoint
-      ansible.builtin.command:
-        zpool checkpoint --discard --wait zroot
+      ansible.builtin.command: zpool checkpoint --discard --wait zroot
       changed_when: zpool_checkpoint_discard_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
@@ -260,8 +255,7 @@
         - destructive
 
     - name: Create NEW zpool checkpoint
-      ansible.builtin.command:
-        zpool checkpoint zroot
+      ansible.builtin.command: zpool checkpoint zroot
       changed_when: zpool_checkpoint_create_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
@@ -271,8 +265,7 @@
         - bsd_zpool_checkpoint_create
 
     - name: Create boot environment for OLD OPNSense Version
-      ansible.builtin.command:
-        bectl create {{ opnsense_current_version.stdout }}
+      ansible.builtin.command: bectl create {{ opnsense_current_version.stdout }}
       changed_when: opnsense_be_create_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
@@ -285,8 +278,7 @@
         - upgrade
 
     - name: Activate boot environment for OLD OPNSense Version
-      ansible.builtin.command:
-        bectl activate {{ opnsense_current_version.stdout }}
+      ansible.builtin.command: bectl activate {{ opnsense_current_version.stdout }}
       changed_when: opnsense_be_activate_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
@@ -316,8 +308,8 @@
         - upgrade
 
     - name: Wait for OPNSense host to reboot
-      ansible.builtin.command:
-        echo TODO
+      ansible.builtin.command: echo TODO
+      changed_when: false
       become: true
       become_method: ansible.builtin.sudo
       register: opnsense_be_create_result
@@ -347,9 +339,8 @@
         - bsd_be_create
         - debug
 
-    - name: List zpool checkpoints
-      ansible.builtin.command:
-        zpool list -H -o name,checkpoint
+    - name: List zpool checkpoints (pre-upgrade)
+      ansible.builtin.command: zpool list -H -o name,checkpoint
       changed_when: false
       check_mode: false
       register: zpool_checkpoints_pre_upgrade_result
@@ -367,8 +358,7 @@
         - debug
 
     - name: Perform the upgrade
-      ansible.builtin.command:
-        echo TODO
+      ansible.builtin.command: echo TODO
       changed_when: opnsense_upgrade_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
@@ -377,10 +367,10 @@
         - opnsense_upgrade
         - upgrade
 
-## Reboot if upgrade does not do this on it's own
-## OR: Wait here for SSH reconnect
-## TODO: Set var by prompt, then rollback if needed
-# zpool import -- rewind-to-checkpoint <pool>
+    ## Reboot if upgrade does not do this on it's own
+    ## OR: Wait here for SSH reconnect
+    ## TODO: Set var by prompt, then rollback if needed
+    # zpool import -- rewind-to-checkpoint <pool>
 
     - name: Prompt to delete NEW checkpoint
       ansible.builtin.pause:
@@ -398,8 +388,7 @@
         - destructive
 
     - name: Delete NEW zpool checkpoint
-      ansible.builtin.command:
-        zpool checkpoint --discard --wait zroot
+      ansible.builtin.command: zpool checkpoint --discard --wait zroot
       changed_when: zpool_checkpoint_discard_new_result.rc == 0
       become: true
       become_method: ansible.builtin.sudo
@@ -409,7 +398,6 @@
         - bsd_zpool
         - bsd_zpool_checkpoint_discard
         - destructive
-
 #    - name: Install Extra packages
 #      opkg: >
 #        name={{ item }}

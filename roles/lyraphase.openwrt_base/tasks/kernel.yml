@@ -1,0 +1,12 @@
+---
+# openwrt-dumbap-base: Tasks entry point. Called by main.yml
+
+- name: Install sysct.d files
+  ansible.builtin.template:
+    src: templates/sysctl.d.j2
+    dest: /etc/sysctl.d/{{ item.key }}.conf
+    owner: root
+    group: root
+    mode: "0644"
+  with_dict: "{{ openwrt_base_sysctl_d }}"
+  when: openwrt_base_sysctl_d is defined

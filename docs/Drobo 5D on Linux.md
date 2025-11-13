@@ -1,5 +1,4 @@
-Drobo 5D on Linux
-=================
+# Drobo 5D on Linux
 
 Drobo USB3 Plug `udevadm monitor` logs:
 
@@ -62,8 +61,6 @@ KERNEL[2870453.709688] add      /module/nls_utf8 (module)
 UDEV  [2870453.710385] add      /module/nls_utf8 (module)
 ```
 
-
-
 Drobo USB3 Plug `journalctl -xn -f` logs:
 
 ```
@@ -101,4 +98,5 @@ Jun 27 23:37:23 raspberrypi org.gtk.Private.UDisks2VolumeMonitor[1032]: index_pa
 Jun 27 23:37:23 raspberrypi org.gtk.Private.UDisks2VolumeMonitor[1032]: index_parse.c:191: indx_parse(): error opening /media/pi/67f7128a-1664-3b03-baa1-88cf3735347c/BDMV/BACKUP/index.bdmv
 Jun 27 23:37:23 raspberrypi udisksd[1123]: Mounted /dev/sdb2 at /media/pi/67f7128a-1664-3b03-baa1-88cf3735347c on behalf of uid 1000
 ```
+
 <!-- markdownlint-disable-file -->

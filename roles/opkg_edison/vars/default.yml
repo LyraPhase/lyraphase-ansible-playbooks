@@ -1,0 +1,6 @@
+# default.yml - default vars for unsupported / unknown OS
+# (Assumes this is Intel Edison Yocto Image)
+opkg_repo_files:
+  - base-feed.conf
+  - iotkit.conf
+  - alext-repos.conf

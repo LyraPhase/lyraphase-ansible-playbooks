@@ -1,69 +1,76 @@
 exclude: |
-    (?x)^(
-        Gemfile\.lock|
-        playbooks/.*/inventory|
-        playbooks/.*/roles|
-        vendor/bundle/.*|
-        tmp/.*|
-        \.kitchen/.*|
-        screenlog\..*|
-        .*\.retry
-    )$
+  (?x)^(
+      Gemfile\.lock|
+      playbooks/.*/inventory|
+      playbooks/.*/roles|
+      vendor/bundle/.*|
+      tmp/.*|
+      \.kitchen/.*|
+      screenlog\..*|
+      .*\.retry|
+      \.mypy_cache/.*
+  )$
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks.git
+  - repo: https://github.com/pre-commit/pre-commit-hooks.git
     rev: v1.1.1
     hooks:
-    -   id: check-added-large-files
-    -   id: check-merge-conflict
-    -   id: check-symlinks
-    -   id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-yaml
         exclude: |
-            (?x)^(
-                \.kitchen\.libvirt\.ssh\.yml|
-                roles/journald/\.kitchen\.yml|
-                roles/journald/\.kitchen\.docker\.local\.yml
-            )$
-    -   id: end-of-file-fixer
+          (?x)^(
+              \.kitchen\.libvirt\.ssh\.yml|
+              roles/journald/\.kitchen\.yml|
+              roles/journald/\.kitchen\.docker\.local\.yml
+          )$
+      - id: end-of-file-fixer
         exclude: |
-            (?x)^(
-              .*\.patch|
-              .*/README\.md|
-              .*/LICENSE
-            )$
-    -   id: trailing-whitespace
+          (?x)^(
+            .*\.patch|
+            .*/README\.md|
+            .*/LICENSE
+          )$
+      - id: trailing-whitespace
         exclude: |
-            (?x)^(
-              .*\.patch|
-              .*/README\.md|
-              .*/LICENSE
-            )$
--   repo: https://github.com/gitleaks/gitleaks
+          (?x)^(
+            .*\.patch|
+            .*/README\.md|
+            .*/LICENSE
+          )$
+  - repo: https://github.com/gitleaks/gitleaks
     rev: v8.21.1
     hooks:
       - id: gitleaks
--   repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.42.0
+
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.19.0
     hooks:
-      - id: markdownlint
--   repo: https://github.com/detailyang/pre-commit-shell.git
+      - id: markdownlint-cli2
+
+  - repo: https://github.com/detailyang/pre-commit-shell.git
     rev: 1.0.2
     hooks:
-    -   id: shell-lint
-        args: ["--exclude=SC1090,SC1091,SC2034,SC2039,SC2140,SC2148,SC2153,SC2154,SC2164"]
+      - id: shell-lint
+        args:
+          [
+            "--exclude=SC1090,SC1091,SC2034,SC2039,SC2140,SC2148,SC2153,SC2154,SC2164",
+          ]
         exclude: |
-            (?x)^(
-                vendor/bundle/.*|
-                tmp/.*
-            )$
--   repo: local
+          (?x)^(
+              vendor/bundle/.*|
+              tmp/.*|
+              dockerized_run\..*(\.sh)?
+          )$
+  - repo: local
     hooks:
-    -   id: bad-patterns
+      - id: bad-patterns
         name: Check for bad patterns in Hook files
         entry: ./bin/pre-commit/bad-patterns.sh
         language: system
         exclude: ^\.git/hooks/.*\.sample
         files: |
-            (?x)^(
-                \.git/hooks/.*|
-                hooks/.*
-            )$
+          (?x)^(
+              \.git/hooks/.*|
+              hooks/.*
+          )$

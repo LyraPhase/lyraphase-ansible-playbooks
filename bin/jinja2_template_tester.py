@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys
+
 import yaml
 from jinja2 import Template
 

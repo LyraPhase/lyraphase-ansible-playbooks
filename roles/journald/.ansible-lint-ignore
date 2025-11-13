@@ -1,0 +1,3 @@
+# This file contains ignores rule violations for ansible-lint
+.kitchen.docker.local.yml load-failure[yaml] skip
+.kitchen.yml load-failure[yaml] skip

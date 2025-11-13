@@ -1,5 +1,4 @@
-Intel Edison Power Requirements
-===============================
+# Intel Edison Power Requirements
 
 [Anecdotally][1], the Intel Edison has power requirements between 20-800 mW
 depending on load.

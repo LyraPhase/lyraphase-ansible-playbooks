@@ -1,0 +1,20 @@
+---
+# openwrt_base: entry point for meta
+galaxy_info:
+  namespace: lyraphase
+  author: James Cuzella
+  description: Installs python and Ansible dependencies via opkg on OpenWRT / LEDE
+  company: LyraPhase
+  license: AGPL-3.0-or-later
+  min_ansible_version: "2.5"
+  platforms:
+    - name: OpenWrt
+      versions:
+        - "17.01"
+  galaxy_tags:
+    - system
+    - networking
+    - openwrt
+    - packaging
+  # dependencies:
+# version: 0.0.1 ## Ansible 2.0 broke this. Uncomment if / when they ever fix ansible/ansible#13496

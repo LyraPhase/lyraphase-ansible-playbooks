@@ -2,11 +2,10 @@
 version: 3
 
 images:
- base_image:
-  name: quay.io/centos/centos:stream10-minimal
+  base_image:
+    name: quay.io/centos/centos:stream10-minimal
 options:
   package_manager_path: /usr/bin/microdnf
-
 
 dependencies:
   python_interpreter:

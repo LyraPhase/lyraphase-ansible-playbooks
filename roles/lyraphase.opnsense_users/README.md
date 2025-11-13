@@ -20,10 +20,10 @@ OPNSense user: `root`, & password: `opnsense`.
 ## Role Variables
 
 - `lyraphase_opnsense_users_sudoers_path`: The location of `sudoers.d` drop-in directory
-   Default: `'/usr/local/etc/sudoers.d'`
+  Default: `'/usr/local/etc/sudoers.d'`
 - `lyraphase_opnsense_users_ansible_gid`: Group ID for Ansible group.
-   [Pick a free(BSD) GID][1]
-   Default: `731`
+  [Pick a free(BSD) GID][1]
+  Default: `731`
 
 ## Dependencies
 
@@ -60,7 +60,7 @@ There are 2 main scenarios which you could run this role:
     - hosts: opnsense
       user: root
       gather_facts: no
-       
+
       roles:
         - role: lyraphase.opnsense_users
           tags:

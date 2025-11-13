@@ -1,6 +1,6 @@
 namespace: lyraphase
 name: opnsense
-version: 1.0.0
+version: 0.0.1
 readme: README.md
 authors:
   - James Cuzella <james.cuzella@lyraphase.com>
@@ -11,28 +11,31 @@ description: LyraPhase OPNsense Ansible collection allows automation, and
 
 license_file: LICENSE
 
-tags:
-  [
-    "opnsense",
-    "infrastructure",
-    "automation",
-    "devops",
-  ]
+tags: ["opnsense", "infrastructure", "automation", "devops"]
 
-dependencies: {
-  "community.general": ">=10.6.0",
-  "ansibleguy.opnsense": ">=1.2.13"
-}
+dependencies:
+  {
+    "community.general": ">=10.6.0",
+    "ansibleguy.opnsense": ">=1.2.13",
+    "ansible.netcommon": ">=8.1.0",
+    "ansible.utils": ">=6.0.0",
+  }
 
-repository: https://github.com/LyraPhase/OPNsense-ansible-collection
+repository: https://github.com/LyraPhase/ansible_opnsense
 
-homepage: https://github.com/LyraPhase/OPNsense-ansible-collection
+homepage: https://github.com/LyraPhase/ansible_opnsense
 
-issues: https://github.com/LyraPhase/OPNsense-ansible-collection/issues
+issues: https://github.com/LyraPhase/ansible_opnsense/issues
 
-documentation: https://github.com/LyraPhase/OPNsense-ansible-collection/tree/docs
+documentation: https://github.com/LyraPhase/ansible_opnsense/tree/docs
 
 build_ignore:
   - .github
   - codecov.yml
   - tests/integration
+  - tests/sanity
+  - tests/unit
+  - tests/config.yml
+  - test-requirements.txt
+  - tox-ansible.ini
+  - changelogs

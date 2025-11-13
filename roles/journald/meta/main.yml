@@ -1,68 +1,110 @@
 ---
 # journald: entry point for meta
 galaxy_info:
+  namespace: lyraphase
   author: James Cuzella
   description: Installs journald
   company: LyraPhase
   license: AGPL-3.0-or-later
-  min_ansible_version: 1.2
+  min_ansible_version: "1.2"
   platforms:
-  # Platforms tested are uncommented, but it probably works on most CentOS/RHEL
-  #- name: EL
-  #  versions:
-  #     - all
-  #     - 5
-  #     - 6
-  #     - 7
-  # - name: GenericUNIX
-  #   versions:
-  #     - all
-  #     - any
-  # - name: Fedora
-  #   versions:
-  #     - all
-  #     - 16
-  #     - 17
-  #     - 18
-  #     - 19
-  #     - 20
-  # - name: opensuse
-  #   versions:
-  #     - all
-  #     - 12.1
-  #     - 12.2
-  #     - 12.3
-  #     - 13.1
-  #     - 13.2
-  # - name: Amazon
-  #   versions:
-  #     - all
-  #     - 2013.03
-  #     - 2013.09
-  # - name: GenericBSD
-  #   versions:
-  #     - all
-  #     - any
-  # - name: FreeBSD
-  #   versions:
-  #     - all
-  #     - 8.0
-  #     - 8.1
-  #     - 8.2
-  #     - 8.3
-  #     - 8.4
-  #     - 9.0
-  #     - 9.1
-  #     - 9.1
-  #     - 9.2
-  # - name: Ubuntu
-  #   versions:
-  #     - all
-  #     - lucid    # 10.04
-  #     - precise  # 12.04
-  #     - saucy    # 13.10
-  #     - trusty   # 14.04
-  #     - utopic   # 14.10
+    # Platforms tested are RHEL & Ubuntu, but it probably works on most modern
+    # CentOS/RHEL and SystemD based distros
+    - name: EL
+      versions:
+        - "7"
+        - "8"
+        - "9"
+        - "10"
+        # - "11"
+    - name: Fedora
+      versions:
+        - "28"
+        - "29"
+        - "30"
+        - "31"
+        - "32"
+        - "33"
+        - "34"
+        - "35"
+        - "36"
+        - "37"
+        - "38"
+        - "39"
+        - "40"
+        - "41"
+        - "42"
+    - name: Rocky
+      versions:
+        - all
+    - name: ArchLinux
+      versions:
+        - all
+    - name: opensuse
+      versions:
+        # First OpenSuse version to use SystemD: 12.1
+        # Currently all supported opensuse Galaxy schema versions use SystemD
+        # Consider just 'all' ?
+        - "12.1"
+        - "12.2"
+        - "12.3"
+        - "13.1"
+        - "13.2"
+        - "15.0"
+        - "15.1"
+        - "15.2"
+        - "15.3"
+        - "15.4"
+        - "15.5"
+        - "42.1"
+        - "42.2"
+        - "42.3"
+        # - all
+    - name: Amazon
+      # AL2 and above support SystemD
+      versions:
+        - "2015.03"
+        - "2015.09"
+        - "2016.03"
+        - "2016.09"
+        - "2017.03"
+        - "2017.09"
+        - "2017.12"
+        - "2018.03"
+        - Candidate
+    - name: Ubuntu
+      versions:
+        # Use Upstart init.d
+        # - lucid    # 10.04
+        # - precise  # 12.04
+        # - saucy    # 13.10
+        # - trusty   # 14.04
+        # - utopic   # 14.10
+        # Use SystemD + JournalD
+        - vivid    # 15.04
+        - wily     # 15.10
+        - xenial   # 16.04
+        - yakkety  # 16.10
+        - zesty    # 17.04
+        - artful   # 17.10
+        - bionic   # 18.04
+        - cosmic   # 18.10
+        - disco    # 19.04
+        - eoan     # 19.10
+        - focal    # 20.04
+        - groovy   # 20.10
+        - hirsute  # 21.04
+        - impish   # 21.10
+        - jammy    # 22.04
+        - kinetic  # 22.10
+        - lunar    # 23.04
+        - mantic   # 23.10
+        - noble    # 24.04
+        - oracular # 24.10
+        - plucky   # 25.04
+        - questing # 25.10
+        # - resolute # 26.04
+        # - s????? # 26.10
   # - name: SLES
   #   versions:
   #     - all
@@ -76,33 +118,24 @@ galaxy_info:
   #   versions:
   #     - all
   #     - any
-  # - name: Debian
-  #   versions:
-  #     - all
-  #     - etch
-  #     - lenny
-  #     - squeeze
-  #     - wheezy
-  # - name: Darwin
-  #   versions:
-  #     - all
-  categories:
-  #   - web
-  #   - system
-  #   - packaging
-  #   - networking
-  #   - monitoring
-  #   - development
-  #   - database:sql
-  #   - database:nosql
-  #   - database
-  #   - clustering
-  #   - cloud:rax
-  #   - cloud:gce
-  #   - cloud:ec2
-  #   - cloud
-  dependencies:
+    - name: Debian
+      versions:
+        # Debian 8 / jessie was first to support SystemD
+        - jessie
+        - stretch
+        - buster
+        - bullseye
+        - bookworm
+        - trixie
+        - forky
+        - sid
+  galaxy_tags:
+    - system
+    - monitoring
+    - logging
+    - logs
+  # dependencies:
   # Specify role dependencies here
   # For foo
-  #  - foo
-#version: 0.0.1 ## Ansible 2.0 broke this. Uncomment if / when they ever fix ansible/ansible#13496
+  #   - foo
+# version: 0.0.1 ## Ansible 2.0 broke this. Uncomment if / when they ever fix ansible/ansible#13496

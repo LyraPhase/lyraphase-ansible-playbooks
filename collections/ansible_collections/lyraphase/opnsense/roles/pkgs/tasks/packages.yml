@@ -1,0 +1,13 @@
+---
+# tasks file for lyraphase.opnsense.pkgs pkg install
+- name: Install OPNsense packages
+  ansibleguy.opnsense.package:
+    firewall: "{{ inventory_hostname }}"
+    ssl_verify: "{{ opnsense_pkgs_auth.ssl_verify | default(true) }}"
+    ssl_ca_file: "{{ opnsense_pkgs_auth.ssl_ca_file | default(omit) }}"
+    api_key: "{{ opnsense_pkgs_auth.api_key | default(omit) }}"
+    api_secret: "{{ opnsense_pkgs_auth.api_secret | default(omit) }}"
+    api_credential_file: "{{ opnsense_pkgs_auth.api_credential_file | default(omit) }}"
+    name: "{{ item }}"
+    action: install
+  with_items: "{{ opnsense_pkgs_list }}"

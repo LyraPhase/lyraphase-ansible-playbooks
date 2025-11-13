@@ -5,6 +5,11 @@
     name: ansible
     state: present
     gid: "{{ lyraphase_opnsense_users_ansible_gid }}"
+  tags:
+    - ansible_bootstrap
+    - ansible_group
+    - group
+    - bootstrap
 
 - name: >-
     Allow the ansible group to run sudo
@@ -16,6 +21,11 @@
     commands: ALL
     nopassword: true
     sudoers_path: "{{ lyraphase_opnsense_users_sudoers_path }}"
+  tags:
+    - ansible_bootstrap
+    - ansible_group
+    - group
+    - bootstrap
 
 - name: Reset root user password (once first-run)
   ansible.builtin.user:

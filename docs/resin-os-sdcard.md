@@ -14,7 +14,7 @@
     "style": "consistent"
   },
   "heading-style": {
-    "style": "setext_with_atx"
+    "style": "atx"
   },
   "no-inline-html": {
     "allowed_elements": ["br"]
@@ -22,8 +22,7 @@
 }
 -->
 
-ResinOS SD Card info
-====================
+# ResinOS SD Card info
 
 In order to use [kubespray](https://github.com/kubernetes-incubator/kubespray),
 we need to trick it into thinking it is deploying onto CoreOS.
@@ -665,8 +664,7 @@ Creating journal (32768 blocks): done
 Writing superblocks and filesystem accounting information: done
 ```
 
-Re-Mount root read / write
---------------------------
+## Re-Mount root read / write
 
     $ mount -o remount,rw /
 
@@ -704,8 +702,7 @@ Re-Mount root read / write
     sent 230,088 bytes  received 1,401 bytes  154,326.00 bytes/sec
     total size is 78,835,736  speedup is 340.56
 
-Rename partition label to 'resin-data'
---------------------------------------
+## Rename partition label to 'resin-data'
 
 ```bash
 $ fdisk /dev/mmcblk1
@@ -810,13 +807,11 @@ Re-reading the partition table failed.: Device or resource busy
 The kernel still uses the old table. The new table will be used at the next reboot or after you run partprobe(8) or kpartx(8).
 ```
 
-Label the new FS as resin-data
-------------------------------
+## Label the new FS as resin-data
 
     e2label /dev/mmcblk1p1 resin-data
 
-Now rename the old resin-data on the Intel Edison to 'resin-data-OLD'
----------------------------------------------------------------------
+## Now rename the old resin-data on the Intel Edison to 'resin-data-OLD'
 
 ```bash
 $ fdisk /dev/mmcblk0
@@ -957,12 +952,11 @@ Re-reading the partition table failed.: Device or resource busy
 The kernel still uses the old table. The new table will be used at the next reboot or after you run partprobe(8) or kpartx(8).
 ```
 
-FS Label needs to be changed
-----------------------------
+## FS Label needs to be changed
 
 This seems to be used by udev `/lib/udev/rules.d/60-persistent-storage.rules`
 
-```bash
+````bash
 root@6dd9478:~# e2label /dev/mmcblk0p11
 resin-data
 
@@ -1023,7 +1017,7 @@ tmpfs on /var/lib type tmpfs (rw,relatime)
 /dev/mmcblk1p1 on /var/lib/docker type ext4 (rw,relatime,data=ordered)
 /dev/mmcblk1p1 on /var/volatile/lib/docker type ext4 (rw,relatime,data=ordered)
 /dev/mmcblk0p10 on /etc/dropbear type ext4 (rw,relatime,data=ordered)
-```
+````
 
 Udev should have mounted the device by the new label:
 
