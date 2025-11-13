@@ -1,6 +1,26 @@
-## macOS GitHub Actions runner VM
+<!-- markdownlint-configure-file
+{
+  "line-length": {
+    "line_length": 80,
+    "heading_line_length":80,
+    "code_block_line_length":300,
+    "headings":80,
+    "code_blocks": true
+  },
+  "hr-style": {
+    "style": "consistent"
+  },
+  "heading-style": {
+    "style": "atx"
+  },
+  "no-hard-tabs": false,
+  "no-trailing-punctuation": false,
+}
+-->
 
-### Homebrew formulae installed / bottle TODO:
+# macOS GitHub Actions runner VM
+
+## Homebrew formulae installed / bottle TODO:
 
 ```console
 $ brew list
