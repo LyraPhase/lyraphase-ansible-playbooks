@@ -69,7 +69,7 @@ class Default(FactsBase):
         else:
             if isinstance(data, Exception):
                 self.warnings.append(
-                    "Unable to gather product information: %s" % to_text(data)
+                    "Unable to gather product information: %s" % to_text(data),
                 )
 
     def parse_asatype(self, data):
@@ -145,7 +145,7 @@ class Hardware(FactsBase):
         if data:
             if "sysctl: unknown oid" in data:
                 warnings.append(
-                    "Unable to gather amount of hardware total memory (hw.realmem)"
+                    "Unable to gather amount of hardware total memory (hw.realmem)",
                 )
             else:
                 if "hw.realmem:" in data:
@@ -155,7 +155,7 @@ class Hardware(FactsBase):
                     )
                 else:
                     warnings.append(
-                        "Unable to gather amount of hardware total memory (hw.realmem)"
+                        "Unable to gather amount of hardware total memory (hw.realmem)",
                     )
 
         data = self.responses[2]
@@ -171,7 +171,7 @@ class Hardware(FactsBase):
             self.facts["memtotal_mb"] = pagesize * pagecount // 1024 // 1024
             self.facts["memfree_mb"] = pagesize * freecount // 1024 // 1024
             self.facts["memused_mb"] = int(
-                self.facts["memtotal_mb"] - self.facts["memfree_mb"]
+                self.facts["memtotal_mb"] - self.facts["memfree_mb"],
             )
 
         # Get free memory. vmstat output looks like:
@@ -189,7 +189,7 @@ class Hardware(FactsBase):
                     )
                 else:
                     warnings.append(
-                        "Unable to gather amount of physical memory (hw.physmem)"
+                        "Unable to gather amount of physical memory (hw.physmem)",
                     )
 
     def parse_filesystems(self, data):
@@ -218,7 +218,7 @@ class Hardware(FactsBase):
 class Packages(FactsBase):
     # COMMANDS = ["configctl firmware local"] ## Includes kernel & userland metadata also
     COMMANDS = [
-        "pkg query '%n|||%v|||%c|||%sh|||%k|||%a|||%L|||%R|||%o'"
+        "pkg query '%n|||%v|||%c|||%sh|||%k|||%a|||%L|||%R|||%o'",
     ]  # Just package metadata
     PKG_KEYS = [
         "name",

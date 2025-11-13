@@ -52,11 +52,11 @@ class ActionModule(ActionNetworkModule):
 
         display.vvvv(
             "config module: %s"
-            % to_text(self._config_module, errors="surrogate_then_replace")
+            % to_text(self._config_module, errors="surrogate_then_replace"),
         )
         display.vvvv(
             "persistent_connection: %s"
-            % to_text(persistent_connection, errors="surrogate_then_replace")
+            % to_text(persistent_connection, errors="surrogate_then_replace"),
         )
 
         if persistent_connection not in ("network_cli"):
