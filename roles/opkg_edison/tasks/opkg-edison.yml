@@ -20,9 +20,9 @@
     mode: "0644"
   with_items: "{{ opkg_repo_files }}"
   notify:
-    - destroy opkg cache
-    - create opkg cache dir
-    - opkg update
+    - Destroy opkg cache
+    - Create opkg cache dir
+    - OPKG update
 
 # Run yum makecache handlers immediately
 # (Should fix Ansible runs on hosts with pre-existing opkg repo problems)
