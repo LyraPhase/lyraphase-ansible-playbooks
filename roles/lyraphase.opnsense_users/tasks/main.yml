@@ -3,7 +3,9 @@
 - name: Import bootstrap tasks
   ansible.builtin.import_tasks: "bootstrap.yml"
   tags:
-    - bootstrap
+    - ansible_bootstrap
+    - opnsense_users_bootstrap
     - ansible_group
     - users
     - install_users
+    - bootstrap
