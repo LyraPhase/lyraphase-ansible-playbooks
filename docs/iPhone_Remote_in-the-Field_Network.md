@@ -13,7 +13,7 @@
     "style": "consistent"
   },
   "heading-style": {
-    "style": "setext_with_atx"
+    "style": "atx"
   },
   "required-headings": {
     "headings": [
