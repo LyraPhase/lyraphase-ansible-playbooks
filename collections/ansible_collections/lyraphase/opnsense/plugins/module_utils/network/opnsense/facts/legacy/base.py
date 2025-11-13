@@ -58,9 +58,7 @@ class Default(FactsBase):
         if data and (not isinstance(data, Exception)):
             product_data = json.loads(data)
             self.facts["opnsense_edition"] = (
-                "opnsense-business"
-                if "business" in product_data["product_id"]
-                else "opnsense-community"
+                "opnsense-business" if "business" in product_data["product_id"] else "opnsense-community"
             )
             self.facts["product"] = product_data
             # self.facts["asatype"] = self.parse_asatype(data)
@@ -150,9 +148,7 @@ class Hardware(FactsBase):
             else:
                 if "hw.realmem:" in data:
                     (realmem_key, realmem_value) = data.split(":")
-                    self.facts["hardware_realmem_mb"] = (
-                        int(realmem_value.rstrip().lstrip()) // 1024 // 1024
-                    )
+                    self.facts["hardware_realmem_mb"] = int(realmem_value.rstrip().lstrip()) // 1024 // 1024
                 else:
                     warnings.append(
                         "Unable to gather amount of hardware total memory (hw.realmem)",
@@ -184,9 +180,7 @@ class Hardware(FactsBase):
                 warnings.append("Unable to gather amount of used memory (vmstat 'fre')")
             else:
                 if "fre" in data:
-                    self.facts["memfree_mb"] = (
-                        int(data.splitlines()[-1].split()[4]) // 1024
-                    )
+                    self.facts["memfree_mb"] = int(data.splitlines()[-1].split()[4]) // 1024
                 else:
                     warnings.append(
                         "Unable to gather amount of physical memory (hw.physmem)",
