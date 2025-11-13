@@ -4,12 +4,11 @@
 - name: "Gather /etc/os-release"
   check_mode: false
   changed_when: false
-  ansible.builtin.raw:
-    cat /etc/os-release
+  ansible.builtin.raw: cat /etc/os-release
   register: os_release
   when: >
-        not (ansible_distribution_major_version is defined or
-             ansible_distribution_version is defined)
+    not (ansible_distribution_major_version is defined or
+         ansible_distribution_version is defined)
   tags:
     - openwrt_bootstrap
     - openwrt-python
@@ -18,12 +17,12 @@
 
 - name: Set openwrt_release facts - Decode and parse /etc/os-release content
   ansible.builtin.set_fact:
-    os_release_data: "{{ os_release_data | default({}) | combine({ item.split('=')[0].lower(): item.split('=')[1].replace(\"'\", '').replace('\"', '') }) }}"
+    os_release_data: '{{ os_release_data | default({}) | combine({ item.split(''='')[0].lower(): item.split(''='')[1].replace("''", '''').replace(''"'', '''') }) }}'
   loop: "{{ os_release.stdout_lines }}"
   when: >
-        os_release is defined and os_release.rc == 0 and
-        not (ansible_distribution_major_version is defined or
-             ansible_distribution_version is defined)
+    os_release is defined and os_release.rc == 0 and
+    not (ansible_distribution_major_version is defined or
+         ansible_distribution_version is defined)
   tags:
     - openwrt_bootstrap
     - openwrt-python
@@ -50,9 +49,9 @@
     openwrt_base_minor_version: "{{ 1 | extract(os_release_data.version.split('.')) | default('') | int }}"
   failed_when: false
   when: >
-        os_release_data is defined and
-        not (ansible_distribution_major_version is defined or
-             ansible_distribution_version is defined)
+    os_release_data is defined and
+    not (ansible_distribution_major_version is defined or
+         ansible_distribution_version is defined)
   tags:
     - openwrt_bootstrap
     - openwrt-python

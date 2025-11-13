@@ -7,7 +7,7 @@
 #openwrt_base_bootstrap_dhcp_proto: 'static'
 
 # Dumb AP mode: use DHCP for br-lan
-openwrt_base_bootstrap_dhcp_proto: 'dhcp'
+openwrt_base_bootstrap_dhcp_proto: "dhcp"
 
 openwrt_base_sysctl_d:
   local:
