@@ -12,8 +12,8 @@
   tags:
     - openwrt_bootstrap
     - openwrt-python
-    - openwrt-base-facts
-    - openwrt-base-setup-os-release-facts
+    - openwrt_base-facts
+    - openwrt_base-setup-os-release-facts
 
 - name: Set openwrt_release facts - Decode and parse /etc/os-release content
   ansible.builtin.set_fact:
@@ -26,8 +26,8 @@
   tags:
     - openwrt_bootstrap
     - openwrt-python
-    - openwrt-base-facts
-    - openwrt-base-setup-os-release-facts
+    - openwrt_base-facts
+    - openwrt_base-setup-os-release-facts
 
 - name: DEBUG os_release facts
   ansible.builtin.debug:
@@ -35,8 +35,8 @@
   tags:
     - openwrt_bootstrap
     - openwrt-python
-    - openwrt-base-facts
-    - openwrt-base-setup-os-release-facts
+    - openwrt_base-facts
+    - openwrt_base-setup-os-release-facts
 
 - name: Set OpenWrt distribution & version if facts NOT set
   check_mode: false
@@ -55,5 +55,5 @@
   tags:
     - openwrt_bootstrap
     - openwrt-python
-    - openwrt-base-facts
-    - openwrt-base-setup-os-release-facts
+    - openwrt_base-facts
+    - openwrt_base-setup-os-release-facts

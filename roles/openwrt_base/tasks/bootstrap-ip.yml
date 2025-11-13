@@ -1,5 +1,5 @@
 ---
-# openwrt-base: bootstrap-ip Tasks entry point. Called by main.yml
+# openwrt_base: bootstrap-ip Tasks entry point. Called by main.yml
 
 - name: Check for current OpenWRT IP
   check_mode: false

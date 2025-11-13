@@ -10,8 +10,8 @@
   tags:
     - openwrt_bootstrap
     - openwrt-python
-    - openwrt-base-facts
-    - openwrt-base-setup-os-release-facts
+    - openwrt_base-facts
+    - openwrt_base-setup-os-release-facts
 
 # Load a variable file based on the OS type, or a default if not found.
 - name: Include OS-specific vars

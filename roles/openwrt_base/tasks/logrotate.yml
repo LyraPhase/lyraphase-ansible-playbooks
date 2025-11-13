@@ -1,5 +1,5 @@
 ---
-# openwrt-base: Tasks entry point. Called by main.yml
+# openwrt_base: Tasks entry point. Called by main.yml
 
 # Placeholder for handling OS-specific vars
 # Load a variable file based on the OS type, or a default if not found.
@@ -12,13 +12,10 @@
 #     - "../vars/default.yml"
 #   when: openwrt_base_logrotate_files is not defined
 
-- name: Install wireless config
+- name: Install logrotate drop-ins
   ansible.builtin.template:
-    src: templates/etc-config/wireless.j2
-    dest: /etc/config/wireless
+    src: templates/logrotate.conf.j2
+    dest: /etc/logrotate.conf
     owner: root
     group: root
     mode: "0644"
-  register: openwrt_wireless
-  notify:
-    - reload wifi

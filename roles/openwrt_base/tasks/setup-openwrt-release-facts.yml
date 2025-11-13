@@ -1,5 +1,5 @@
 ---
-# openwrt-base: setup-openwrt-release-facts Tasks entry point. Called by main.yml
+# openwrt_base: setup-openwrt-release-facts Tasks entry point. Called by main.yml
 
 - name: "Gather /etc/openwrt_release"
   ansible.builtin.slurp:
@@ -8,8 +8,8 @@
   tags:
     - opkg-openwrt
     - apk-openwrt
-    - openwrt-base-facts
-    - openwrt-base-setup-openwrt-release-facts
+    - openwrt_base-facts
+    - openwrt_base-setup-openwrt-release-facts
 
 - name: Set openwrt_release facts - Decode and parse /etc/openwrt_release content
   ansible.builtin.set_fact:
@@ -18,8 +18,8 @@
   tags:
     - opkg-openwrt
     - apk-openwrt
-    - openwrt-base-facts
-    - openwrt-base-setup-openwrt-release-facts
+    - openwrt_base-facts
+    - openwrt_base-setup-openwrt-release-facts
 
 - name: DEBUG openwrt_release facts
   ansible.builtin.debug:
@@ -27,5 +27,5 @@
   tags:
     - opkg-openwrt
     - apk-openwrt
-    - openwrt-base-facts
-    - openwrt-base-setup-openwrt-release-facts
+    - openwrt_base-facts
+    - openwrt_base-setup-openwrt-release-facts

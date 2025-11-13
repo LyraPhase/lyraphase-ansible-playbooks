@@ -1,5 +1,5 @@
 ---
-# openwrt-base: entry point for tasks
+# openwrt_base: entry point for tasks
 #               Generally only include other file(s) and add tags here.
 
 - name: "Run tasks: bootstrap-ip"
@@ -21,7 +21,7 @@
   tags:
     - opkg-openwrt
     - apk-openwrt
-    - openwrt-base-facts
+    - openwrt_base-facts
     - openwrt-setup-openwrt-release-facts
 - name: "Run tasks: opkg-openwrt"
   ansible.builtin.import_tasks: opkg-openwrt.yml
@@ -36,11 +36,11 @@
   ansible.builtin.import_tasks: crontabs.yml
   tags:
     - crontabs-openwrt
-    - openwrt-base-crontabs
+    - openwrt_base-crontabs
 - name: "Run tasks: kernel (sysctl.d)"
   ansible.builtin.import_tasks: kernel.yml
   tags:
     - kernel-openwrt
     - sysctl-openwrt
-    - openwrt-base-kernel
-    - openwrt-base-sysctl
+    - openwrt_base-kernel
+    - openwrt_base-sysctl

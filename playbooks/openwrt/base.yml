@@ -6,7 +6,7 @@
   user: root
   gather_facts: "{{ not (ansible_bootstrap | default(false)) }}"
   vars_files:
-    - "vars/openwrt-base.yml"
+    - "vars/openwrt_base.yml"
 
   pre_tasks:
     - name: Ansible setup
@@ -25,7 +25,7 @@
         - packages
         - install_packages
   roles:
-    - openwrt-base
+    - lyraphase.openwrt_base
 #    - openwrt-logrotate
     - role: imp1sh.ansible_managemynetwork.ansible_users
       tags:

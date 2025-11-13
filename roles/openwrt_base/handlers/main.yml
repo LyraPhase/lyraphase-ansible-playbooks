@@ -1,5 +1,5 @@
 ---
-# openwrt-base: entry point for handlers
+# openwrt_base: entry point for handlers
 # This should fix any weird opkg cache bugs
 # Use this if you're seeing 0 packages for a repo,
 - name: destroy opkg cache
