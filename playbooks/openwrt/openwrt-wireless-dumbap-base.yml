@@ -8,7 +8,7 @@
   gather_facts: true
   vars_files:
     - "vars/openwrt_wireless_dumbap.yml"
-    - "vars/openwrt-dhcp-dumbap.yml"
+    - "vars/openwrt_dhcp_dumbap.yml"
 
   roles:
     - role: imp1sh.ansible_managemynetwork.ansible_openwrtwireless
