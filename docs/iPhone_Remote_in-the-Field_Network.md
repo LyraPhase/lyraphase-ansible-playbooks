@@ -134,8 +134,8 @@ Below is a copied version of that guide for future googlers:
    will power off the board.)**
    <br/><br/>
    ![Image of Intel Edison Arduino Breakout Board: A finger presses the PWR button.
-  With ports facing the right, buttons are on top left.
-  The buttons from left to right are: RM, FW, PWR, SHLD.](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238749/1600-846/IMG_20140906_195830~2.jpg)
+With ports facing the right, buttons are on top left.
+The buttons from left to right are: RM, FW, PWR, SHLD.](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238749/1600-846/IMG_20140906_195830~2.jpg)
 2. The LED should start blinking and you should see a new available wireless
    network named `EDISON-xx-xx`
 3. Connect to this network. \***note - this will disconnect your computer from the internet**\*
@@ -151,23 +151,23 @@ Below is a copied version of that guide for future googlers:
    then replace "`edison`" in the URL with the name you have chosen.**
 
    ![Image of Google Chrome Web Browser: Page opened is "edison.local".
-  Edison One-time Setup page is shown.](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238750/1560-900/Screen+Shot+2014-09-06+at+8.18.45+PM.png)
+Edison One-time Setup page is shown.](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238750/1560-900/Screen+Shot+2014-09-06+at+8.18.45+PM.png)
 
 2. Enter a new password and name for Edison.
    In this example we will call Edison "`myedison`"
    <br/><br/>
    ![Image of Edison One-time Setup Page:
-  Set device password & Change Device Name fields are shown.
-  Name is set to "myedison".](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238751/1600-716/Screen+Shot+2014-09-06+at+8.32.01+PM.png)
+Set device password & Change Device Name fields are shown.
+Name is set to "myedison".](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238751/1600-716/Screen+Shot+2014-09-06+at+8.32.01+PM.png)
 3. Enter the name and pasword of your WiFi network.
    If you do not know the network protocol of your network,
    try "`WPA-Personal`" first.
    <br/><br/>
    ![Image of Edison One-time Setup Page:
-  Connect to A WiFi Network fields shown.
-  Network name is set to "kafka",
-  Network Protocol is set to "WPA-Personal or WPA2-Personal".
-  Password is set but blocked out.](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238752/1600-311/Screen+Shot+2014-09-06+at+8.32.17+PM.png)
+Connect to A WiFi Network fields shown.
+Network name is set to "kafka",
+Network Protocol is set to "WPA-Personal or WPA2-Personal".
+Password is set but blocked out.](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238752/1600-311/Screen+Shot+2014-09-06+at+8.32.17+PM.png)
 4. Click "Submit"
 5. You will see this screen.
    Please connect to your WiFi network now, and after **one** minute visit
@@ -176,14 +176,14 @@ Below is a copied version of that guide for future googlers:
    "`myedison`" with your name.
    <br/><br/>
    ![Image of Leaving One-time Setup Page:
-  Text is: "Please wait while the device connects to 'kafka'.
-  After about a minute, connect this machine to 'kafka' and
-  visit http://myedison.local in your browser. "](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238753/1600-635/Screen+Shot+2014-09-06+at+8.32.37+PM.png)
+Text is: "Please wait while the device connects to 'kafka'.
+After about a minute, connect this machine to 'kafka' and
+visit http://myedison.local in your browser. "](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238753/1600-635/Screen+Shot+2014-09-06+at+8.32.37+PM.png)
 6. Visiting the "myedison.local" page will verify if you have successfully
    configured and connected Edison to WiFi.
    <br/><br/>
    ![Image of Intel Edison Device Information Page:
-  Hostname is shown as "myedison", IP Address is shown.](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238754/1600-446/Screen+Shot+2014-09-06+at+8.36.06+PM.png)
+Hostname is shown as "myedison", IP Address is shown.](https://web.archive.org/web/20141213055724im_/https://communities.intel.com/servlet/JiveServlet/downloadImage/102-23137-8-238754/1600-446/Screen+Shot+2014-09-06+at+8.36.06+PM.png)
 
 **Congratulations, you have successfully configured and connected your
 Intel® Edison development board to WiFi!**
