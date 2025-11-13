@@ -5,6 +5,8 @@
 .kitchen.yml
 roles/*/.kitchen.*.yml
 roles/*/.kitchen.yml
+execution-environment.yml
+execution-environment.py2-ansible2.10.yml
 
 # Environments
 .env
