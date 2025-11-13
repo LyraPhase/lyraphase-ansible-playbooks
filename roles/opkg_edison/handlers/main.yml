@@ -1,5 +1,5 @@
 ---
-# opkg-edison: entry point for handlers
+# opkg_edison: entry point for handlers
 # This should fix any weird opkg cache bugs
 # Use this if you're seeing 0 packages for a repo,
 - name: destroy opkg cache
