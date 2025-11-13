@@ -102,8 +102,8 @@ galaxy_info:
   #   - cloud:gce
   #   - cloud:ec2
   #   - cloud
-  dependencies:
+  # dependencies:
   # Specify role dependencies here
   # For foo
-  #  - foo
+  #   - foo
 # version: 0.0.1 ## Ansible 2.0 broke this. Uncomment if / when they ever fix ansible/ansible#13496
