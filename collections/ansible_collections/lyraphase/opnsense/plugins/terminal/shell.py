@@ -47,9 +47,7 @@ try:
 except ImportError:
     from ansible.module_utils._text import to_bytes, to_text
 
-from ansible_collections.ansible.netcommon.plugins.plugin_utils.terminal_base import (
-    TerminalBase,
-)
+from ansible_collections.ansible.netcommon.plugins.plugin_utils.terminal_base import TerminalBase
 
 
 class TerminalModule(TerminalBase):

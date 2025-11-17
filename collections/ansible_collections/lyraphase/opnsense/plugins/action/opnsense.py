@@ -26,9 +26,8 @@ __metaclass__ = type
 
 from ansible.module_utils.common.text.converters import to_text
 from ansible.utils.display import Display
-from ansible_collections.ansible.netcommon.plugins.action.network import (
-    ActionModule as ActionNetworkModule,
-)
+
+from ansible_collections.ansible.netcommon.plugins.action.network import ActionModule as ActionNetworkModule
 
 display = Display()
 
