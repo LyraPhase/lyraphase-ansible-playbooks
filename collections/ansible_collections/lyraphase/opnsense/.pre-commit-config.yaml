@@ -78,7 +78,7 @@ repos:
         alias: ruff
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+    rev: 7.0.0
     hooks:
       - id: isort
         name: Sort import statements using isort
