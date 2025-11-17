@@ -114,3 +114,6 @@ venv.bak/
 
 # antsibull-changelog
 changelogs/.plugin-cache.yaml
+
+# ruff
+.ruff_cache
