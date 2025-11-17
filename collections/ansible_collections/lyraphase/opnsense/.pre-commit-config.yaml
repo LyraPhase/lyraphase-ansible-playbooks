@@ -47,24 +47,35 @@ repos:
     hooks:
       - id: add-trailing-comma
 
-  - repo: https://github.com/pycontribs/mirrors-prettier
-    rev: "v3.4.2"
+#  - repo: https://github.com/pycontribs/mirrors-prettier
+#    rev: "v3.4.2"
+#    hooks:
+#      - id: prettier
+#        entry: env CI=1 bash -c "prettier --list-different . || ec=$? && prettier --loglevel=error --write . && exit $ec"
+#        pass_filenames: false
+#        args: []
+#        additional_dependencies:
+#          - prettier
+#          - prettier-plugin-toml
+#        exclude: |
+#          (?x)^(
+#            .*\.patch|
+#            .*/LICENSE|
+#            \.mypy_cache/.*|
+#            CHANGELOG\.rst|
+#            \.kitchen\.?.*\.yml
+#          )$
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.3
     hooks:
-      - id: prettier
-        entry: env CI=1 bash -c "prettier --list-different . || ec=$? && prettier --loglevel=error --write . && exit $ec"
-        pass_filenames: false
-        args: []
-        additional_dependencies:
-          - prettier
-          - prettier-plugin-toml
-        exclude: |
-          (?x)^(
-            .*\.patch|
-            .*/LICENSE|
-            \.mypy_cache/.*|
-            CHANGELOG\.rst|
-            \.kitchen\.?.*\.yml
-          )$
+      - id: ruff-check
+        alias: ruff
+        args:
+          - "--fix"
+          - "--show-fixes"
+      - id: ruff-format
+        alias: ruff
 
   - repo: https://github.com/PyCQA/isort
     rev: 5.13.2
@@ -72,13 +83,13 @@ repos:
       - id: isort
         name: Sort import statements using isort
         args: ["--filter-files"]
-
-  - repo: https://github.com/psf/black
-    rev: 24.10.0
-    hooks:
-      - id: black
-
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.1.1
-    hooks:
-      - id: flake8
+#
+#  - repo: https://github.com/psf/black
+#    rev: 24.10.0
+#    hooks:
+#      - id: black
+#
+#  - repo: https://github.com/pycqa/flake8
+#    rev: 7.1.1
+#    hooks:
+#      - id: flake8
