@@ -1,0 +1,6 @@
+ansible-core==2.18.8
+#ansible-runner
+pytz
+ansible-pylibssh
+#ansible-lint
+debugpy
