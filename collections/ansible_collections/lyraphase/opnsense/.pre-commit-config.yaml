@@ -14,10 +14,13 @@ exclude: |
   )$
 repos:
   - repo: https://github.com/ansible-network/collection_prep
-    rev: 1.1.1
+    rev: 1.1.2
     hooks:
       # - id: autoversion # removed as being handled by GHA push and release drafter
       - id: update-docs
+        args:
+          - "-p"
+          - "collections/ansible_collections/lyraphase/opnsense"
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -47,38 +50,32 @@ repos:
     hooks:
       - id: add-trailing-comma
 
-  - repo: https://github.com/pycontribs/mirrors-prettier
-    rev: "v3.4.2"
-    hooks:
-      - id: prettier
-        entry: env CI=1 bash -c "prettier --list-different . || ec=$? && prettier --loglevel=error --write . && exit $ec"
-        pass_filenames: false
-        args: []
-        additional_dependencies:
-          - prettier
-          - prettier-plugin-toml
-        exclude: |
-          (?x)^(
-            .*\.patch|
-            .*/LICENSE|
-            \.mypy_cache/.*|
-            CHANGELOG\.rst|
-            \.kitchen\.?.*\.yml
-          )$
+#  - repo: https://github.com/pycontribs/mirrors-prettier
+#    rev: "v3.4.2"
+#    hooks:
+#      - id: prettier
+#        entry: env CI=1 bash -c "prettier --list-different . || ec=$? && prettier --loglevel=error --write . && exit $ec"
+#        pass_filenames: false
+#        args: []
+#        additional_dependencies:
+#          - prettier
+#          - prettier-plugin-toml
+#        exclude: |
+#          (?x)^(
+#            .*\.patch|
+#            .*/LICENSE|
+#            \.mypy_cache/.*|
+#            CHANGELOG\.rst|
+#            \.kitchen\.?.*\.yml
+#          )$
 
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.13.2
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.3
     hooks:
-      - id: isort
-        name: Sort import statements using isort
-        args: ["--filter-files"]
-
-  - repo: https://github.com/psf/black
-    rev: 24.10.0
-    hooks:
-      - id: black
-
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.1.1
-    hooks:
-      - id: flake8
+      - id: ruff-check
+        alias: ruff
+        args:
+          - "--fix"
+          - "--show-fixes"
+      - id: ruff-format
+        alias: ruff

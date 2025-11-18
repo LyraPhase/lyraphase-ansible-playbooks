@@ -14,9 +14,6 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from ansible_collections.ansible.netcommon.plugins.module_utils.network.common.facts.facts import (
-    FactsBase,
-)
 from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.facts.legacy.base import (
     Config,
     Default,
@@ -26,6 +23,8 @@ from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsens
 from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.facts.packages.packages import (
     PackagesFacts,
 )
+
+from ansible_collections.ansible.netcommon.plugins.module_utils.network.common.facts.facts import FactsBase
 
 FACT_LEGACY_SUBSETS = dict(default=Default, hardware=Hardware, config=Config)
 

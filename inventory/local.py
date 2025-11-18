@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+
+import argparse
+import json
+import sys
+from os import path
+
+import rpi
+
+sys.path.append(path.join(path.dirname(__file__), "lib/python/site-packages/"))
+
 """
 Ansible dynamic inventory experimentation
 
@@ -16,14 +26,6 @@ ANSIBLE_INV = {
     }
 }
 """
-
-import argparse
-import json
-import sys
-from os import path
-
-sys.path.append(path.join(path.dirname(__file__), "lib/python/site-packages/"))
-import rpi
 
 
 def output_list_inventory(json_output):

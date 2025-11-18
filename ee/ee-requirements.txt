@@ -3,3 +3,4 @@ ansible-runner
 pytz
 ansible-pylibssh
 ansible-lint
+debugpy
