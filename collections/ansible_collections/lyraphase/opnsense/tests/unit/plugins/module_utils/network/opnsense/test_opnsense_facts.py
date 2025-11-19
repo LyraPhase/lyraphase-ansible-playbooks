@@ -42,6 +42,14 @@ class TestOPNsenseFactsModule(TestOPNsenseModule):
     module = opnsense_facts
 
     def setUp(self):
+        self.mock_shell_get_capabilities = patch(
+            "ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.shell.get_capabilities"
+        )
+        self.shell_get_capabilities = self.mock_shell_get_capabilities.start()
+        self.shell_get_capabilities.return_value = {
+            "device_info": OPNsenseDeviceInfo.MOCK_DEVICE_INFO.copy(),
+        }
+
         super(TestOPNsenseFactsModule, self).setUp()
         self.mock_run_commands = patch(
             "ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.facts.legacy.base.run_commands",
@@ -57,11 +65,14 @@ class TestOPNsenseFactsModule(TestOPNsenseModule):
             "ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.facts.legacy.base.get_capabilities",
         )
         self.get_capabilities = self.mock_get_capabilities.start()
-        self.get_capabilities.return_value = OPNsenseDeviceInfo.MOCK_DEVICE_INFO.copy().update(
+        capabilities_return_value = OPNsenseDeviceInfo.MOCK_DEVICE_INFO.copy()
+        capabilities_return_value.update(
             {
-                "network_api": "cliconf",
+                "network_api": "ansible.netcommon.libssh",
+                "device_info": OPNsenseDeviceInfo.MOCK_DEVICE_INFO.copy(),
             }
         )
+        self.get_capabilities.return_value = capabilities_return_value
 
     def tearDown(self):
         super(TestOPNsenseFactsModule, self).tearDown()
