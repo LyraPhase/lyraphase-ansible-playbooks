@@ -63,7 +63,7 @@ def set_module_args(args):
         args["_ansible_remote_tmp"] = "/tmp"
     if "_ansible_keep_remote_files" not in args:
         args["_ansible_keep_remote_files"] = False
-
+    basic._ANSIBLE_PROFILE = "legacy"
     args = json.dumps({"ANSIBLE_MODULE_ARGS": args})
     log("Module args: %s" % to_text(args, errors="surrogate_then_replace"), 4)
     debug_stacktrace()
