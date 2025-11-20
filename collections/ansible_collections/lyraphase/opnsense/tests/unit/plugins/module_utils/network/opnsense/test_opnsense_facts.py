@@ -91,15 +91,23 @@ class TestOPNsenseFactsModule(TestOPNsenseModule):
 
         self.run_commands.side_effect = load_from_file
 
-    @unittest.skip("TODO: implement base facts + tests")
-    def test_opnsense_facts_base(self):
+    def test_opnsense_facts_platform_facts(self):
         set_module_args({"gather_subset": "default"})
         result = self.execute_module()
-        self.assertEqual(
-            result["ansible_facts"]["ansible_net_opnsense_edition"],
-            "opnsense-business",
-        )
-        self.assertEqual(result["ansible_facts"]["ansible_net_system"], "opnsense")
+        # self.log("Result: %s" % result, 4)
+        expected = {
+            "ansible_net_system": "opnsense",
+            "ansible_net_version": "24.4.3",
+            "ansible_net_freebsd_version": "13.2-RELEASE-p12",
+            "ansible_net_unbound_version": "1.20.0",
+            "ansible_net_hostname": "OPNsense.internal",
+            "ansible_net_api": "ansible.netcommon.libssh",
+            "ansible_net_python_version": "3.12.11",
+            "ansible_net_opnsense_edition": "opnsense-business",
+        }
+        for key, value in expected.items():
+            self.assertEqual(result["ansible_facts"][key], value)
+
 
     @unittest.skip("TODO: implement filesystems info facts + tests")
     def test_opnsense_facts_filesystems_info(self):
