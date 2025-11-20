@@ -57,11 +57,17 @@ class Default(FactsBase):
         self.facts.update(self.platform_facts())
         data = self.responses[0]
         if data and (not isinstance(data, Exception)):
-            product_data = json.loads(data)
-            self.facts["opnsense_edition"] = (
-                "opnsense-business" if "business" in product_data["product_id"] else "opnsense-community"
-            )
-            self.facts["product"] = product_data
+            # print("Product data: %s" % to_text(data, errors="surrogate_then_replace"))
+            try:
+                product_data = json.loads(data)
+                self.facts["opnsense_edition"] = (
+                    "opnsense-business" if "business" in product_data["product_id"] else "opnsense-community"
+                )
+                self.facts["product"] = product_data
+            except Exception as exc:
+                self.module.warn(
+                    "Unable to parse product information as JSON: %s" % to_text(exc),
+                )
             # self.facts["asatype"] = self.parse_asatype(data)
             # self.facts["serialnum"] = self.parse_serialnum(data)
             # self.parse_stacks(data)
