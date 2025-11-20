@@ -142,8 +142,11 @@ class TestOPNsenseFactsModule(TestOPNsenseModule):
 
     @unittest.skip("TODO: implement filesystems info facts + tests")
     def test_opnsense_facts_filesystems_info(self):
-        # TODO
+        # TODO: Gather FS facts
         pass
+        # "ansible_net_filesystems": ["/", "/var", "/tmp", "/usr", "/usr/local", "/home", "/boot/efi"],
+        # Current:
+        #   'ansible_net_filesystems': [], 'ansible_net_filesystems_info': {},
         set_module_args({"gather_subset": "hardware"})
         result = self.execute_module()
         self.assertEqual(
