@@ -52,8 +52,8 @@ from ansible_collections.ansible.netcommon.plugins.plugin_utils.terminal_base im
 
 class TerminalModule(TerminalBase):
     terminal_stdout_re = [
-        re.compile(rb"[\r\n]?[\w+\-\.:\/\[\]]+(?:[^\)]+){,3}[>#] ?$", re.MULTILINE),
-        re.compile(rb"\w+\@[\w\-\.]+:[^\]] ?[>#\$] ?$"),
+        re.compile(rb"^[\r\n]?[\w+\-\.:\/\[\]]+(?:[^\)]+){,3}[>#\?] ?", re.MULTILINE),
+        re.compile(rb"^\w+\@[\w\-\.]+:[^\]] ?[>#\$%] ?"),
     ]
 
     terminal_stderr_re = [
