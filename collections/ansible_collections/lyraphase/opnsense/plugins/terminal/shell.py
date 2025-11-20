@@ -42,6 +42,7 @@ import re
 
 from ansible.errors import AnsibleConnectionFailure
 
+
 try:
     from ansible.module_utils.common.text.converters import to_bytes, to_text
 except ImportError:
