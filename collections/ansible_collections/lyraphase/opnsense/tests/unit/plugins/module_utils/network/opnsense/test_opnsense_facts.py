@@ -108,6 +108,37 @@ class TestOPNsenseFactsModule(TestOPNsenseModule):
         for key, value in expected.items():
             self.assertEqual(result["ansible_facts"][key], value)
 
+    def test_opnsense_facts_product(self):
+        set_module_args({"gather_subset": "default"})
+        self.maxDiff = None
+        expected = {
+            "ansible_net_product": {
+                "product_abi": "24.4",
+                "product_arch": "amd64",
+                "product_check": None,
+                "product_copyright_owner": "Deciso B.V.",
+                "product_copyright_url": "https://www.deciso.com/",
+                "product_copyright_years": "2014-2024",
+                "product_email": "project@opnsense.org",
+                "product_hash": "deefa5e05",
+                "product_id": "opnsense-business",
+                "product_latest": "24.4.3",
+                "product_license": {"valid_to": "2026-05-06"},
+                "product_log": 1,
+                "product_mirror": "https://opnsense-update.deciso.com/${SUBSCRIPTION}/FreeBSD:13:amd64/24.4",
+                "product_name": "OPNsense",
+                "product_nickname": "Savvy Shark",
+                "product_repos": "OPNsense",
+                "product_series": "24.4",
+                "product_tier": "1",
+                "product_time": "Thu Sep 19 20:13:17 MDT 2024",
+                "product_version": "24.4.3",
+                "product_website": "https://opnsense.org/",
+            }
+        }
+        result = self.execute_module()
+        # self.log("Result: %s" % result, 4)
+        self.assertEqual(result["ansible_facts"]["ansible_net_product"], expected["ansible_net_product"])
 
     @unittest.skip("TODO: implement filesystems info facts + tests")
     def test_opnsense_facts_filesystems_info(self):
