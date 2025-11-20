@@ -149,17 +149,13 @@ class Hardware(FactsBase):
         data = self.responses[1]
         if data:
             if "sysctl: unknown oid" in data:
-                warnings.append(
-                    "Unable to gather amount of hardware total memory (hw.realmem)",
-                )
+                self._warn_hw_mem("hardware total", "hw.realmem")
             else:
                 if "hw.realmem:" in data:
                     (realmem_key, realmem_value) = data.split(":")
                     self.facts["hardware_realmem_mb"] = int(realmem_value.rstrip().lstrip()) // 1024 // 1024
                 else:
-                    warnings.append(
-                        "Unable to gather amount of hardware total memory (hw.realmem)",
-                    )
+                    self._warn_hw_mem("hardware total", "hw.realmem")
 
         data = self.responses[2]
         if data:
@@ -189,9 +185,7 @@ class Hardware(FactsBase):
                 if "fre" in data:
                     self.facts["memfree_mb"] = int(data.splitlines()[-1].split()[4]) // 1024
                 else:
-                    warnings.append(
-                        "Unable to gather amount of physical memory (hw.physmem)",
-                    )
+                    self._warn_hw_mem("physical", "hw.physmem")
 
     def parse_filesystems(self, data):
         return re.findall(r"^Directory of (\S+)/", data, re.M)
@@ -214,6 +208,11 @@ class Hardware(FactsBase):
                 facts[fs]["spacefree_kb"] = int(match.group(2)) / 1024
 
         return facts
+
+    def _warn_hw_mem(self, mem_type_str, sysctl_key):
+        self.warnings.append(
+            "Unable to gather amount of %s memory (%s)" % (mem_type_str, sysctl_key),
+        )
 
 
 class Packages(FactsBase):
