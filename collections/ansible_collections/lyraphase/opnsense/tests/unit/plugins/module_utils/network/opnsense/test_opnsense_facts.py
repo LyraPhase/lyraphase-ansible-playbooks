@@ -157,3 +157,14 @@ class TestOPNsenseFactsModule(TestOPNsenseModule):
             result["ansible_facts"]["ansible_net_filesystems_info"]["zroot"]["spacefree_kb"],
             201488732.0,
         )
+
+    def test_opnsense_facts_hardware(self):
+        set_module_args({"gather_subset": "hardware"})
+        result = self.execute_module()
+        expected = {
+            "ansible_net_memtotal_mb": 15740,
+            "ansible_net_memfree_mb": 9920,
+            "ansible_net_memused_mb": 5817,
+        }
+        for key, value in expected.items():
+            self.assertEqual(result["ansible_facts"][key], value)
