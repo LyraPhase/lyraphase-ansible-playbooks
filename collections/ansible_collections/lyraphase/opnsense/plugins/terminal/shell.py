@@ -1,5 +1,3 @@
-#!/usr/bin/python
-#
 # -*- coding: utf-8 -*-
 # Copyright 2025 LyraPhase LLC
 # Copyright 2025 James Cuzella (@trinitronx)
