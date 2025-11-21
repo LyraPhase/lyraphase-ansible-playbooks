@@ -24,6 +24,8 @@ class NetworkModule(AnsibleModule):
             connection = Connection(self._socket_path)
 
         self.connection = connection
+        if self.connection._network_os is None:
+            self.connection._network_os = "lyraphase.opnsense.shell"
 
     @property
     def provider(self):
@@ -44,4 +46,3 @@ class NetworkModule(AnsibleModule):
                 self._name.split(".")[-1],
                 connection_type,
             )
-
