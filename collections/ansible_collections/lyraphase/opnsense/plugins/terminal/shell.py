@@ -42,6 +42,7 @@ import re
 
 from ansible.errors import AnsibleConnectionFailure
 
+
 try:
     from ansible.module_utils.common.text.converters import to_bytes, to_text
 except ImportError:
@@ -52,8 +53,8 @@ from ansible_collections.ansible.netcommon.plugins.plugin_utils.terminal_base im
 
 class TerminalModule(TerminalBase):
     terminal_stdout_re = [
-        re.compile(rb"[\r\n]?[\w+\-\.:\/\[\]]+(?:[^\)]+){,3}[>#] ?$", re.MULTILINE),
-        re.compile(rb"\w+\@[\w\-\.]+:[^\]] ?[>#\$] ?$"),
+        re.compile(rb"\w+\@[\w\-\.]+:[^\]] ?[>#\$%] ?$"),
+        re.compile(rb"^[\r\n]?[\w+\-\.:\/\[\]@~ ]+[#%\$] ?(?:.*?[\r\n](?:[^>\)\?]*?)?[>#\?] ?)*", re.MULTILINE),
     ]
 
     terminal_stderr_re = [

@@ -1,0 +1,15 @@
+Filesystem                 Type    1024-blocks    Used     Avail Capacity  Mounted on
+zroot/ROOT/24.4.3          zfs       204105912 2586444 201519468     1%    /
+/dev/gpt/efifs             msdosfs      262129     887    261241     0%    /boot/efi
+zroot                      zfs       201519564      96 201519468     0%    /zroot
+zroot/tmp                  zfs       201549372   29904 201519468     0%    /tmp
+zroot/usr/src              zfs       201519564      96 201519468     0%    /usr/src
+zroot/usr/home             zfs       201519564      96 201519468     0%    /usr/home
+zroot/usr/ports            zfs       201519564      96 201519468     0%    /usr/ports
+zroot/var/tmp              zfs       201519564      96 201519468     0%    /var/tmp
+zroot/var/audit            zfs       201519564      96 201519468     0%    /var/audit
+zroot/var/log              zfs       204899500 3380032 201519468     2%    /var/log
+zroot/var/mail             zfs       201519620     152 201519468     0%    /var/mail
+zroot/var/crash            zfs       201519568     100 201519468     0%    /var/crash
+/usr/local/lib/python3.11  nullfs    204105912 2586444 201519468     1%    /var/unbound/usr/local/lib/python3.11
+/lib                       nullfs    204105912 2586444 201519468     1%    /var/unbound/lib

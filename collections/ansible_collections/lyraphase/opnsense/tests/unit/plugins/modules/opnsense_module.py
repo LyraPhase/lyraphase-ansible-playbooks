@@ -21,7 +21,7 @@ from ansible_collections.lyraphase.opnsense.tests.unit.plugins.modules.utils imp
 
 
 fixture_path = os.path.join(os.path.dirname(__file__), "fixtures")
-fixture_data = {}
+fixture_data: dict = {}
 
 
 def load_fixture(name):
@@ -33,11 +33,21 @@ def load_fixture(name):
     with open(path) as f:
         data = f.read()
 
-    try:
-        data = json.loads(data)
-    except Exception:
-        pass
+    fixture_data[path] = data
+    return data
 
+
+def load_json_fixture(name):
+    path = os.path.join(fixture_path, "".join(name, ".json"))
+    if path in fixture_data:
+        return fixture_data[path]
+
+    with open(path) as f:
+        data = f.read()
+    # Some commands will return JSON, and our module code expects to call
+    # json.loads() internally
+    # If needed, implement this as a separate method for specific .json fixtures
+    data = json.loads(data)
     fixture_data[path] = data
     return data
 
