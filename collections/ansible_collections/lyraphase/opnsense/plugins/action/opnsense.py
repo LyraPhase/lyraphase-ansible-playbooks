@@ -39,11 +39,11 @@ class ActionModule(ActionNetworkModule):
 
         module_name = self._task.action.split(".")[-1]
         # TODO: remove config modules
-        self._config_module = True if module_name in ["asa_config", "config"] else False
+        self._config_module = True if module_name in ["opnsense_config", "config"] else False
         persistent_connection = self._play_context.connection.split(".")[-1]
         warnings = []
 
-        if persistent_connection not in ("network_cli"):
+        if persistent_connection not in ("network_cli", "libssh"):
             return {
                 "failed": True,
                 "msg": "Connection type %s is not valid for this module" % self._play_context.connection,
