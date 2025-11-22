@@ -14,11 +14,11 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 
-from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.facts.legacy.base import (
+from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.facts.legacy.base import ( # pylint: disable=unused-import
     Config,
     Default,
     Hardware,
-    Packages,
+    Packages, # pylint: disable=unused-import
 )
 from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.facts.packages.packages import (
     PackagesFacts,
