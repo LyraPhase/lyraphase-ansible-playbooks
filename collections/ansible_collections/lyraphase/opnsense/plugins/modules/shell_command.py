@@ -6,22 +6,7 @@
 
 from __future__ import absolute_import, division, print_function
 
-import time
-
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import string_types
-from ansible_collections.ansible.netcommon.plugins.module_utils.network.common.parsing import (
-    Conditional,
-)
-from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.shell import (
-    check_args,
-    run_commands,
-    shell_argument_spec,
-)
-
-
 __metaclass__ = type
-
 
 DOCUMENTATION = """
 module: shell_command
@@ -36,6 +21,7 @@ description:
 version_added: 1.0.0
 extends_documentation_fragment:
 - lyraphase.opnsense.become
+- lyraphase.opnsense.shell_opts
 options:
   commands:
     description:
@@ -91,6 +77,21 @@ notes:
   match (like the Python I(in) operator).  The I(matches) operator searches
   using a regex search operation.
 """
+
+
+import time
+
+from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.six import string_types
+from ansible_collections.ansible.netcommon.plugins.module_utils.network.common.parsing import (
+    Conditional,
+)
+from ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.shell import (
+    check_args,
+    run_commands,
+    shell_argument_spec,
+)
+
 
 EXAMPLES = """
 - name: Show the OPNsense version

@@ -25,6 +25,19 @@ __metaclass__ = type
 
 from ansible_collections.ansible.netcommon.plugins.action.network import ActionModule as ActionNetworkModule
 
+DOCUMENTATION = """
+---
+author: James Cuzella (@trinitronx)
+name: shell
+short_description: Use opnsense shell to run command on the OPNsense platform
+description:
+- This opnsense plugin provides low level action module apis for running the modules
+  in the C(lyraphase.opnsense) collection.
+version_added: 1.0.0
+extends_documentation_fragment:
+- lyraphase.opnsense.action_shell
+"""
+
 
 class ActionModule(ActionNetworkModule):
     def run(self, tmp=None, task_vars=None):

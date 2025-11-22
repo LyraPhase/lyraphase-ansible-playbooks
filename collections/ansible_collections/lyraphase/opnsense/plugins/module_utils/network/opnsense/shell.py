@@ -51,8 +51,26 @@ _CONNECTION = None
 command_spec = {"command": {"key": True}, "prompt": {}, "answer": {}}
 
 shell_argument_spec = {
-    "opnsense_shell_option": {"type": "str"},
-    "passwords": {"type": "bool"},
+    "opnsense_shell_option": {
+        "type": "str",
+        "default": "shell",
+        "choices": [
+            "shell",
+            "logout",
+            "assign_interfaces",
+            "set_interface_ip",
+            "reset_root_password",
+            "reset_to_factory_defaults",
+            "power_off",
+            "reboot",
+            "ping",
+            "pftop",
+            "firewall_log",
+            "reload_services",
+            "update",
+            "restore_backup",
+        ],
+    },
 }
 
 

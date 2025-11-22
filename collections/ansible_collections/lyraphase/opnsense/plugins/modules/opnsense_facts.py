@@ -27,7 +27,7 @@ __metaclass__ = type
 
 
 DOCUMENTATION = """
-module: facts
+module: opnsense_facts
 author:
 - James Cuzella (@trinitronx)
 short_description: Collect facts from remote devices running OPNsense
@@ -41,6 +41,7 @@ description:
 version_added: 1.0.0
 extends_documentation_fragment:
 - lyraphase.opnsense.become
+- lyraphase.opnsense.shell_opts
 notes:
 - Tested against OPNsense 24.4.3
 options:
@@ -65,6 +66,12 @@ options:
     required: false
     type: list
     elements: str
+  passwords:
+    description:
+    - Saves config.xml passwords in clear-text when set to `True`.
+      Defaults to `False`
+    default: False
+    type: bool
 """
 
 EXAMPLES = """
