@@ -1,5 +1,3 @@
-#!/usr/bin/python
-#
 # -*- coding: utf-8 -*-
 # Copyright 2025 LyraPhase LLC
 # Copyright 2025 James Cuzella (@trinitronx)
@@ -21,6 +19,7 @@
 # If not, see <http://www.gnu.org/licenses/>.
 #
 from __future__ import absolute_import, division, print_function
+
 
 __metaclass__ = type
 

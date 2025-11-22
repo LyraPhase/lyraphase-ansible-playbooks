@@ -1,0 +1,10 @@
+---
+testcase: "*"
+test_items: []
+# ansible_network_os: lyraphase.opnsense.shell
+# ansible_ssh_user: root
+# ansible_ssh_pass:
+# ansible_terminal_initial_prompt:
+#   - "^Enter an option: ?"
+# ansible_terminal_initial_answer:
+#   - "8"

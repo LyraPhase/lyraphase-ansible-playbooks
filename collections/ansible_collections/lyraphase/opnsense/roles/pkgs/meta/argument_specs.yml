@@ -36,7 +36,7 @@ argument_specs:
             authenticate, a CA file to verify against, or an
             `api_credential_file` used to authenticate with the OPNsense
             firewall's API.
-          - API key + secret Sub-options are set as ‘no_log’ parameters.
+          - API key + secret Sub-options are set as `no_log` parameters.
           - "Required: `false`"
         type: dict
         required_together:
@@ -57,9 +57,9 @@ argument_specs:
             default: null
           api_key:
             description:
-              - API key used to authenticate, alternative to ‘api_credential_file’.
-              - Is set as ‘no_log’ parameter.
-              - "Required: `false`, `true` if ‘api_credential_file’ is not used"
+              - API key used to authenticate, alternative to `api_credential_file`.
+              - Is set as `no_log` parameter.
+              - "Required: `false`, `true` if `api_credential_file` is not used"
             type: str
             default: null
             no_log: true
@@ -69,8 +69,8 @@ argument_specs:
               - ["api_key", "api_credential_file"]
           api_secret:
             description:
-              - API secret used to authenticate, alternative to ‘api_credential_file’.
-              - Is set as ‘no_log’ parameter.
+              - API secret used to authenticate, alternative to `api_credential_file`.
+              - Is set as `no_log` parameter.
             type: str
             default: null
             no_log: true
@@ -82,7 +82,7 @@ argument_specs:
             description:
               - Path to the api-credential file as downloaded through the
                 web-interface.
-              - Alternative to ‘api_key’ and ‘api_secret’
+              - Alternative to `api_key` and `api_secret`
             type: path
             default: null
             mutually_exclusive:

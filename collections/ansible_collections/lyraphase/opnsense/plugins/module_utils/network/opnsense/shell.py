@@ -33,7 +33,12 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 import json
 
-from ansible.module_utils._text import to_text
+
+try:
+    from ansible.module_utils.common.text.converters import to_text
+except ImportError:
+    from ansible.module_utils._text import to_text
+
 from ansible.module_utils.connection import Connection, ConnectionError, exec_command
 from ansible_collections.ansible.netcommon.plugins.module_utils.network.common.utils import (
     EntityCollection,
@@ -46,8 +51,26 @@ _CONNECTION = None
 command_spec = {"command": {"key": True}, "prompt": {}, "answer": {}}
 
 shell_argument_spec = {
-    "opnsense_shell_option": {"type": "str"},
-    "passwords": {"type": "bool"},
+    "opnsense_shell_option": {
+        "type": "str",
+        "default": "shell",
+        "choices": [
+            "shell",
+            "logout",
+            "assign_interfaces",
+            "set_interface_ip",
+            "reset_root_password",
+            "reset_to_factory_defaults",
+            "power_off",
+            "reboot",
+            "ping",
+            "pftop",
+            "firewall_log",
+            "reload_services",
+            "update",
+            "restore_backup",
+        ],
+    },
 }
 
 
@@ -74,13 +97,14 @@ def get_connection(module):
 
 
 def get_capabilities(module):
+    module.debug("inside get_capabilities")
     if hasattr(module, "_shell_capabilities"):
         return module._shell_capabilities
     try:
         capabilities = Connection(module._socket_path).get_capabilities()
-        module.debug("Capabilities: %s" % to_text(capabilities, errors="surrogate_then_replace"))
     except ConnectionError as exc:
         module.fail_json(msg=to_text(exc, errors="surrogate_then_replace"))
+    module.debug("Capabilities: %s" % to_text(capabilities, errors="surrogate_then_replace"))
     module._shell_capabilities = json.loads(capabilities)
 
     return module._shell_capabilities

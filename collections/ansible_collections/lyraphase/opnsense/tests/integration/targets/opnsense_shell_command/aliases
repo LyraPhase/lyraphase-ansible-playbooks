@@ -1,0 +1,4 @@
+context/controller/group1
+gather_facts/no
+env/set/ANSIBLE_HOST_KEY_AUTO_ADD/True
+env/set/ANSIBLE_HOST_KEY_CHECKING/False

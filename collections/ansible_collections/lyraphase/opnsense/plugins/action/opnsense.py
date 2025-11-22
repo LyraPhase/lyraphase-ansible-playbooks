@@ -1,5 +1,3 @@
-#!/usr/bin/python
-#
 # -*- coding: utf-8 -*-
 # Copyright 2025 LyraPhase LLC
 # Copyright 2025 James Cuzella (@trinitronx)
@@ -22,14 +20,23 @@
 #
 from __future__ import absolute_import, division, print_function
 
-__metaclass__ = type
 
-from ansible.module_utils.common.text.converters import to_text
-from ansible.utils.display import Display
+__metaclass__ = type
 
 from ansible_collections.ansible.netcommon.plugins.action.network import ActionModule as ActionNetworkModule
 
-display = Display()
+DOCUMENTATION = """
+---
+author: James Cuzella (@trinitronx)
+name: shell
+short_description: Use opnsense shell to run command on the OPNsense platform
+description:
+- This opnsense plugin provides low level action module apis for running the modules
+  in the C(lyraphase.opnsense) collection.
+version_added: 1.0.0
+extends_documentation_fragment:
+- lyraphase.opnsense.action_shell
+"""
 
 
 class ActionModule(ActionNetworkModule):
@@ -45,18 +52,11 @@ class ActionModule(ActionNetworkModule):
 
         module_name = self._task.action.split(".")[-1]
         # TODO: remove config modules
-        self._config_module = True if module_name in ["asa_config", "config"] else False
+        self._config_module = True if module_name in ["opnsense_config", "config"] else False
         persistent_connection = self._play_context.connection.split(".")[-1]
         warnings = []
 
-        display.vvvv(
-            "config module: %s" % to_text(self._config_module, errors="surrogate_then_replace"),
-        )
-        display.vvvv(
-            "persistent_connection: %s" % to_text(persistent_connection, errors="surrogate_then_replace"),
-        )
-
-        if persistent_connection not in ("network_cli"):
+        if persistent_connection not in ("network_cli", "libssh"):
             return {
                 "failed": True,
                 "msg": "Connection type %s is not valid for this module" % self._play_context.connection,

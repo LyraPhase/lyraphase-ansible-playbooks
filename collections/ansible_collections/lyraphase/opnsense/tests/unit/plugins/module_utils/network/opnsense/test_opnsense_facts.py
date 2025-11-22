@@ -43,7 +43,7 @@ class TestOPNsenseFactsModule(TestOPNsenseModule):
 
     def setUp(self):
         self.mock_shell_get_capabilities = patch(
-            "ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.shell.get_capabilities"
+            "ansible_collections.lyraphase.opnsense.plugins.module_utils.network.opnsense.shell.get_capabilities",
         )
         self.shell_get_capabilities = self.mock_shell_get_capabilities.start()
         self.shell_get_capabilities.return_value = {
@@ -70,7 +70,7 @@ class TestOPNsenseFactsModule(TestOPNsenseModule):
             {
                 "network_api": "ansible.netcommon.libssh",
                 "device_info": OPNsenseDeviceInfo.MOCK_DEVICE_INFO.copy(),
-            }
+            },
         )
         self.get_capabilities.return_value = capabilities_return_value
 
@@ -134,7 +134,7 @@ class TestOPNsenseFactsModule(TestOPNsenseModule):
                 "product_time": "Thu Sep 19 20:13:17 MDT 2024",
                 "product_version": "24.4.3",
                 "product_website": "https://opnsense.org/",
-            }
+            },
         }
         result = self.execute_module()
         # self.log("Result: %s" % result, 4)
