@@ -1,0 +1,23 @@
+---
+- ansible.builtin.debug:
+    msg: "START cli/not_config_facts.yaml on connection={{ ansible_connection
+      }}"
+
+- name: test not config
+  register: result
+  lyraphase.opnsense.opnsense_facts:
+    gather_subset:
+      - "!config"
+
+- assert:
+    that:
+      - result.changed == false
+      - "'config' not in result.ansible_facts.ansible_net_gather_subset"
+      - "'default' in result.ansible_facts.ansible_net_gather_subset"
+      - "'hardware' in result.ansible_facts.ansible_net_gather_subset"
+      - result.ansible_facts.ansible_net_filesystems is defined
+      - result.ansible_facts.ansible_net_filesystems_info is defined
+
+- ansible.builtin.debug:
+    msg: "END cli/not_config_facts.yaml on connection={{ ansible_connection
+      }}"
