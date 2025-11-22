@@ -39,6 +39,8 @@ extends_documentation_fragment:
 import json
 import re
 
+from typing import Pattern
+
 from ansible.errors import AnsibleConnectionFailure
 
 
@@ -51,12 +53,21 @@ from ansible_collections.ansible.netcommon.plugins.plugin_utils.terminal_base im
 
 
 class TerminalModule(TerminalBase):
-    terminal_stdout_re = [
+    #: terminal initial prompt
+    # terminal_initial_prompt: list[Pattern[bytes]] = [re.compile(rb"^Enter an option: ?", re.MULTILINE)]
+
+    #: terminal initial answer
+    # terminal_initial_answer: list[Pattern[bytes]] = [to_bytes("8", "utf-8", errors="surrogate_or_strict")]
+
+    #: Send newline after prompt match
+    # terminal_inital_prompt_newline: bool = True
+
+    terminal_stdout_re: list[Pattern[bytes]] = [
         re.compile(rb"\w+\@[\w\-\.]+:[^\]] ?[>#\$%] ?$"),
         re.compile(rb"^[\r\n]?[\w+\-\.:\/\[\]@~ ]+[#%\$] ?(?:.*?[\r\n](?:[^>\)\?]*?)?[>#\?] ?)*", re.MULTILINE),
     ]
 
-    terminal_stderr_re = [
+    terminal_stderr_re: list[Pattern[bytes]] = [
         re.compile(rb"error:", re.I),
         re.compile(rb"Permission denied, please try again\."),
         re.compile(
@@ -71,12 +82,26 @@ class TerminalModule(TerminalBase):
     # terminal_config_prompt = re.compile(r"^.+\(config(-.*)?\)#$")
 
     def on_open_shell(self):
+        """Called after the SSH session is established
+
+        This method is called right after the invoke_shell() is called from
+        the Paramiko SSHClient instance.  It provides an opportunity to setup
+        terminal parameters such as disbling paging for instance.
+        """
+        # if self.terminal_initial_prompt.match(self._get_prompt().strip()):
+        # to_opnsense_shell_answer()
+        # self._exec_cli_command(self.terminal_initial_answer)
         if self._get_prompt().strip().endswith(b"#"):
             self.disable_pager()
+        try:
+            cmd = b"stty cols 511 rows 94"
+            self._exec_cli_command(cmd)
+        except AnsibleConnectionFailure:
+            raise AnsibleConnectionFailure("unable to set terminal parameters")
 
     def disable_pager(self):
         try:
-            self._exec_cli_command("no terminal pager")
+            self._exec_cli_command("unset PAGER")
         except AnsibleConnectionFailure:
             raise AnsibleConnectionFailure("unable to disable terminal pager")
 
@@ -84,12 +109,14 @@ class TerminalModule(TerminalBase):
         if self._get_prompt().strip().endswith(b"#"):
             return
 
-        cmd = {"command": "enable"}
+        cmd = {"command": "sudo"}
+        # TODO: Figure out network_cli become structure
+        # cmd = "sudo"
         if passwd:
             # Note: python-3.5 cannot combine u"" and r"" together.  Thus make
             # an r string and use to_text to ensure it's text on both py2 and py3.
             cmd["prompt"] = to_text(
-                r"[\r\n]?[Pp]assword: $",
+                r"^[\r\n]?[Pp]assword: ?$",
                 errors="surrogate_or_strict",
             )
             cmd["answer"] = passwd
