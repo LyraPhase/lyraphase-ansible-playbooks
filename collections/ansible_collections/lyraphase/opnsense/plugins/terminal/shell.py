@@ -109,7 +109,9 @@ class TerminalModule(TerminalBase):
         if self._get_prompt().strip().endswith(b"#"):
             return
 
-        cmd = {"command": "enable"}
+        cmd = {"command": "sudo"}
+        # TODO: Figure out network_cli become structure
+        # cmd = "sudo"
         if passwd:
             # Note: python-3.5 cannot combine u"" and r"" together.  Thus make
             # an r string and use to_text to ensure it's text on both py2 and py3.
