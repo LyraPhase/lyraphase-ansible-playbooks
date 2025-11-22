@@ -1,0 +1,52 @@
+---
+- delegate_to: localhost
+  ansible.builtin.debug:
+    msg: "START cli/output.yaml"
+
+- name: get output for single command
+  # network_os: lyraphase.opnsense.shell
+  # vars:
+  #   ansible_ssh_user: root
+  register: result
+  lyraphase.opnsense.shell_command:
+    commands:
+      - whoami
+
+- assert:
+    that:
+      - result.changed == false
+      - result.stdout is defined
+
+- name: get output for multiple commands
+  # network_os: lyraphase.opnsense.shell
+  register: result
+  lyraphase.opnsense.shell_command:
+    commands:
+      - whoami
+      - opnsense-version -v
+
+- assert:
+    that:
+      - result.changed == false
+      - result.stdout is defined
+      - result.stdout | length >= 2
+
+- name: test become
+  register: result
+  lyraphase.opnsense.shell_command:
+    commands:
+      - whoami
+  vars:
+    ansible_become: true
+    ansible_become_method: sudo
+    ansible_become_user: root
+
+- assert:
+    that:
+      - result.changed == false
+      - result.stdout is defined
+      - result.stdout[0] == "root"
+
+- delegate_to: localhost
+  ansible.builtin.debug:
+    msg: "END cli/output.yaml"
