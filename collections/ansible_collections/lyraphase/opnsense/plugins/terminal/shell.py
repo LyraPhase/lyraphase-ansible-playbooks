@@ -89,7 +89,7 @@ class TerminalModule(TerminalBase):
             # Note: python-3.5 cannot combine u"" and r"" together.  Thus make
             # an r string and use to_text to ensure it's text on both py2 and py3.
             cmd["prompt"] = to_text(
-                r"[\r\n]?[Pp]assword: $",
+                r"^[\r\n]?[Pp]assword: ?$",
                 errors="surrogate_or_strict",
             )
             cmd["answer"] = passwd
