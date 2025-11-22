@@ -82,8 +82,22 @@ class TerminalModule(TerminalBase):
     # terminal_config_prompt = re.compile(r"^.+\(config(-.*)?\)#$")
 
     def on_open_shell(self):
+        """Called after the SSH session is established
+
+        This method is called right after the invoke_shell() is called from
+        the Paramiko SSHClient instance.  It provides an opportunity to setup
+        terminal parameters such as disbling paging for instance.
+        """
+        # if self.terminal_initial_prompt.match(self._get_prompt().strip()):
+        # to_opnsense_shell_answer()
+        # self._exec_cli_command(self.terminal_initial_answer)
         if self._get_prompt().strip().endswith(b"#"):
             self.disable_pager()
+        try:
+            cmd = b"stty cols 511 rows 94"
+            self._exec_cli_command(cmd)
+        except AnsibleConnectionFailure:
+            raise AnsibleConnectionFailure("unable to set terminal parameters")
 
     def disable_pager(self):
         try:
