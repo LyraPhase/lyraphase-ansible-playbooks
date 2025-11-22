@@ -19,7 +19,7 @@ from ansible.module_utils.common.network import is_masklen, to_netmask
 
 if sys.version_info >= (2, 7):
     # TODO: Remove unused util functions
-    from ansible.module_utils.six import iteritems # pylint: disable=ansible-bad-import-from
+    from ansible.module_utils.six import iteritems  # pylint: disable=ansible-bad-import-from
 
 
 def remove_duplicate_cmd(cmd, commands):

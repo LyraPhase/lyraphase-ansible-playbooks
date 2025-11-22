@@ -8,10 +8,15 @@ from __future__ import absolute_import, division, print_function
 __metaclass__ = type
 
 import json
+import sys
 
 from threading import RLock
 
-from ansible.module_utils.six import itervalues
+
+if sys.version_info >= (2, 7):
+    # TODO: Remove unused providers stuff (if any)
+    from ansible.module_utils.six import itervalues  # pylint: disable=ansible-bad-import-from
+
 from ansible_collections.ansible.netcommon.plugins.module_utils.network.common.config import (
     NetworkConfig,
 )

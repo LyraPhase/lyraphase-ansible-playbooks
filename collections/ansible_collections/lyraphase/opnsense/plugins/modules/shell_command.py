@@ -6,6 +6,7 @@
 
 from __future__ import absolute_import, division, print_function
 
+
 __metaclass__ = type
 
 DOCUMENTATION = """
@@ -82,7 +83,7 @@ notes:
 import time
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six import string_types
+from ansible.module_utils.six import string_types  # pylint: disable=ansible-bad-import-from
 from ansible_collections.ansible.netcommon.plugins.module_utils.network.common.parsing import (
     Conditional,
 )
