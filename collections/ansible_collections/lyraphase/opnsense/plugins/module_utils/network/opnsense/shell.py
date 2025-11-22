@@ -97,13 +97,14 @@ def get_connection(module):
 
 
 def get_capabilities(module):
+    module.debug("inside get_capabilities")
     if hasattr(module, "_shell_capabilities"):
         return module._shell_capabilities
     try:
         capabilities = Connection(module._socket_path).get_capabilities()
-        module.debug("Capabilities: %s" % to_text(capabilities, errors="surrogate_then_replace"))
     except ConnectionError as exc:
         module.fail_json(msg=to_text(exc, errors="surrogate_then_replace"))
+    module.debug("Capabilities: %s" % to_text(capabilities, errors="surrogate_then_replace"))
     module._shell_capabilities = json.loads(capabilities)
 
     return module._shell_capabilities
