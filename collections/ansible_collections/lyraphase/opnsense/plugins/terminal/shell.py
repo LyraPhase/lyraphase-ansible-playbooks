@@ -39,6 +39,8 @@ extends_documentation_fragment:
 import json
 import re
 
+from typing import Pattern
+
 from ansible.errors import AnsibleConnectionFailure
 
 
@@ -51,12 +53,21 @@ from ansible_collections.ansible.netcommon.plugins.plugin_utils.terminal_base im
 
 
 class TerminalModule(TerminalBase):
-    terminal_stdout_re = [
+    #: terminal initial prompt
+    # terminal_initial_prompt: list[Pattern[bytes]] = [re.compile(rb"^Enter an option: ?", re.MULTILINE)]
+
+    #: terminal initial answer
+    # terminal_initial_answer: list[Pattern[bytes]] = [to_bytes("8", "utf-8", errors="surrogate_or_strict")]
+
+    #: Send newline after prompt match
+    # terminal_inital_prompt_newline: bool = True
+
+    terminal_stdout_re: list[Pattern[bytes]] = [
         re.compile(rb"\w+\@[\w\-\.]+:[^\]] ?[>#\$%] ?$"),
         re.compile(rb"^[\r\n]?[\w+\-\.:\/\[\]@~ ]+[#%\$] ?(?:.*?[\r\n](?:[^>\)\?]*?)?[>#\?] ?)*", re.MULTILINE),
     ]
 
-    terminal_stderr_re = [
+    terminal_stderr_re: list[Pattern[bytes]] = [
         re.compile(rb"error:", re.I),
         re.compile(rb"Permission denied, please try again\."),
         re.compile(
