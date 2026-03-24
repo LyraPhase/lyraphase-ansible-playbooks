@@ -4,7 +4,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 on: # yamllint disable-line rule:truthy
-  pull_request_target:
+  # Use pull_request rather than pull_request_target to avoid exposing secrets
+  # other than the ReadOnly GITHUB_TOKEN
+  pull_request:
     types: [opened, labeled, unlabeled, synchronize]
 jobs:
   check_label:
